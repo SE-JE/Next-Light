@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { ReactNode, useState } from "react";
 import { sidebarItem, sidebarProps } from "./sidebar.props";
 import clsx from "clsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/router";
-import { useToggleContext } from "@/context/ToogleContext";
+import { useToggleContext } from "@/context/ToggleContext";
 import Link from "next/link";
 
 function ListWrapper({
@@ -23,12 +23,11 @@ function ListWrapper({
   }
 }
 
-export default function SidebarComponent({
+export function SidebarComponent({
   head,
   items,
   basePath,
   toggle,
-  children,
   onChange,
   hasAccess,
   className,
@@ -70,9 +69,10 @@ export default function SidebarComponent({
   };
 
   const cekActive = (path: string) => {
-    const activePath = router.asPath?.split("?")[0];
+    const activePath =
+      router.asPath?.split("?")[0]?.replace(`${basePath || ""}`, "") || "/";
 
-    const currentPath = `${basePath || ""}${path ? `${path}` : ""}`;
+    const currentPath = `${path ? `${path}` : ""}`;
 
     const isPrefix = (longer: string, shorter: string): boolean => {
       return (
@@ -102,14 +102,15 @@ export default function SidebarComponent({
               <>
                 <div className="px-2 pt-2">
                   <div
-                    className={`flex justify-between items-center cursor-pointer text-light-foreground py-2 ${
-                      menu_head?.collapse && "cursor-pointer"
-                    }`}
+                    className={clsx(
+                      `flex justify-between items-center cursor-pointer text-light-foreground py-2 text-xs uppercase ${
+                        menu_head?.collapse && "cursor-pointer"
+                      }`,
+                      className?.headList
+                    )}
                     onClick={() => setShow(String(menu_head_key))}
                   >
-                    <label className="text-xs uppercase">
-                      {menu_head?.label}
-                    </label>
+                    <label>{menu_head?.label}</label>
                     {menu_head.collapse && (
                       <FontAwesomeIcon
                         icon={faChevronDown}
@@ -131,17 +132,22 @@ export default function SidebarComponent({
                         <>
                           <ListWrapper
                             key={`${menu_head_key}.${menu_key}`}
-                            path={menu?.path || ""}
+                            path={
+                              menu?.path ? `${basePath || ""}${menu?.path}` : ""
+                            }
                             onClick={() =>
                               setShow(`${menu_head_key}.${menu_key}`)
                             }
                           >
                             <div
-                              className={`flex items-center justify-between px-2 py-2 gap-2 transition-colors duration-300 transform hover:text-primary cursor-pointer transition-none ${
-                                menu?.path && cekActive(menu?.path || "")
-                                  ? "text-primary border-l-2 border-primary pl-4"
-                                  : ""
-                              }`}
+                              className={clsx(
+                                `flex items-center justify-between px-2 py-2 gap-2 transition-colors duration-300 transform hover:text-primary cursor-pointer transition-none ${
+                                  menu?.path && cekActive(menu?.path || "")
+                                    ? "text-primary border-l-2 border-primary pl-4"
+                                    : ""
+                                }`,
+                                className?.menuList
+                              )}
                             >
                               <div className="flex gap-2 items-center">
                                 {menu?.left_content}
@@ -182,12 +188,15 @@ export default function SidebarComponent({
                                         }
                                       >
                                         <div
-                                          className={`flex items-center justify-between px-2 py-2 gap-2 transition-colors duration-300 transform hover:text-primary cursor-pointer transition-none ${
-                                            menu?.path &&
-                                            cekActive(menu?.path || "")
-                                              ? "text-primary border-l-2 border-primary pl-4"
-                                              : ""
-                                          }`}
+                                          className={clsx(
+                                            `flex items-center justify-between px-2 py-2 gap-2 transition-colors duration-300 transform hover:text-primary cursor-pointer transition-none ${
+                                              menu?.path &&
+                                              cekActive(menu?.path || "")
+                                                ? "text-primary border-l-2 border-primary pl-4"
+                                                : ""
+                                            }`,
+                                            className?.childList
+                                          )}
                                         >
                                           <div className="flex gap-2 items-center">
                                             {menu?.left_content}
@@ -226,5 +235,11 @@ export default function SidebarComponent({
         </nav>
       </aside>
     </>
+  );
+}
+
+export function SidebarContentComponent({ children }: { children: ReactNode }) {
+  return (
+    <main className="w-[calc(100vw-256px)] overflow-x-hidden">{children}</main>
   );
 }

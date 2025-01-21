@@ -24,5 +24,8 @@ export type sidebarProps = {
   onChange?: () => void;
   className?: {
     container?: string;
+    headList?: string;
+    menuList?: string;
+    childList?: string;
   };
 };
