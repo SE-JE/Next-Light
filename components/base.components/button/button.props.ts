@@ -1,18 +1,15 @@
+import { ReactNode } from "react";
+
 export type buttonProps = {
-  type?: 'submit' | 'button';
-  label: string;
-  variant?: 'solid' | 'outline' | 'light' | 'simple';
-  paint?: 'primary' | 'secondary' | 'success' | 'danger' | 'warning';
-  customPaint?: {
-    bg?: string;
-    color?: string;
-    border?: string;
-  };
+  type?: "submit" | "button";
+  label: string | ReactNode;
+  variant?: "solid" | "outline" | "light" | "simple";
+  paint?: "primary" | "secondary" | "success" | "danger" | "warning";
   rounded?: boolean | string;
   block?: boolean;
   className?: string;
   disabled?: boolean;
-  size?: 'xs' | 'sm' | 'md' | 'lg';
+  size?: "xs" | "sm" | "md" | "lg";
   onClick?: any;
   icon?: any;
   loading?: boolean;
@@ -21,9 +18,9 @@ export type buttonProps = {
 
 export type iconButtonProps = {
   icon: any;
-  type?: 'submit' | 'button';
-  variant?: 'solid' | 'outline' | 'light' | 'simple';
-  paint?: 'primary' | 'secondary' | 'success' | 'danger' | 'warning';
+  type?: "submit" | "button";
+  variant?: "solid" | "outline" | "light" | "simple";
+  paint?: "primary" | "secondary" | "success" | "danger" | "warning";
   customPaint?: {
     bg?: string;
     color?: string;
@@ -32,7 +29,7 @@ export type iconButtonProps = {
   rounded?: boolean | string;
   className?: string;
   disabled?: boolean;
-  size?: 'xs' | 'sm' | 'md' | 'lg';
+  size?: "xs" | "sm" | "md" | "lg";
   onClick?: any;
   loading?: boolean;
   hover?: boolean;

@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { sidebarItem, sidebarProps } from "./sidebar.props";
 import clsx from "clsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -44,28 +44,22 @@ export function SidebarComponent({
     );
   };
 
-  const checkShow = (key: string, nestedItems?: sidebarItem[]): boolean => {
+  const checkShow = (key: string): boolean => {
     if (shows?.includes(key)) {
       return true;
     }
 
-    return (
-      nestedItems?.some((item) => {
-        const activePath = router.asPath?.split("?")[0];
-        const currentPath = `${basePath || ""}${
-          item.path ? `/${item.path}` : ""
-        }`;
+    return false;
 
-        if (
-          currentPath === activePath ||
-          getActive(`sidebar_${basePath}`) === item.path
-        ) {
-          return true;
-        }
+    // return (
+    //   nestedItems?.some((item) => {
+    //     if (item?.path && cekActive(item?.path || "")) {
+    //       return true;
+    //     }
 
-        return item.items ? checkShow(key, item.items) : false;
-      }) ?? false
-    );
+    //     return item.items ? checkShow(key, item.items) : false;
+    //   }) ?? false
+    // );
   };
 
   const cekActive = (path: string) => {
@@ -86,6 +80,21 @@ export function SidebarComponent({
     );
   };
 
+  useEffect(() => {
+    items?.map((head, head_key) => {
+      head?.items?.map((menu, key) => {
+        if (menu?.path && cekActive(menu?.path || "")) {
+          setShow(`${head_key}`);
+        }
+        menu?.items?.map((child) => {
+          if (child?.path && cekActive(child?.path || "")) {
+            setShow(`${head_key}.${key}`);
+          }
+        });
+      });
+    });
+  }, []);
+
   return (
     <>
       <aside
@@ -103,24 +112,19 @@ export function SidebarComponent({
                 <div className="px-2 pt-2">
                   <div
                     className={clsx(
-                      `flex justify-between items-center cursor-pointer text-light-foreground py-2 text-xs uppercase ${
+                      `flex justify-between items-center text-light-foreground py-2 text-xs uppercase ${
                         menu_head?.collapse && "cursor-pointer"
                       }`,
                       className?.headList
                     )}
                     onClick={() => setShow(String(menu_head_key))}
                   >
-                    <label>{menu_head?.label}</label>
+                    <div>{menu_head?.label}</div>
                     {menu_head.collapse && (
                       <FontAwesomeIcon
                         icon={faChevronDown}
                         className={`text-xs
-                            ${
-                              checkShow(
-                                String(menu_head_key),
-                                menu_head?.items
-                              ) && "rotate-180"
-                            }
+                            ${checkShow(String(menu_head_key)) && "rotate-180"}
                           `}
                       />
                     )}

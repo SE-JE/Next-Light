@@ -4,7 +4,7 @@ import ExampleLayout from "./_layout";
 export default function Example() {
   return (
     <>
-      <div className="text-2xl">
+      <div>
         <p className="text-xl">Dashboard</p>
       </div>
     </>
