@@ -28,6 +28,7 @@ export function SidebarComponent({
   items,
   basePath,
   toggle,
+  onToggleChange,
   onChange,
   hasAccess,
   className,
@@ -97,9 +98,17 @@ export function SidebarComponent({
 
   return (
     <>
+      <div
+        className={`absolute top-0 left-0 w-full h-full bg-background bg-opacity-50 blur-md z-20 md:hidden ${
+          toggle ? "scale-100 md:scale-0" : "scale-0"
+        }`}
+        onClick={() => onToggleChange?.()}
+      ></div>
       <aside
         className={clsx(
-          "flex flex-col w-64 h-screen px-2 py-4 overflow-y-auto bg-white border-r rtl:border-r-0 rtl:border-l",
+          `flex flex-col ${
+            toggle ? "scale-x-100 md:scale-x-0" : "scale-x-0 md:scale-x-100"
+          } absolute md:relative w-64 h-screen px-2 py-4 overflow-y-auto bg-white border-r rtl:border-r-0 rtl:border-l z-20`,
           className?.container
         )}
       >
@@ -165,7 +174,7 @@ export function SidebarComponent({
                                 {menu?.items?.length && (
                                   <FontAwesomeIcon
                                     icon={faChevronUp}
-                                    className={`block md:hidden lg:block text-sm ${
+                                    className={`text-sm ${
                                       checkShow(
                                         `${menu_head_key}.${menu_key}`
                                       ) || "rotate-180"
@@ -214,7 +223,7 @@ export function SidebarComponent({
                                             {menu?.items?.length && (
                                               <FontAwesomeIcon
                                                 icon={faChevronUp}
-                                                className={`block md:hidden lg:block text-sm ${
+                                                className={`block text-sm ${
                                                   checkShow(
                                                     `${menu_head_key}.${menu_key}`
                                                   ) || "rotate-180"
@@ -244,6 +253,8 @@ export function SidebarComponent({
 
 export function SidebarContentComponent({ children }: { children: ReactNode }) {
   return (
-    <main className="w-[calc(100vw-256px)] overflow-x-hidden">{children}</main>
+    <main className="w-full md:w-[calc(100vw-256px)] overflow-x-hidden">
+      {children}
+    </main>
   );
 }

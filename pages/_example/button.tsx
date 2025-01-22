@@ -13,26 +13,26 @@ export default function Button() {
       <div className="flex flex-col gap-4">
         <p className="text-xl">Button</p>
 
-        <div className="flex gap-4">
+        <div className="flex gap-4 flex-wrap">
           <ButtonComponent label="Button Primary" />
           <ButtonComponent label="Button Secondary" paint="secondary" />
           <ButtonComponent label="Button Warning" paint="warning" />
           <ButtonComponent label="Button Danger" paint="danger" />
           <ButtonComponent label="Button Disabled" disabled />
         </div>
-        <div className="flex gap-4">
+        <div className="flex gap-4 flex-wrap">
           <ButtonComponent label="Button Solid" />
           <ButtonComponent label="Button Light" variant="light" />
           <ButtonComponent label="Button Outline" variant="outline" />
           <ButtonComponent label="Button Simple" variant="simple" />
         </div>
-        <div className="flex gap-4 items-start">
+        <div className="flex gap-4 flex-wrap items-start">
           <ButtonComponent label="Button lg" size="lg" />
           <ButtonComponent label="Button md" size="md" />
           <ButtonComponent label="Button sm" size="sm" />
           <ButtonComponent label="Button xs" size="xs" />
         </div>
-        <div className="flex gap-4 items-start">
+        <div className="flex gap-4 flex-wrap items-start">
           <ButtonComponent label="Button Custom 1" className="bg-red-500" />
           <ButtonComponent
             label="Button Custom 2"
@@ -54,7 +54,7 @@ export default function Button() {
             className="rounded-r-full"
           />
         </div>
-        <div className="flex gap-4 items-start">
+        <div className="flex gap-4 flex-wrap items-start">
           <div className="w-1/3">
             <ButtonComponent label="Button Block" block />
           </div>
@@ -63,7 +63,7 @@ export default function Button() {
           <ButtonComponent label="Button Loading" loading />
         </div>
 
-        <div className="flex gap-4 items-start">
+        <div className="flex gap-4 flex-wrap items-start">
           <IconButtonComponent icon={faStar} />
           <IconButtonComponent icon={faStar} variant="light" />
           <IconButtonComponent icon={faStar} variant="outline" />

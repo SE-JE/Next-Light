@@ -19,6 +19,7 @@ export type sidebarProps = {
   basePath?: string;
   show?: boolean;
   toggle?: boolean;
+  onToggleChange?: () => void;
   children?: any;
   hasAccess?: number[];
   onChange?: () => void;
