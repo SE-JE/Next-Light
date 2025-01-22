@@ -1,0 +1,16 @@
+import { ReactNode } from "react";
+import ExampleLayout from "../_layout";
+
+export default function Table() {
+  return (
+    <>
+      <div>
+        <p className="text-xl">Table</p>
+      </div>
+    </>
+  );
+}
+
+Table.getLayout = function getLayout(page: ReactNode) {
+  return <ExampleLayout>{page}</ExampleLayout>;
+};

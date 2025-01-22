@@ -89,6 +89,7 @@ export function SidebarComponent({
         }
         menu?.items?.map((child) => {
           if (child?.path && cekActive(child?.path || "")) {
+            setShow(`${head_key}`);
             setShow(`${head_key}.${key}`);
           }
         });
@@ -185,15 +186,19 @@ export function SidebarComponent({
                             </div>
                           </ListWrapper>
                           <div className="px-4">
-                            <div className="flex flex-col border-l-2">
+                            <div className="flex flex-col">
                               {menu?.items?.length &&
                                 checkShow(`${menu_head_key}.${menu_key}`) &&
-                                menu?.items?.map((menu, menu_child_key) => {
+                                menu?.items?.map((child, menu_child_key) => {
                                   return (
                                     <>
                                       <ListWrapper
                                         key={`${menu_head_key}.${menu_key}.${menu_child_key}`}
-                                        path={menu?.path || ""}
+                                        path={
+                                          child?.path
+                                            ? `${basePath || ""}${child?.path}`
+                                            : ""
+                                        }
                                         onClick={() =>
                                           setShow(
                                             `${menu_head_key}.${menu_key}.${menu_child_key}`
@@ -202,25 +207,25 @@ export function SidebarComponent({
                                       >
                                         <div
                                           className={clsx(
-                                            `flex items-center justify-between px-2 py-2 gap-2 transition-colors duration-300 transform hover:text-primary cursor-pointer transition-none ${
-                                              menu?.path &&
-                                              cekActive(menu?.path || "")
-                                                ? "text-primary border-l-2 border-primary pl-4"
+                                            `flex items-center justify-between px-2 py-2 gap-2 transition-colors duration-300 transform hover:text-primary cursor-pointer transition-none border-l-2 ${
+                                              child?.path &&
+                                              cekActive(child?.path || "")
+                                                ? "text-primary border-primary pl-4"
                                                 : ""
                                             }`,
                                             className?.childList
                                           )}
                                         >
                                           <div className="flex gap-2 items-center">
-                                            {menu?.left_content}
+                                            {child?.left_content}
                                             <span className="text-sm font-medium">
-                                              {menu?.label}
+                                              {child?.label}
                                             </span>
                                           </div>
                                           <div className="flex gap-2 items-center">
-                                            {menu?.right_content}
+                                            {child?.right_content}
 
-                                            {menu?.items?.length && (
+                                            {child?.items?.length && (
                                               <FontAwesomeIcon
                                                 icon={faChevronUp}
                                                 className={`block text-sm ${
