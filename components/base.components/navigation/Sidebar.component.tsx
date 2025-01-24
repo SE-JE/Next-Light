@@ -51,16 +51,6 @@ export function SidebarComponent({
     }
 
     return false;
-
-    // return (
-    //   nestedItems?.some((item) => {
-    //     if (item?.path && cekActive(item?.path || "")) {
-    //       return true;
-    //     }
-
-    //     return item.items ? checkShow(key, item.items) : false;
-    //   }) ?? false
-    // );
   };
 
   const cekActive = (path: string) => {
@@ -109,7 +99,7 @@ export function SidebarComponent({
         className={clsx(
           `flex flex-col ${
             toggle ? "scale-x-100 md:scale-x-0" : "scale-x-0 md:scale-x-100"
-          } absolute md:relative w-64 h-screen px-2 py-4 overflow-y-auto bg-white border-r rtl:border-r-0 rtl:border-l z-20`,
+          } absolute md:relative w-64 h-screen px-2 py-4 overflow-y-auto bg-white z-20 rounded-r-[12px] shadow-sm`,
           className?.container
         )}
       >

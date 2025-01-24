@@ -36,9 +36,29 @@ export default function ExampleLayout({ children }: { children: ReactNode }) {
                 collapse: true,
                 items: [
                   {
+                    label: "Accordion",
+                    left_content: <FontAwesomeIcon icon={faStar} />,
+                    path: "/accordion",
+                  },
+                  {
+                    label: "Breadcrumb",
+                    left_content: <FontAwesomeIcon icon={faStar} />,
+                    path: "/breadcrumb",
+                  },
+                  {
                     label: "Button",
                     left_content: <FontAwesomeIcon icon={faStar} />,
                     path: "/button",
+                  },
+                  {
+                    label: "Card",
+                    left_content: <FontAwesomeIcon icon={faStar} />,
+                    path: "/card",
+                  },
+                  {
+                    label: "Carousel",
+                    left_content: <FontAwesomeIcon icon={faStar} />,
+                    path: "/carousel",
                   },
                   {
                     label: "Input",
@@ -46,18 +66,79 @@ export default function ExampleLayout({ children }: { children: ReactNode }) {
                     path: "/input",
                   },
                   {
-                    label: "Smart Component",
+                    label: "Modal",
                     left_content: <FontAwesomeIcon icon={faStar} />,
-                    items: [
-                      {
-                        label: "Tabel",
-                        path: "/smart-component/table",
-                      },
-                      {
-                        label: "Form",
-                        path: "/smart-component/form",
-                      },
-                    ],
+                    path: "/table",
+                  },
+                  {
+                    label: "Table",
+                    left_content: <FontAwesomeIcon icon={faStar} />,
+                    path: "/table",
+                  },
+                  {
+                    label: "Typography",
+                    left_content: <FontAwesomeIcon icon={faStar} />,
+                    path: "/typography",
+                  },
+                  {
+                    label: "Wizard",
+                    left_content: <FontAwesomeIcon icon={faStar} />,
+                    path: "/wizard",
+                  },
+                ],
+              },
+              {
+                label: "Smart Component",
+                collapse: true,
+                items: [
+                  {
+                    label: "Tabel Supervision",
+                    path: "/smart-component/table",
+                  },
+                  {
+                    label: "Form Supervision",
+                    path: "/smart-component/form",
+                  },
+                ],
+              },
+              {
+                label: "Navigasi",
+                collapse: true,
+                items: [
+                  {
+                    label: "Sidebar",
+                    left_content: <FontAwesomeIcon icon={faStar} />,
+                    path: "/sidebar",
+                  },
+                  {
+                    label: "Headbar",
+                    left_content: <FontAwesomeIcon icon={faStar} />,
+                    path: "/headbar",
+                  },
+                  {
+                    label: "Tabbar",
+                    left_content: <FontAwesomeIcon icon={faStar} />,
+                    path: "/tabbar",
+                  },
+                  {
+                    label: "Navbar",
+                    left_content: <FontAwesomeIcon icon={faStar} />,
+                    path: "/navbar",
+                  },
+                  {
+                    label: "Mega Navbar",
+                    left_content: <FontAwesomeIcon icon={faStar} />,
+                    path: "/mega-navbar",
+                  },
+                  {
+                    label: "Footer",
+                    left_content: <FontAwesomeIcon icon={faStar} />,
+                    path: "/mega-navbar",
+                  },
+                  {
+                    label: "Bottombar",
+                    left_content: <FontAwesomeIcon icon={faStar} />,
+                    path: "/tabbar",
                   },
                 ],
               },

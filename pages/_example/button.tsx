@@ -1,11 +1,11 @@
 import { ReactNode } from "react";
 import ExampleLayout from "./_layout";
+import { faArrowRight, faStar } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   ButtonComponent,
   IconButtonComponent,
-} from "@/components/base.components/button";
-import { faArrowRight, faStar } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+} from "@/components/base.components";
 
 export default function Button() {
   return (

@@ -3,11 +3,11 @@
 @tailwind utilities;
 
 body {
-	@apply bg-background text-foreground max-w-full overflow-x-hidden;
+	@apply bg-background text-foreground max-w-full overflow-x-hidden font-normal;
 }
 
 * {
-  @apply font-medium transition duration-100;
+  @apply transition duration-100;
 }
 
 @layer base {
