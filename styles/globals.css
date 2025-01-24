@@ -1,6 +1,8 @@
-@tailwind base;
+/* @tailwind base;
 @tailwind components;
-@tailwind utilities;
+@tailwind utilities; */
+
+@import "tailwindcss";
 
 body {
 	@apply bg-background text-foreground max-w-full overflow-x-hidden font-normal;
@@ -9,20 +11,35 @@ body {
 * {
   @apply transition duration-100;
 }
-
+@theme {
+  --color-background: #ebf4fc;
+  --color-foreground: #373A40;
+  --color-light-foreground: #686D76;
+  --color-primary: #5aafff;
+  --color-light-primary: #baddfd;
+  --color-secondary: #04a9ca;
+  --color-light-secondary: #9ae9f9;
+  --color-danger: #f3777a;
+  --color-light-danger: #fececf;
+  --color-warning: #f57e2c;
+  --color-light-warning: #ffd7bc;
+  --color-success: #69c9ca;
+  --color-light-success: #9af8f9;
+  --color-disable: #c4c3c3;
+  --color-light-disable: #f4f4f4;
+}
 @layer base {
-
+  
 }
 
 @layer components {
   .button {
-    @apply whitespace-nowrap;
+    @apply whitespace-nowrap cursor-pointer disabled:!text-disable disabled:!bg-light-disable;
     transform: scale(1);
     filter: brightness(0.95);
   }
 
   .button:disabled {
-    @apply bg-light-disable text-disable;
     cursor: default;
     pointer-events: none;
   }

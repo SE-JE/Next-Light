@@ -37,7 +37,7 @@ export default function Button() {
           <ButtonComponent
             label="Button Custom 2"
             variant="outline"
-            className="border-red-500 text-red-500 bg-red-500 bg-opacity-20"
+            className="border-red-500 text-red-500 bg-red-500/20"
           />
           <ButtonComponent
             label="Button Custom 3"

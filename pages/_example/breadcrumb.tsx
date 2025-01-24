@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function breadcrumb() {
+export default function Breadcrumb() {
   return (
     <>
       <div></div>
