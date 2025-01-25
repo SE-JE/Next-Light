@@ -102,7 +102,7 @@ export default function ExampleLayout({ children }: { children: ReactNode }) {
                 ],
               },
               {
-                label: "Navigasi",
+                label: "Navigation & Layout",
                 collapse: true,
                 items: [
                   {
