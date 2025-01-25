@@ -4,12 +4,13 @@ import { faArrowRight, faStar } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   ButtonComponent,
+  CardComponent,
   IconButtonComponent,
 } from "@/components/base.components";
 
 export default function Button() {
   return (
-    <div className="bg-white px-4 py-3 rounded-xl">
+    <CardComponent>
       <div className="flex flex-col gap-4">
         <p className="text-xl">Button</p>
 
@@ -77,7 +78,7 @@ export default function Button() {
           <IconButtonComponent icon={faStar} disabled />
         </div>
       </div>
-    </div>
+    </CardComponent>
   );
 }
 

@@ -112,7 +112,7 @@ export function SidebarComponent({
                 <div className="px-2 pt-2">
                   <div
                     className={clsx(
-                      `flex justify-between items-center text-light-foreground py-2 text-xs uppercase ${
+                      `flex justify-between items-center text-light-foreground font-semibold py-2 text-xs uppercase ${
                         menu_head?.collapse && "cursor-pointer"
                       }`,
                       className?.headList

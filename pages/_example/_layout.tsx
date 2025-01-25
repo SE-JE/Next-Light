@@ -99,6 +99,14 @@ export default function ExampleLayout({ children }: { children: ReactNode }) {
                     label: "Form Supervision",
                     path: "/smart-component/form",
                   },
+                  {
+                    label: "Smart Option",
+                    path: "/smart-component/smart-option",
+                  },
+                  {
+                    label: "Smart Confirmation",
+                    path: "/smart-component/smart-confirmation",
+                  },
                 ],
               },
               {
@@ -139,6 +147,28 @@ export default function ExampleLayout({ children }: { children: ReactNode }) {
                     label: "Bottombar",
                     left_content: <FontAwesomeIcon icon={faStar} />,
                     path: "/tabbar",
+                  },
+                ],
+              },
+              {
+                label: "Helper & Utilities",
+                collapse: true,
+                items: [
+                  {
+                    label: "Fetching Hook",
+                    path: "/",
+                  },
+                  {
+                    label: "Form Hook",
+                    path: "/",
+                  },
+                  {
+                    label: "Caching",
+                    path: "/",
+                  },
+                  {
+                    label: "Lazy Load",
+                    path: "/",
                   },
                 ],
               },
