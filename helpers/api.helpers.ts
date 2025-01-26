@@ -3,7 +3,7 @@ import axios, { AxiosProgressEvent } from 'axios';
 import Cookies from 'js-cookie';
 import Router from 'next/router';
 import { token_cookie_name, loginPath, basePath } from './middleware.helpers';
-import fileDownload from 'js-file-download';
+// import fileDownload from 'js-file-download';
 import { Decrypt } from './encryption.helpers';
 import { standIn } from './standIn.helpers';
 
@@ -374,48 +374,48 @@ export type downloadProps = {
 // =========================>
 // ## Download function
 // =========================>
-export const download = async ({
-  path,
-  url,
-  params,
-  includeHeaders,
-  bearer,
-  fileName,
-  onDownloadProgress,
-}: downloadProps) => {
-  const fetchUrl = url
-    ? url
-    : `${process.env.NEXT_PUBLIC_API_URL}/${path || ''}`;
-  const fetchHeaders: any = includeHeaders || {};
+// export const download = async ({
+//   path,
+//   url,
+//   params,
+//   includeHeaders,
+//   bearer,
+//   fileName,
+//   onDownloadProgress,
+// }: downloadProps) => {
+//   const fetchUrl = url
+//     ? url
+//     : `${process.env.NEXT_PUBLIC_API_URL}/${path || ''}`;
+//   const fetchHeaders: any = includeHeaders || {};
 
-  if (!fetchHeaders.Authorization) {
-    if (bearer) {
-      fetchHeaders.Authorization = `Bearer ${bearer}`;
-    } else if (Cookies.get(token_cookie_name)) {
-      fetchHeaders.Authorization = `Bearer ${Decrypt(
-        Cookies.get(token_cookie_name)
-      )}`;
-    }
-  }
+//   if (!fetchHeaders.Authorization) {
+//     if (bearer) {
+//       fetchHeaders.Authorization = `Bearer ${bearer}`;
+//     } else if (Cookies.get(token_cookie_name)) {
+//       fetchHeaders.Authorization = `Bearer ${Decrypt(
+//         Cookies.get(token_cookie_name)
+//       )}`;
+//     }
+//   }
 
-  if (!fetchHeaders.responseType) {
-    fetchHeaders.responseType = 'blob';
-  }
+//   if (!fetchHeaders.responseType) {
+//     fetchHeaders.responseType = 'blob';
+//   }
 
-  const fetch = await axios.get(fetchUrl, {
-    headers: fetchHeaders,
-    params: {
-      ...params,
-    },
-    onDownloadProgress: onDownloadProgress,
-  });
+//   const fetch = await axios.get(fetchUrl, {
+//     headers: fetchHeaders,
+//     params: {
+//       ...params,
+//     },
+//     onDownloadProgress: onDownloadProgress,
+//   });
 
-  if (fetch.status == 401) {
-    Router.push(loginPath);
-  } else if (fetch.status == 403) {
-    Router.push(basePath);
-  } else {
-    fileDownload(fetch.data, fileName);
-    return fetch.data;
-  }
-};
+//   if (fetch.status == 401) {
+//     Router.push(loginPath);
+//   } else if (fetch.status == 403) {
+//     Router.push(basePath);
+//   } else {
+//     fileDownload(fetch.data, fileName);
+//     return fetch.data;
+//   }
+// };
