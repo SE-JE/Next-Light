@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import clsx from "clsx";
 import { parseClassName } from "@/helpers";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 type classNamePrefix = "label" | "checked" | "error" | "input";
 
 export type CheckboxProps = {
@@ -28,6 +28,15 @@ export function CheckboxComponent({
   className = "",
 }: CheckboxProps) {
   const randomId = useMemo(() => Math.random().toString(36).substring(7), []);
+
+  const [isInvalid, setIsInvalid] = useState("");
+
+  // =========================>
+  // ## invalid handler
+  // =========================>
+  useEffect(() => {
+    setIsInvalid(error || "");
+  }, [error]);
 
   return (
     <div className={`flex flex-col gap-1 `}>
@@ -62,7 +71,7 @@ export function CheckboxComponent({
           className={clsx(
             "whitespace-nowrap",
             parseClassName<classNamePrefix>(className, "label"),
-            checked && "text-semibold",
+            checked && "font-semibold",
             checked &&
               parseClassName<classNamePrefix>(className, "label", "checked"),
             disabled &&
@@ -73,14 +82,14 @@ export function CheckboxComponent({
         </span>
       </label>
 
-      {error && (
+      {isInvalid && (
         <small
           className={clsx(
             "input-error-message",
             parseClassName<classNamePrefix>(className, "error")
           )}
         >
-          {error}
+          {isInvalid}
         </small>
       )}
     </div>

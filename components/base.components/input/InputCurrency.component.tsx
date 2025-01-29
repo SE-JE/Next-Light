@@ -1,249 +1,191 @@
-// import React, { useEffect, useState } from 'react';
+import {
+  parseClassName,
+  useValidationHelper,
+  ValidationRules,
+} from "@/helpers";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import clsx from "clsx";
+import React, {
+  InputHTMLAttributes,
+  ReactNode,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { CurrencyFormatComponent } from "../format";
 
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-// import { inputNumberProps } from './props/input-number.props';
-// import {
-//   inputContainer,
-//   inputField,
-//   inputIcon,
-//   inputLabel,
-//   inputPadding,
-//   inputTip,
-// } from './input.decorate';
-// import styles from './input.module.css';
-// import { useValidationHelper } from '../../../helpers';
+function formatCurrency(value: string, locale = "id-ID", currency = "IDR") {
+  const numberValue = parseFloat(value.replace(/[^0-9]/g, "")) || 0;
+  return new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency,
+    minimumFractionDigits: 0,
+  }).format(numberValue);
+}
 
-// export function InputCurrencyComponent({
-//   name,
-//   label,
-//   placeholder,
-//   disabled,
-//   value,
-//   onChange,
-//   onFocus,
-//   onBlur,
-//   error,
-//   size,
-//   autocomplete,
-//   leftIcon,
-//   validations,
-//   tip,
-//   min,
-//   max,
-//   register,
-// }: inputNumberProps) {
-//   const [inputValue, setInputValue] = useState<string | number>('');
-//   const [isFocus, setIsFocus] = useState(false);
-//   const [isInvalid, setIsInvalid] = useState('');
-//   const [isFirst, setIsFirst] = useState(true);
+type classNamePrefix =
+  | "label"
+  | "tip"
+  | "error"
+  | "input"
+  | "icon"
+  | "suggest"
+  | "suggest-item";
 
-//   useEffect(() => {
-//     register?.(name, validations);
-//   }, [register, name, validations]);
+export interface inputProps
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange"> {
+  label?: string;
+  tip?: string | ReactNode;
+  leftIcon?: any;
+  rightIcon?: any;
+  className?: string;
+  value?: string;
+  error?: string;
+  validations?: ValidationRules;
+  onChange?: (value: string) => any;
+  register?: (name: string, validations?: ValidationRules) => void;
+  format?: {
+    locale?: string;
+    currency?: string;
+  };
+}
 
-//   const [errorMessage] = useValidationHelper(
-//     {
-//       value: inputValue,
-//       rules: validations,
-//     },
-//     isFirst
-//   );
+export function InputCurrencyComponent({
+  label,
+  tip,
+  leftIcon,
+  rightIcon,
+  className = "",
+  value,
+  error,
+  validations,
+  register,
+  onChange,
+  format,
+  ...props
+}: inputProps) {
+  const [inputValue, setInputValue] = useState("");
+  const [isFocus, setIsFocus] = useState(false);
+  const [isInvalid, setIsInvalid] = useState("");
+  const [isFirst, setIsFirst] = useState(true);
 
-//   // =========================>
-//   // ## invalid handler
-//   // =========================>
-//   useEffect(() => {
-//     setIsInvalid(errorMessage || error || '');
-//   }, [error, errorMessage]);
+  useEffect(() => {
+    register?.(props.name || "", validations);
+  }, [register, validations]);
 
-//   // =========================>
-//   // ## change value handler
-//   // =========================>
-//   useEffect(() => {
-//     setInputValue(formatCurrency(String(value) || ''));
-//     value && setIsFirst(false);
+  const randomId = useMemo(() => Math.random().toString(36).substring(7), []);
 
-//     // eslint-disable-next-line react-hooks/exhaustive-deps
-//   }, [value]);
+  const [errorMessage] = useValidationHelper(
+    {
+      value: inputValue,
+      rules: validations,
+    },
+    isFirst
+  );
 
-//   // =========================>
-//   // ## formatting to currency
-//   // =========================>
-//   const formatCurrency = (value: string) => {
-//     let negative = false;
+  useEffect(() => {
+    setIsInvalid(errorMessage || error || "");
+  }, [error, errorMessage]);
 
-//     if (min && Number(value) < min) value = String(min);
-//     if (max && Number(value) > max) value = String(max);
+  useEffect(() => {
+    setInputValue(value || "");
+    value && setIsFirst(false);
+  }, [value]);
 
-//     if (value.at(0) == '-') {
-//       value.substring(1);
-//       negative = true;
-//     }
-//     let number_string = value.replace(/[^,\d]/g, '').toString(),
-//       split = number_string.split(','),
-//       remaining = split[0].length % 3,
-//       newVal = split[0].substr(0, remaining),
-//       block = split[0].substr(remaining).match(/\d{3}/gi);
+  return (
+    <div className="relative flex flex-col gap-y-0.5">
+      <label
+        htmlFor={randomId}
+        className={clsx(
+          "input-label",
+          parseClassName<classNamePrefix>(className, "label")
+        )}
+      >
+        {label}
+      </label>
 
-//     if (block) {
-//       let separator = remaining ? '.' : '';
-//       newVal += separator + block.join('.');
-//     }
+      {tip && (
+        <small
+          className={clsx(
+            "input-tip",
+            parseClassName<classNamePrefix>(className, "tip")
+          )}
+        >
+          {tip}
+        </small>
+      )}
 
-//     newVal = split[1] != undefined ? newVal + ',' + split[1] : newVal;
+      <div className="relative">
+        <input
+          {...props}
+          id={randomId}
+          className={clsx(
+            "input",
+            parseClassName<classNamePrefix>(className, "input")
+          )}
+          value={
+            inputValue
+              ? CurrencyFormatComponent(
+                  inputValue,
+                  format?.locale,
+                  format?.currency
+                )
+              : ""
+          }
+          onChange={(e) => {
+            const rawValue = e.target.value;
+            setInputValue(rawValue);
+            setIsFirst(false);
+            setIsInvalid("");
+            onChange?.(
+              CurrencyFormatComponent(
+                rawValue,
+                format?.locale,
+                format?.currency
+              )
+            );
+          }}
+          onFocus={(e) => {
+            props.onFocus?.(e);
+            setIsFocus(true);
+          }}
+          onBlur={(e) => {
+            props.onBlur?.(e);
+            setTimeout(() => setIsFocus(false), 100);
+          }}
+          autoComplete="off"
+        />
 
-//     return (negative ? '-' : '') + newVal;
-//   };
+        {leftIcon && (
+          <FontAwesomeIcon
+            className={clsx(
+              "left-4 input-icon",
+              parseClassName<classNamePrefix>(className, "icon")
+            )}
+            icon={leftIcon}
+          />
+        )}
+        {rightIcon && (
+          <FontAwesomeIcon
+            className={clsx(
+              "right-4 input-icon",
+              parseClassName<classNamePrefix>(className, "icon")
+            )}
+            icon={rightIcon}
+          />
+        )}
+      </div>
 
-//   return (
-//     <>
-//       <div
-//         className={`
-//           ${inputContainer[size || 'md']}
-//         `}
-//       >
-//         <label
-//           htmlFor={`input_${name}`}
-//           className={`
-//             select-none
-//             ${inputLabel[size || 'md']}
-//             ${
-//               isFocus
-//                 ? 'text-primary'
-//                 : isInvalid
-//                 ? 'text-danger'
-//                 : 'text-slate-500'
-//             }
-//             ${disabled && 'opacity-60'}
-//           `}
-//         >
-//           {label}
-//         </label>
-
-//         {tip && (
-//           <small
-//             className={`
-//               ${inputTip[size || 'md']}
-//               ${styles.input__tip}
-//             `}
-//           >
-//             {tip}
-//           </small>
-//         )}
-
-//         <div className="relative overflow-hidden">
-//           <input
-//             className={`
-//               ${styles.input}
-//               ${isInvalid && styles.input__error}
-//               ${inputField[size || 'md']}
-//               ${leftIcon && inputPadding['left'][size || 'md']}
-//               ${inputPadding['right'][size || 'md']}
-//             `}
-//             placeholder={placeholder}
-//             id={`input_${name}`}
-//             name={name}
-//             disabled={disabled}
-//             value={inputValue}
-//             onFocus={() => {
-//               setIsFocus(true);
-//               onFocus?.();
-//             }}
-//             onBlur={() => {
-//               setTimeout(() => setIsFocus(false), 100);
-//               onBlur?.();
-//             }}
-//             onChange={(e) => {
-//               setInputValue(formatCurrency(e.target.value));
-
-//               setIsFirst(false);
-//               !errorMessage && setIsInvalid('');
-//               onChange?.(Number(e.target.value.replace(/[$.]+/g, '')));
-//             }}
-//             autoComplete={autocomplete == false ? 'off' : ''}
-//           />
-
-//           {leftIcon && (
-//             <FontAwesomeIcon
-//               className={`
-//                 ${styles.input__icon}
-//                 ${inputIcon['left'][size || 'md']}
-//                 ${
-//                   isFocus
-//                     ? 'text-secondary'
-//                     : isInvalid
-//                     ? 'text-danger'
-//                     : 'text-slate-400'
-//                 }
-//                 ${disabled && 'opacity-60'}
-//               `}
-//               icon={leftIcon}
-//             />
-//           )}
-
-//           {/* {rightIcon && (
-//             <FontAwesomeIcon
-//               className={`
-//                 ${styles.input__icon}
-//                 ${inputIcon['right'][size || 'md']}
-//                 ${
-//                   isFocus
-//                     ? 'text-primary'
-//                     : isInvalid
-//                     ? 'text-danger'
-//                     : 'text-slate-400'
-//                 }
-//                 ${disabled && 'opacity-60'}
-//               `}
-//               icon={rightIcon}
-//             />
-//           )} */}
-//           {/* <label
-//             htmlFor={`input_${name}`}
-//             className={`
-//                 cursor-pointer
-//                 ${inputIcon['right'][size || 'md']}
-//                 ${styles.input__icon}
-//                 ${disabled && 'pointer-events-none opacity-50'}
-//             `}
-//           >
-//             <div className="flex flex-col">
-//               <FontAwesomeIcon
-//                 className={`
-//                   text-gray-400 hover:text-primary -mb-1
-//                 `}
-//                 icon={faSortUp}
-//                 onClick={() => setInputValue(Number(inputValue) + 1)}
-//               />
-//               <FontAwesomeIcon
-//                 className={`
-//                   text-gray-400 hover:text-primary -mt-1
-//               `}
-//                 icon={faSortDown}
-//                 onClick={() => setInputValue(Number(inputValue) - 1)}
-//               />
-//             </div>
-//           </label> */}
-//         </div>
-
-//         {isInvalid && (
-//           <small
-//             className={`
-//               overflow-x-hidden
-//               ${styles.input__error__message}
-//               ${
-//                 size == 'lg'
-//                   ? 'text-sm'
-//                   : size == 'sm'
-//                   ? 'text-[9px]'
-//                   : 'text-xs'
-//               }
-//             `}
-//           >
-//             {isInvalid}
-//           </small>
-//         )}
-//       </div>
-//     </>
-//   );
-// }
+      {isInvalid && (
+        <small
+          className={clsx(
+            "input-error-message",
+            parseClassName<classNamePrefix>(className, "error")
+          )}
+        >
+          {isInvalid}
+        </small>
+      )}
+    </div>
+  );
+}

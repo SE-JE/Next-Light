@@ -4,6 +4,11 @@ import { CardComponent, InputComponent } from "@/components/base.components";
 import { faUserTag } from "@fortawesome/free-solid-svg-icons";
 import { CheckboxComponent } from "@/components/base.components/input/Checkbox.component";
 import { InputCheckboxComponent } from "@/components/base.components/input/InputCheckbox.component";
+import { RadioComponent } from "@/components/base.components/input/Radio.component";
+import { InputRadioComponent } from "@/components/base.components/input/InputRadio.component";
+import { InputCurrencyComponent } from "@/components/base.components/input/InputCurrency.component";
+import { InputDateComponent } from "@/components/base.components/input/InputDate.component";
+import { InputNumberComponent } from "@/components/base.components/input/InputNumber.component";
 type ClassNamePrefix = "label" | "tip" | "error" | "input";
 
 export default function Input() {
@@ -77,38 +82,98 @@ export default function Input() {
               suggestions={["Joko", "Gunawan", "Joko Gunawan"]}
             />
           </div>
-          <div className="col-span-4 flex gap-4">
-            <CheckboxComponent name="check" value="check" label="Checkbox" />
-            <CheckboxComponent
-              name="check"
-              value="check"
-              label="Checkbox"
-              checked
-            />
+          <div className="col-span-4">
+            <div className="flex gap-4">
+              <CheckboxComponent name="check" value="check" label="Checkbox" />
+              <CheckboxComponent
+                name="check"
+                value="check"
+                label="Checkbox"
+                checked
+              />
+            </div>
+            <div className="flex gap-4 mt-4">
+              <RadioComponent name="check" value="check" label="Radio" />
+              <RadioComponent
+                name="check"
+                value="check"
+                label="Radio"
+                checked
+              />
+            </div>
           </div>
-          <div className="col-span-4 flex gap-4">
+          <div className="col-span-4">
             <InputCheckboxComponent
               name="input_check"
               label="Input Checkbox"
-              options={[1, 2, 3, 4, 5, 6].map((i) => {
+              options={[1, 2, 3, 4].map((i) => {
                 return {
                   label: "Check " + i,
                   value: i,
                 };
               })}
             />
+
+            <InputRadioComponent
+              name="input_radio"
+              label="Input Radio"
+              options={[1, 2, 3, 4].map((i) => {
+                return {
+                  label: "Radio " + i,
+                  value: i,
+                };
+              })}
+            />
           </div>
-          <div className="col-span-4 flex gap-4">
+          <div className="col-span-4">
             <InputCheckboxComponent
               name="input_check"
               label="Input Checkbox"
-              options={[1, 2, 3, 4, 5, 6].map((i) => {
+              options={[1, 2, 3, 4].map((i) => {
                 return {
                   label: "Check " + i,
                   value: i,
                 };
               })}
               vertical
+            />
+          </div>
+
+          <div className="col-span-4">
+            <InputRadioComponent
+              name="input_radio"
+              label="Input Radio"
+              options={[1, 2, 3, 4].map((i) => {
+                return {
+                  label: "Radio " + i,
+                  value: i,
+                };
+              })}
+              vertical
+            />
+          </div>
+
+          <div className="col-span-4">
+            <InputCurrencyComponent
+              name="input_currency"
+              label="Input Currency"
+              placeholder="Contoh: Rp. 10.000"
+            />
+          </div>
+
+          <div className="col-span-4">
+            <InputDateComponent
+              name="input_date"
+              label="Input Date"
+              placeholder="YYYY-MM-DD"
+            />
+          </div>
+
+          <div className="col-span-4">
+            <InputNumberComponent
+              name="input_number"
+              label="Input Number"
+              placeholder="0000"
             />
           </div>
         </div>

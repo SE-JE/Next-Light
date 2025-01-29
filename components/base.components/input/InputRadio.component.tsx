@@ -1,91 +1,201 @@
-// import React, { useEffect, useState } from 'react';
-// import { RadioComponent } from './Radio.component';
-// import { inputContainer, inputField, inputLabel } from './input.decorate';
-// import styles from './input.module.css';
-// import { inputRadioProps } from './props/input-radio.props';
+import React, { ReactNode, useEffect, useState } from "react";
+import {
+  get,
+  getProps,
+  parseClassName,
+  useValidationHelper,
+  ValidationRules,
+} from "../../../helpers";
+import { CheckboxComponent } from "./Checkbox.component";
+import styles from "./input.module.css";
+import clsx from "clsx";
+import { RadioComponent } from "./Radio.component";
 
-// export function InputRadioComponent({
-//   name,
-//   label,
-//   size,
-//   disabled,
-//   options,
-//   vertical,
-//   value,
-//   onChange,
-//   validations,
-//   register,
-// }: inputRadioProps) {
-//   const [inputValue, setInputValue] = useState<string>('');
+type classNamePrefix = "label" | "tip" | "error" | "input" | "icon";
 
-//   useEffect(() => {
-//     register?.(name, validations);
-//   }, [register, name, validations]);
+export type inputCheckboxOptionProps = {
+  value: string | number;
+  label: string;
+};
 
-//   useEffect(() => {
-//     if (value) {
-//       setInputValue(value);
-//     } else {
-//       setInputValue('');
-//     }
-//   }, [value]);
+export type inputCheckboxProps = {
+  name: string;
+  label?: string;
+  tip?: string | ReactNode;
+  vertical?: boolean;
 
-//   return (
-//     <>
-//       <div
-//         className={`
-//           ${inputContainer}
-//         `}
-//       >
-//         <label
-//           htmlFor={`input_${name}`}
-//           className={`
-//             select-none
-//             ${inputLabel[size || 'md']}
-//             ${disabled && 'opacity-60'}
-//           `}
-//         >
-//           {label}
-//         </label>
+  /** Use custom class with: "label::", "tip::", "error::", "icon::", "suggest::", "suggest-item::". */
+  className?: string;
+  /** Use custom class with: "label::", "checked::", "error::". */
+  classNameCheckbox?: string;
 
-//         <div
-//           className={`
-//             overflow-auto
-//             ${styles.input}
-//             ${inputField['md']}
-//             ${styles.input_scroll}
-//             ${disabled && 'opacity-60'}
-//           `}
-//         >
-//           <div
-//             className={`
-//               w-full flex gap-3
-//               ${vertical && 'flex-col'}
-//             `}
-//           >
-//             {options?.map((option, key) => {
-//               return (
-//                 <RadioComponent
-//                   key={key}
-//                   label={option.label}
-//                   name={'option_' + name + '_' + option.value}
-//                   checked={inputValue == option.value}
-//                   disabled={disabled}
-//                   onChange={() => {
-//                     if (inputValue == option.value) {
-//                       setInputValue('');
-//                       onChange?.('');
-//                     } else {
-//                       setInputValue(option.value);
-//                       onChange?.(option.value);
-//                     }
-//                   }}
-//                 />
-//               );
-//             })}
-//           </div>
-//         </div>
-//       </div>
-//     </>
-//   );
-// }
+  value?: string | number;
+  disabled?: boolean;
+  error?: string;
+
+  options?: inputCheckboxOptionProps[];
+  serverOptionControl?: getProps;
+  customOptions?: any;
+  validations?: ValidationRules;
+
+  onChange?: (value: string | number) => any;
+  register?: (name: string, validations?: ValidationRules) => void;
+};
+
+export function InputRadioComponent({
+  name,
+  label,
+  tip,
+  vertical,
+  className = "",
+  classNameCheckbox = "",
+
+  value,
+  disabled,
+  error,
+
+  options,
+  serverOptionControl,
+  customOptions,
+  validations,
+
+  register,
+  onChange,
+}: inputCheckboxProps) {
+  const [isInvalid, setIsInvalid] = useState("");
+  const [inputValue, setInputValue] = useState<string | number>("");
+  const [dataOptions, setDataOptions] = useState<inputCheckboxProps[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // =========================>
+  // ## initial
+  // =========================>
+  useEffect(() => {
+    register?.(name, validations);
+  }, [register, name, validations]);
+
+  useEffect(() => {
+    if (value) {
+      setInputValue(value);
+    } else {
+      setInputValue("");
+    }
+  }, [value]);
+
+  // =========================>
+  // ## fetch option
+  // =========================>
+  useEffect(() => {
+    const fetchOptions = async () => {
+      setLoading(true);
+      const mutateOptions = await get(serverOptionControl || {});
+      if (mutateOptions?.status == 200) {
+        customOptions
+          ? setDataOptions([customOptions, ...mutateOptions.data])
+          : setDataOptions(mutateOptions.data);
+        setLoading(false);
+      }
+    };
+
+    if (serverOptionControl?.path || serverOptionControl?.url) {
+      fetchOptions();
+    } else {
+      !options && setDataOptions([]);
+    }
+  }, [serverOptionControl?.path, serverOptionControl?.url]);
+
+  // =========================>
+  // ## invalid handler
+  // =========================>
+  const [errorMessage] = useValidationHelper({
+    value: inputValue,
+    rules: validations,
+  });
+
+  useEffect(() => {
+    setIsInvalid(errorMessage || error || "");
+  }, [error, errorMessage]);
+
+  let dummy = vertical ? [1, 2, 3, 4, 5, 6, 7, 8, 9] : [1, 2, 3];
+
+  return (
+    <>
+      <div className="w-full relative flex flex-col gap-y-0.5">
+        <label
+          className={clsx(
+            "input-label",
+            parseClassName<classNamePrefix>(className, "label"),
+            disabled && "opacity-50",
+            disabled &&
+              parseClassName<classNamePrefix>(className, "label", "disabled"),
+            isInvalid && "text-danger",
+            isInvalid &&
+              parseClassName<classNamePrefix>(className, "label", "focus")
+          )}
+        >
+          {label}
+        </label>
+
+        {tip && (
+          <small
+            className={clsx(
+              "input-tip",
+              parseClassName<classNamePrefix>(className, "tip"),
+              disabled && "opacity-60",
+              disabled &&
+                parseClassName<classNamePrefix>(className, "tip", "disabled")
+            )}
+          >
+            {tip}
+          </small>
+        )}
+
+        <div
+          className={clsx(
+            `input overflow-auto input-scroll w-full flex flex-nowrap gap-y-2 gap-4 ${
+              vertical && `flex-col flex-wrap ${vertical}`
+            }`,
+            parseClassName<classNamePrefix>(className, "input"),
+            isInvalid && "input-error",
+            isInvalid &&
+              parseClassName<classNamePrefix>(className, "input", "error")
+          )}
+        >
+          {loading &&
+            dummy.map((_, key) => {
+              return (
+                <>
+                  <div
+                    key={key}
+                    className="w-1/3 h-6 skeleton-loading rounded-lg"
+                  ></div>
+                </>
+              );
+            })}
+          {(options || dataOptions) &&
+            (options || dataOptions)?.map((option, key) => {
+              return (
+                <RadioComponent
+                  key={key}
+                  label={option.label}
+                  name={`option[${option.value}]#${name}`}
+                  checked={inputValue == option.value}
+                  disabled={disabled}
+                  className={classNameCheckbox}
+                  onChange={() => {
+                    if (inputValue == option.value) {
+                      setInputValue("");
+                      onChange?.("");
+                    } else {
+                      setInputValue(option.value || "");
+                      onChange?.(option.value || "");
+                    }
+                  }}
+                />
+              );
+            })}
+        </div>
+      </div>
+    </>
+  );
+}

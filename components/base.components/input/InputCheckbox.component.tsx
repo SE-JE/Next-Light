@@ -151,65 +151,60 @@ export function InputCheckboxComponent({
 
         <div
           className={clsx(
-            "input overflow-auto input-scroll",
+            `input overflow-auto input-scroll w-full flex flex-nowrap gap-y-2 gap-4 ${
+              vertical && `flex-col flex-wrap ${vertical}`
+            }`,
             parseClassName<classNamePrefix>(className, "input"),
             isInvalid && "input-error",
             isInvalid &&
               parseClassName<classNamePrefix>(className, "input", "error")
           )}
         >
-          <div
-            className={`
-              w-full flex flex-nowrap gap-y-2 -ml-2
-              ${vertical && `flex-col flex-wrap ${vertical}`}
-            `}
-          >
-            {loading &&
-              dummy.map((_, key) => {
-                return (
-                  <>
-                    <div
-                      key={key}
-                      className="w-1/3 h-6 skeleton-loading rounded-lg"
-                    ></div>
-                  </>
-                );
-              })}
-            {(options || dataOptions) &&
-              (options || dataOptions)?.map((option, key) => {
-                const checked = Array()
-                  .concat(inputValue)
-                  .find((val) => val == option.value);
-                return (
-                  <CheckboxComponent
+          {loading &&
+            dummy.map((_, key) => {
+              return (
+                <>
+                  <div
                     key={key}
-                    label={option.label}
-                    name={`option[${option.value}]#${name}`}
-                    checked={!!checked}
-                    disabled={disabled}
-                    className={clsx("label::pr-4", classNameCheckbox)}
-                    onChange={() => {
-                      let newVal: string[] | number[] = [];
-                      if (checked) {
-                        newVal = Array()
+                    className="w-1/3 h-6 skeleton-loading rounded-lg"
+                  ></div>
+                </>
+              );
+            })}
+          {(options || dataOptions) &&
+            (options || dataOptions)?.map((option, key) => {
+              const checked = Array()
+                .concat(inputValue)
+                .find((val) => val == option.value);
+              return (
+                <CheckboxComponent
+                  key={key}
+                  label={option.label}
+                  name={`option[${option.value}]#${name}`}
+                  checked={!!checked}
+                  disabled={disabled}
+                  className={classNameCheckbox}
+                  onChange={() => {
+                    let newVal: string[] | number[] = [];
+                    if (checked) {
+                      newVal = Array()
+                        .concat(inputValue)
+                        .filter((val) => val != option.value);
+                    } else {
+                      newVal = [
+                        ...Array()
                           .concat(inputValue)
-                          .filter((val) => val != option.value);
-                      } else {
-                        newVal = [
-                          ...Array()
-                            .concat(inputValue)
-                            .filter((val) => val != option.value),
-                          option.value,
-                        ];
-                      }
+                          .filter((val) => val != option.value),
+                        option.value,
+                      ];
+                    }
 
-                      setInputValue(newVal);
-                      onChange?.(newVal);
-                    }}
-                  />
-                );
-              })}
-          </div>
+                    setInputValue(newVal);
+                    onChange?.(newVal);
+                  }}
+                />
+              );
+            })}
         </div>
       </div>
     </>

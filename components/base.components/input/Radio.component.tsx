@@ -1,88 +1,94 @@
-// import { useEffect, useState } from 'react';
-// import { radioProps } from './props/radio.props';
-// import styles from './input.module.css';
+import { useEffect, useMemo, useState } from "react";
+import styles from "./input.module.css";
+import clsx from "clsx";
+import { parseClassName } from "@/helpers";
+type classNamePrefix = "label" | "checked" | "error" | "input";
 
-// export function RadioComponent({
-//   label,
-//   name,
-//   color,
-//   onChange,
-//   onClick,
-//   checked,
-//   value,
-//   disabled,
-//   size,
-//   error,
-// }: radioProps) {
-//   const [isInvalid, setIsInvalid] = useState('');
+export type RadioProps = {
+  name: string;
+  label?: string;
+  disabled?: boolean;
+  value?: string;
+  onChange?: () => void;
+  checked?: boolean;
+  error?: string;
+  /** Use custom class with: "label::", "checked::", "error::". */
+  className?: string;
+};
 
-//   // =========================>
-//   // ## invalid handler
-//   // =========================>
-//   useEffect(() => {
-//     setIsInvalid(error || '');
-//   }, [error]);
+export function RadioComponent({
+  name,
+  label,
+  disabled,
+  value,
+  onChange,
+  checked,
+  error,
+  className = "",
+}: RadioProps) {
+  const randomId = useMemo(() => Math.random().toString(36).substring(7), []);
+  const [isInvalid, setIsInvalid] = useState("");
 
-//   return (
-//     <>
-//       <input
-//         type="checkbox"
-//         className="hidden"
-//         id={'radio_' + name}
-//         name={name}
-//         onChange={onChange}
-//         checked={checked}
-//         value={value}
-//         disabled={disabled}
-//       />
+  // =========================>
+  // ## invalid handler
+  // =========================>
+  useEffect(() => {
+    setIsInvalid(error || "");
+  }, [error]);
 
-//       <label
-//         htmlFor={'radio_' + name}
-//         className={`
-//           flex gap-2 items-center cursor-pointer
-//           ${disabled && 'pointer-events-none opacity-60'}
-//         `}
-//         onClick={() => onClick?.()}
-//       >
-//         <div
-//           className={`
-//             flex justify-center items-center rounded-full w-5 h-5
-//             active:outline
-//             ${
-//               checked
-//                 ? ` border-[5px] outline-light-${color || 'primary'} border-${
-//                     color || 'primary'
-//                   } text-white`
-//                 : 'border-slate-300 text-slate-300  border-2'
-//             }
-//           `}
-//         ></div>
-//         <div
-//           className={`
-//             text-sm mt-1 whitespace-nowrap
-//             ${checked && 'font-semibold'}
-//           `}
-//         >
-//           {label}
-//         </div>
-//       </label>
-//       {isInvalid && (
-//         <small
-//           className={`
-//               overflow-x-hidden
-//               ${styles.input__error__message}
-//               ${
-//                 size == 'lg'
-//                   ? 'text-sm'
-//                   : size == 'sm'
-//                   ? 'text-[9px]'
-//                   : 'text-xs'
-//               }
-//             `}
-//         >
-//           {isInvalid}
-//         </small>
-//       )}
-//     </>
-//   );
-// }
+  return (
+    <>
+      <div className={`flex flex-col gap-1 `}>
+        <input
+          type="checkbox"
+          className="hidden"
+          id={randomId}
+          name={name}
+          onChange={onChange}
+          checked={checked}
+          value={value}
+          disabled={disabled}
+        />
+
+        <label
+          htmlFor={randomId}
+          className={`flex gap-2 items-center cursor-pointer ${
+            disabled ? "pointer-events-none opacity-60" : ""
+          }`}
+        >
+          <div
+            className={clsx(
+              `flex justify-center items-center rounded-full w-5 h-5 active:outline border-2 border-light-foreground`,
+              checked && "border-[5px] outline-light-primary border-primary",
+              checked && parseClassName<classNamePrefix>(className, "checked"),
+              parseClassName<classNamePrefix>(className, "input")
+            )}
+          ></div>
+          <div
+            className={clsx(
+              "whitespace-nowrap",
+              parseClassName<classNamePrefix>(className, "label"),
+              checked && "font-semibold",
+              checked &&
+                parseClassName<classNamePrefix>(className, "label", "checked"),
+              disabled &&
+                parseClassName<classNamePrefix>(className, "label", "disabled")
+            )}
+          >
+            {label}
+          </div>
+        </label>
+        {isInvalid && (
+          <small
+            className={clsx(
+              "input-error-message",
+              parseClassName<classNamePrefix>(className, "error")
+            )}
+          >
+            {isInvalid}
+          </small>
+        )}
+      </div>
+    </>
+  );
+}

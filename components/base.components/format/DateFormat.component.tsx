@@ -1,5 +1,4 @@
-import moment from 'moment';
-import React from 'react';
+import moment from "moment";
 
 export function DateFormatComponent({
   date,
@@ -8,5 +7,5 @@ export function DateFormatComponent({
   date: Date;
   format?: string;
 }) {
-  return <>{moment(date).format(format ? format : 'DD MMM YYYY')}</>;
+  return moment(date).format(format ? format : "DD MMM YYYY");
 }

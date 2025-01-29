@@ -126,30 +126,30 @@ body {
   }
 
   .input-scroll::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
     position: fixed;
     top: 0;
     left: 0;
   }
 
   .input-scroll:hover::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
   }
 
   .input-scroll::-webkit-scrollbar-track {
-    box-shadow: inset 0 0 3px rgba(0, 0, 0, .2);
+    box-shadow: inset 0 0 3px rgba(0, 0, 0, .1);
     border-radius: 10px;
   }
 
   .input-scroll::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, .2);
+    background: rgba(0, 0, 0, .1);
     border-radius: 10px;
   }
 
   .input-scroll::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, .4);
+    background: rgba(0, 0, 0, .1);
   }
 }
 
