@@ -46,7 +46,7 @@ export function CheckboxComponent({
         id={randomId}
         name={name}
         onChange={onChange}
-        checked={checked}
+        defaultChecked={checked}
         value={value}
         disabled={disabled}
       />

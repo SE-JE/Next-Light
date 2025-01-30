@@ -68,7 +68,7 @@ export default function ExampleLayout({ children }: { children: ReactNode }) {
                   {
                     label: "Modal",
                     left_content: <FontAwesomeIcon icon={faStar} />,
-                    path: "/table",
+                    path: "/modal",
                   },
                   {
                     label: "Table",
@@ -106,6 +106,10 @@ export default function ExampleLayout({ children }: { children: ReactNode }) {
                   {
                     label: "Smart Confirmation",
                     path: "/smart-component/smart-confirmation",
+                  },
+                  {
+                    label: "Smart Responsive",
+                    path: "/smart-component/smart-responsive",
                   },
                 ],
               },
