@@ -1,10 +1,27 @@
 import React, { ReactNode } from "react";
 import ExampleLayout from "./_layout";
+import { WizardComponent } from "@/components/base.components/Wizard";
 
 export default function Table() {
   return (
     <>
-      <div></div>
+      <WizardComponent
+        items={[
+          {
+            label: "Item 1",
+            circle_content: "1",
+          },
+          {
+            label: "Item 2",
+            circle_content: "2",
+          },
+          {
+            label: "Item 3",
+            circle_content: "3",
+          },
+        ]}
+        active={0}
+      />
     </>
   );
 }
