@@ -7,7 +7,7 @@ export const parseClassName = <prefixType>(
   const matchedClasses = classes
     .filter((cls) => {
       const [clsPrefix, ...rest] = cls.split("::");
-      if (rest.length === 0 && prefix === "input") {
+      if (rest.length === 0 && (prefix === "input" || prefix === "base")) {
         return true;
       }
       if (rest.length > 0 && clsPrefix === prefix) {
@@ -35,7 +35,7 @@ export const parseClassName = <prefixType>(
           }
         }
       }
-      if (rest.length === 0 && prefix === "input") {
+      if (rest.length === 0 && (prefix === "input" || prefix === "base")) {
         return cls;
       }
       return "";

@@ -5,7 +5,7 @@ import { IconButtonComponent } from "../button";
 import { parseClassName } from "@/helpers";
 type classNamePrefix = "base" | "backdrop" | "header" | "footer";
 
-export type modalProps = {
+export type floatingPageProps = {
   show: boolean;
   onClose: () => void;
   title?: string | ReactNode;
@@ -15,7 +15,7 @@ export type modalProps = {
   className?: string;
 };
 
-export function ModalComponent({
+export function FloatingPageComponent({
   show,
   onClose,
   title,
@@ -23,7 +23,7 @@ export function ModalComponent({
   tip,
   footer,
   className = "",
-}: modalProps) {
+}: floatingPageProps) {
   useEffect(() => {
     if (show) {
       document.getElementsByTagName("body")[0].style.overflow = "hidden";
@@ -45,9 +45,9 @@ export function ModalComponent({
 
       <div
         className={clsx(
-          "modal",
-          "w-[calc(100vw-2rem)] md:w-[50vw] max-w-[500px]",
-          !show && "-translate-y-full opacity-0 scale-y-0",
+          "floating-page",
+          "w-[100vw] md:w-[50vw] max-w-[700px]",
+          !show && "top-[200vh] md:top-0 md:-right-[100vw]",
           parseClassName<classNamePrefix>(className, "base")
         )}
       >
@@ -79,7 +79,7 @@ export function ModalComponent({
         {footer && (
           <div
             className={clsx(
-              "modal-footer",
+              "modal-footer absolute bottom-0 w-full",
               parseClassName<classNamePrefix>(className, "footer")
             )}
           >
