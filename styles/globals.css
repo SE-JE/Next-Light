@@ -168,6 +168,10 @@ body {
     @apply fixed top-[1rem] right-0 bg-background lg:top-0 h-screen z-40 border-t-4 md:border-t-0 md:border-l-4 border-primary shadow-[0px_-4px_10px_-4px_rgba(0,0,0,0.25)] md:shadow-[-4px_0px_10px_-4px_rgba(0,0,0,0.25)] overflow-hidden;
   }
 
+  .toast {
+    @apply isolate fixed right-5 bottom-5 opacity-100 bg-white z-40 shadow-xs border-t-4 border-primary;
+  }
+
   .modal-backdrop {
     @apply isolate fixed left-0 top-0 z-40 w-screen h-screen bg-light-foreground/20 backdrop-blur-[1px];
   }

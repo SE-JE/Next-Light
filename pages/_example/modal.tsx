@@ -4,6 +4,7 @@ import { ButtonComponent } from "@/components/base.components";
 import { ModalComponent } from "@/components/base.components/modal/Modal.component";
 import { FloatingPageComponent } from "@/components/base.components/modal/FloatingPage.component";
 import { ModalConfirmComponent } from "@/components/base.components/modal/ModalConfirm.component";
+import { ToastComponent } from "@/components/base.components/modal/Toast";
 
 export default function Modal() {
   const [show, setShow] = useState<string | null>(null);
@@ -22,6 +23,7 @@ export default function Modal() {
           block
           onClick={() => setShow("modal-confirm")}
         />
+        <ButtonComponent label="Toast" block onClick={() => setShow("toast")} />
       </div>
 
       <ModalComponent
@@ -63,9 +65,19 @@ export default function Modal() {
       <ModalConfirmComponent
         show={show == "modal-confirm"}
         onClose={() => setShow(null)}
-        title="Modal Confirm"
-        className=""
+        title="Modal Confirm?"
       />
+
+      <ToastComponent
+        show={show == "toast"}
+        onClose={() => setShow(null)}
+        title="Toast Showing!"
+      >
+        <div className="px-2 pb-4 text-sm">
+          Lorem, ipsum dolor sit amet consectetur adipisicing elit. Fuga,
+          repellat.
+        </div>
+      </ToastComponent>
     </>
   );
 }
