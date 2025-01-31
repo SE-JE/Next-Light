@@ -3,6 +3,7 @@ import ExampleLayout from "./_layout";
 import { ButtonComponent } from "@/components/base.components";
 import { ModalComponent } from "@/components/base.components/modal/Modal.component";
 import { FloatingPageComponent } from "@/components/base.components/modal/FloatingPage.component";
+import { ModalConfirmComponent } from "@/components/base.components/modal/ModalConfirm.component";
 
 export default function Modal() {
   const [show, setShow] = useState<string | null>(null);
@@ -15,6 +16,11 @@ export default function Modal() {
           label="Floating Page"
           block
           onClick={() => setShow("floating-page")}
+        />
+        <ButtonComponent
+          label="Modal Confirm"
+          block
+          onClick={() => setShow("modal-confirm")}
         />
       </div>
 
@@ -53,6 +59,13 @@ export default function Modal() {
           unde!
         </div>
       </FloatingPageComponent>
+
+      <ModalConfirmComponent
+        show={show == "modal-confirm"}
+        onClose={() => setShow(null)}
+        title="Modal Confirm"
+        className=""
+      />
     </>
   );
 }
