@@ -99,7 +99,7 @@ export function SidebarComponent({
         className={clsx(
           `flex flex-col ${
             toggle ? "scale-x-100 md:scale-x-0" : "scale-x-0 md:scale-x-100"
-          } absolute md:relative w-64 h-screen px-2 py-4 overflow-y-auto bg-white z-20 rounded-r-[12px] shadow-sm`,
+          } fixed w-64 h-screen px-2 py-4 overflow-y-auto bg-white z-20 rounded-r-[12px] shadow-sm`,
           className?.container
         )}
       >
@@ -248,7 +248,7 @@ export function SidebarComponent({
 
 export function SidebarContentComponent({ children }: { children: ReactNode }) {
   return (
-    <main className="w-full md:w-[calc(100vw-256px)] overflow-x-hidden">
+    <main className="w-full md:ml-[256px] md:w-[calc(100vw-256px)] overflow-x-hidden">
       {children}
     </main>
   );

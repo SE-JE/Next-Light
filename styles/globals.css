@@ -179,5 +179,54 @@ body {
 }
 
 @layer utilities {
+  .skeleton-loading {
+    position: relative;
+    overflow: hidden;
+}
+
+  .skeleton-loading::after {
+      content: "";
+      @apply absolute w-full h-full top-0 left-0 z-[60];
+      background: #f1f1f1;
+      background: linear-gradient(100deg, #f1f1f1 10%, #fff 20%, #f1f1f1 35%);
+      background-size: 200% 100%;
+      animation: 1s loading ease-out infinite;
+  }
+
+  @keyframes loading {
+      to {
+          background-position-x: -200%;
+      }
+  }
+
+  body::-webkit-scrollbar,
+  .scroll::-webkit-scrollbar {
+    @apply w-[10px] h-[10px];
+  }
+
+  .scroll-sm::-webkit-scrollbar {
+    @apply w-[7px] h-[7px];
+  }
+
+  .scroll-lg::-webkit-scrollbar {
+    @apply w-[14px] h-[14px];
+  }
   
+  body::-webkit-scrollbar-thumb,
+  .scroll::-webkit-scrollbar-thumb,
+  .scroll-sm::-webkit-scrollbar-thumb, 
+  .scroll-lg::-webkit-scrollbar-thumb {
+    @apply bg-light-primary/60 cursor-pointer;
+  }
+
+  body::-webkit-scrollbar-thumb:hover,
+  .scroll:hover::-webkit-scrollbar-thumb:hover,
+  .scroll-sm:hover::-webkit-scrollbar-thumb:hover,
+  .scroll-lg:hover::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary;
+  }
+
+  .scroll-none::-webkit-scrollbar {
+    @apply w-0 h-0;
+  }
 }

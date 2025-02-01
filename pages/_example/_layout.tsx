@@ -71,6 +71,11 @@ export default function ExampleLayout({ children }: { children: ReactNode }) {
                     path: "/modal",
                   },
                   {
+                    label: "Scroll Container",
+                    left_content: <FontAwesomeIcon icon={faStar} />,
+                    path: "/scroll-container",
+                  },
+                  {
                     label: "Table",
                     left_content: <FontAwesomeIcon icon={faStar} />,
                     path: "/table",

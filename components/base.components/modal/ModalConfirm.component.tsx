@@ -1,7 +1,7 @@
 import { ReactNode, useEffect } from "react";
-import { faQuestion, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faQuestion } from "@fortawesome/free-solid-svg-icons";
 import clsx from "clsx";
-import { ButtonComponent, IconButtonComponent } from "../button";
+import { ButtonComponent } from "../button";
 import { parseClassName } from "@/helpers";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 type classNamePrefix = "base" | "backdrop" | "header" | "footer";
