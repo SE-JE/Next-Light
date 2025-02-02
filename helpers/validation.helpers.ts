@@ -24,7 +24,8 @@ export type ValidationHelperProps = {
     | Date[]
     | File
     | File[]
-    | null;
+    | null
+    | (string | number)[];
   rules?: ValidationRules;
 };
 

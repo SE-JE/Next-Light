@@ -248,7 +248,7 @@ export function SidebarComponent({
 
 export function SidebarContentComponent({ children }: { children: ReactNode }) {
   return (
-    <main className="w-full md:ml-[256px] md:w-[calc(100vw-256px)] overflow-x-hidden">
+    <main className="w-full md:ml-[256px] md:w-[calc(100vw-256px)] min-h-screen overflow-x-hidden">
       {children}
     </main>
   );

@@ -9,6 +9,7 @@ import { InputRadioComponent } from "@/components/base.components/input/InputRad
 import { InputCurrencyComponent } from "@/components/base.components/input/InputCurrency.component";
 import { InputDateComponent } from "@/components/base.components/input/InputDate.component";
 import { InputNumberComponent } from "@/components/base.components/input/InputNumber.component";
+import { SelectComponent } from "@/components/base.components/input/Select.component";
 type ClassNamePrefix = "label" | "tip" | "error" | "input";
 
 export default function Input() {
@@ -174,6 +175,51 @@ export default function Input() {
               name="input_number"
               label="Input Number"
               placeholder="0000"
+            />
+          </div>
+
+          <div className="col-span-4">
+            <SelectComponent
+              name="input_select"
+              label="Select Option"
+              placeholder="Choice option..."
+              options={[1, 2, 3, 4, 5].map((i) => {
+                return {
+                  label: "Option " + i,
+                  value: i,
+                };
+              })}
+            />
+          </div>
+
+          <div className="col-span-4">
+            <SelectComponent
+              name="input_select"
+              label="Select Option Searchable"
+              placeholder="Choice option..."
+              options={[1, 2, 3, 4, 5].map((i) => {
+                return {
+                  label: "Option " + i,
+                  value: i,
+                };
+              })}
+              searchable
+            />
+          </div>
+
+          <div className="col-span-4">
+            <SelectComponent
+              name="input_select"
+              label="Multiple Select Option"
+              placeholder="Choice option..."
+              options={[1, 2, 3, 4, 5].map((i) => {
+                return {
+                  label: "Option " + i,
+                  value: i,
+                };
+              })}
+              searchable
+              multiple
             />
           </div>
         </div>

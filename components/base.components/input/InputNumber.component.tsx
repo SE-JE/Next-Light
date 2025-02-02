@@ -93,7 +93,7 @@ export function InputNumberComponent({
   // ## change value handler
   // =========================>
   useEffect(() => {
-    setInputValue(String(value) || "");
+    setInputValue(String(value || ""));
     value && setIsFirst(false);
   }, [value]);
 

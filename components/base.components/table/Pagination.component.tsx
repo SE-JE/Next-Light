@@ -5,19 +5,19 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
 
-export type paginateProps = {
+export type PaginationProps = {
   totalRow: number;
   paginate: number;
   page: number;
   onChange?: (totalRow: number, paginate: number, page: number) => void;
 };
 
-export default function PaginateComponent({
+export default function PaginationComponent({
   totalRow,
   paginate,
   page,
   onChange,
-}: paginateProps) {
+}: PaginationProps) {
   const [pagination, setPagination] = useState<{
     first: boolean;
     pages: number[];

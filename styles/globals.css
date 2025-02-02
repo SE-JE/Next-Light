@@ -118,7 +118,7 @@ body {
   }
 
   .input-values-item {
-      @apply flex px-1 pl-2 justify-between bg-light-primary text-gray-500 items-center rounded-[4px];
+      @apply flex text-sm px-1 pl-2 justify-between bg-white text-foreground items-center rounded-[4px];
   }
 
   .input-values-delete {
@@ -176,6 +176,7 @@ body {
     @apply isolate fixed left-0 top-0 z-40 w-screen h-screen bg-light-foreground/20 backdrop-blur-[1px];
   }
 
+  
 }
 
 @layer utilities {
