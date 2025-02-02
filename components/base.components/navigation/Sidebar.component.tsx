@@ -1,10 +1,9 @@
 import React, { ReactNode, useEffect, useState } from "react";
-import { sidebarItem, sidebarProps } from "./sidebar.props";
+import { sidebarProps } from "./sidebar.props";
 import clsx from "clsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/router";
-import { useToggleContext } from "@/context/ToggleContext";
 import Link from "next/link";
 
 function ListWrapper({
@@ -29,12 +28,12 @@ export function SidebarComponent({
   basePath,
   toggle,
   onToggleChange,
-  onChange,
-  hasAccess,
+  // onChange,
+  // hasAccess,
   className,
 }: sidebarProps) {
   const router = useRouter();
-  const { getActive } = useToggleContext();
+  // const { getActive } = useToggleContext();
   const [shows, setShows] = useState<string[]>([]);
 
   const setShow = (key: string) => {

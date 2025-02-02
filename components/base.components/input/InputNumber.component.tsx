@@ -98,7 +98,7 @@ export function InputNumberComponent({
   }, [value]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let newValue = e.target.value;
+    const newValue = e.target.value;
 
     const regex = /^-?\d*\.?\d*$/;
     if (regex.test(newValue)) {

@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import styles from "./input.module.css";
 import clsx from "clsx";
 import { parseClassName } from "@/helpers";
 type classNamePrefix = "label" | "checked" | "error" | "input";

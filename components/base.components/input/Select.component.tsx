@@ -14,13 +14,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import clsx from "clsx";
-import React, {
-  InputHTMLAttributes,
-  ReactNode,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { ReactNode, useEffect, useMemo, useState } from "react";
 
 type classNamePrefix =
   | "label"
@@ -164,7 +158,6 @@ export function SelectComponent({
       setInputValue("");
       setInputShowValue("");
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, dataOptions]);
 
   // =========================>
@@ -208,7 +201,7 @@ export function SelectComponent({
   const onKeyDownOption = (e: any) => {
     if (dataOptions?.length) {
       if (e.keyCode === 13) {
-        let resultValue = filteredOptions?.at(activeOption);
+        const resultValue = filteredOptions?.at(activeOption);
         setActiveOption(-1);
         setFilteredOptions([]);
         setShowOption(false);
@@ -251,7 +244,7 @@ export function SelectComponent({
   const fetchOptions = async () => {
     setLoadingOption(true);
 
-    let serverControl = {
+    const serverControl = {
       ...serverOptionControl,
       params: serverSearchable
         ? {
@@ -471,7 +464,7 @@ export function SelectComponent({
                             className={`input-values-delete`}
                             onClick={() => {
                               const values = Array().concat(inputValue);
-                              let index = values.findIndex(
+                              const index = values.findIndex(
                                 (val: string | number) => val == item
                               );
                               setInputValue(
@@ -544,31 +537,34 @@ export function SelectComponent({
           </label>
         </div>
 
-        {!!dataOptions?.length && showOption && !!filteredOptions?.length && (
-          <div>
-            <ul
-              className={`
+        {!!dataOptions?.length &&
+          showOption &&
+          loadingOption &&
+          !!filteredOptions?.length && (
+            <div>
+              <ul
+                className={`
                   input-suggest-container scroll-sm
                   ${isFocus ? "opacity-100 scale-y-100" : "opacity-0 scale-y-0"}
                 `}
-            >
-              {(newOption
-                ? [newOption, ...filteredOptions]
-                : filteredOptions
-              ).map((option, key) => {
-                const selected =
-                  !!(
-                    (typeof inputValue == "string" ||
-                      typeof inputValue == "number") &&
-                    inputValue == option.value
-                  ) ||
-                  (Array.isArray(inputValue) &&
-                    Array()
-                      .concat(inputValue)
-                      .find((val: string | number) => val == option.value));
-                return (
-                  <li
-                    className={`
+              >
+                {(newOption
+                  ? [newOption, ...filteredOptions]
+                  : filteredOptions
+                ).map((option, key) => {
+                  const selected =
+                    !!(
+                      (typeof inputValue == "string" ||
+                        typeof inputValue == "number") &&
+                      inputValue == option.value
+                    ) ||
+                    (Array.isArray(inputValue) &&
+                      Array()
+                        .concat(inputValue)
+                        .find((val: string | number) => val == option.value));
+                  return (
+                    <li
+                      className={`
                         cursor-pointer hover:bg-light-primary
                         input-suggest
                         ${
@@ -576,63 +572,66 @@ export function SelectComponent({
                           "bg-light-primary text-primary"
                         }
                       `}
-                    key={key}
-                    onMouseDown={() => {
-                      setKeydown(true);
-                      setTimeout(() => setIsFocus(true), 110);
-                    }}
-                    onMouseUp={() => {
-                      setKeydown(false);
-                      setActiveOption(key);
-                      setFilteredOptions([]);
-                      setShowOption(false);
-                      if (!multiple) {
-                        setInputShowValue(option.label);
-                        serverSearchable && setKeyword(option.label);
-                        setInputValue(option.value);
-                        onChange?.(option.value, option);
-                      } else {
-                        const values: string[] | number[] = Array.isArray(
-                          inputValue
-                        )
-                          ? Array()
-                              .concat(inputValue)
-                              .filter((val) => val != option.value)
-                          : [];
-                        setInputShowValue("");
-                        serverSearchable && setKeyword("");
-                        if (
-                          Array.isArray(inputValue) &&
-                          Array()
-                            .concat(inputValue)
-                            .find((val) => val == option.value)
-                        ) {
-                          setInputValue(values);
-                          onChange?.(values);
+                      key={key}
+                      onMouseDown={() => {
+                        setKeydown(true);
+                        setTimeout(() => setIsFocus(true), 110);
+                      }}
+                      onMouseUp={() => {
+                        setKeydown(false);
+                        setActiveOption(key);
+                        setFilteredOptions([]);
+                        setShowOption(false);
+                        if (!multiple) {
+                          setInputShowValue(option.label);
+                          serverSearchable && setKeyword(option.label);
+                          setInputValue(option.value);
+                          onChange?.(option.value, option);
                         } else {
-                          setInputValue([
-                            ...Array().concat(values),
-                            option.value,
-                          ]);
-                          onChange?.([...Array().concat(values), option.value]);
+                          const values: string[] | number[] = Array.isArray(
+                            inputValue
+                          )
+                            ? Array()
+                                .concat(inputValue)
+                                .filter((val) => val != option.value)
+                            : [];
+                          setInputShowValue("");
+                          serverSearchable && setKeyword("");
+                          if (
+                            Array.isArray(inputValue) &&
+                            Array()
+                              .concat(inputValue)
+                              .find((val) => val == option.value)
+                          ) {
+                            setInputValue(values);
+                            onChange?.(values);
+                          } else {
+                            setInputValue([
+                              ...Array().concat(values),
+                              option.value,
+                            ]);
+                            onChange?.([
+                              ...Array().concat(values),
+                              option.value,
+                            ]);
+                          }
                         }
-                      }
-                      setTimeout(() => setIsFocus(false), 120);
-                    }}
-                  >
-                    {selected && (
-                      <FontAwesomeIcon
-                        icon={faCheckCircle}
-                        className="mr-2 text-sm"
-                      />
-                    )}
-                    {option.label}
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        )}
+                        setTimeout(() => setIsFocus(false), 120);
+                      }}
+                    >
+                      {selected && (
+                        <FontAwesomeIcon
+                          icon={faCheckCircle}
+                          className="mr-2 text-sm"
+                        />
+                      )}
+                      {option.label}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
 
         {isInvalid && (
           <small

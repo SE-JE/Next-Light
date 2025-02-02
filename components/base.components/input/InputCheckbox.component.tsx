@@ -7,7 +7,6 @@ import {
   ValidationRules,
 } from "../../../helpers";
 import { CheckboxComponent } from "./Checkbox.component";
-import styles from "./input.module.css";
 import clsx from "clsx";
 
 type classNamePrefix = "label" | "tip" | "error" | "input" | "icon";
@@ -115,7 +114,7 @@ export function InputCheckboxComponent({
     setIsInvalid(errorMessage || error || "");
   }, [error, errorMessage]);
 
-  let dummy = vertical ? [1, 2, 3, 4, 5, 6, 7, 8, 9] : [1, 2, 3];
+  const dummy = vertical ? [1, 2, 3, 4, 5, 6, 7, 8, 9] : [1, 2, 3];
 
   return (
     <>

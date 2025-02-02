@@ -112,7 +112,7 @@ export function InputComponent({
 
   useEffect(() => {
     if (inputValue && typeof inputValue === "string") {
-      let val = inputValue.split("");
+      const val = inputValue.split("");
       let newVal = "";
 
       if (onlyAlphabet) {
@@ -167,7 +167,7 @@ export function InputComponent({
   const onKeyDownSuggestion = (e: any) => {
     if (dataSuggestions?.length) {
       if (e.keyCode === 13) {
-        let resultValue = filteredSuggestions?.at(activeSuggestion);
+        const resultValue = filteredSuggestions?.at(activeSuggestion);
         setActiveSuggestion(-1);
         setFilteredSuggestions([]);
         setShowSuggestions(false);

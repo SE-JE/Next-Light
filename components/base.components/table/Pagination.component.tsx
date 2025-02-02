@@ -32,7 +32,7 @@ export default function PaginationComponent({
   useEffect(() => {
     if (totalRow > paginate) {
       let newPages = [];
-      let lastPage = Math.ceil(totalRow / paginate);
+      const lastPage = Math.ceil(totalRow / paginate);
 
       if (page > 1 && page < lastPage) {
         if (page > 2) {

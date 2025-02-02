@@ -6,8 +6,6 @@ import {
   useValidationHelper,
   ValidationRules,
 } from "../../../helpers";
-import { CheckboxComponent } from "./Checkbox.component";
-import styles from "./input.module.css";
 import clsx from "clsx";
 import { RadioComponent } from "./Radio.component";
 
@@ -116,7 +114,7 @@ export function InputRadioComponent({
     setIsInvalid(errorMessage || error || "");
   }, [error, errorMessage]);
 
-  let dummy = vertical ? [1, 2, 3, 4, 5, 6, 7, 8, 9] : [1, 2, 3];
+  const dummy = vertical ? [1, 2, 3, 4, 5, 6, 7, 8, 9] : [1, 2, 3];
 
   return (
     <>

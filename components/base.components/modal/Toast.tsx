@@ -1,4 +1,4 @@
-import { ReactNode, useEffect } from "react";
+import { ReactNode } from "react";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import clsx from "clsx";
 import { IconButtonComponent } from "../button";

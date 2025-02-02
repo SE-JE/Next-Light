@@ -14,15 +14,6 @@ import React, {
 } from "react";
 import { CurrencyFormatComponent } from "../format";
 
-function formatCurrency(value: string, locale = "id-ID", currency = "IDR") {
-  const numberValue = parseFloat(value.replace(/[^0-9]/g, "")) || 0;
-  return new Intl.NumberFormat(locale, {
-    style: "currency",
-    currency,
-    minimumFractionDigits: 0,
-  }).format(numberValue);
-}
-
 type classNamePrefix =
   | "label"
   | "tip"
@@ -98,7 +89,16 @@ export function InputCurrencyComponent({
         htmlFor={randomId}
         className={clsx(
           "input-label",
-          parseClassName<classNamePrefix>(className, "label")
+          parseClassName<classNamePrefix>(className, "label"),
+          props.disabled && "opacity-50",
+          props.disabled &&
+            parseClassName<classNamePrefix>(className, "label", "disabled"),
+          isFocus && "text-primary",
+          isFocus &&
+            parseClassName<classNamePrefix>(className, "label", "focus"),
+          isInvalid && "text-danger",
+          isInvalid &&
+            parseClassName<classNamePrefix>(className, "label", "focus")
         )}
       >
         {label}
@@ -108,7 +108,10 @@ export function InputCurrencyComponent({
         <small
           className={clsx(
             "input-tip",
-            parseClassName<classNamePrefix>(className, "tip")
+            parseClassName<classNamePrefix>(className, "tip"),
+            props.disabled && "opacity-60",
+            props.disabled &&
+              parseClassName<classNamePrefix>(className, "tip", "disabled")
           )}
         >
           {tip}
@@ -121,7 +124,12 @@ export function InputCurrencyComponent({
           id={randomId}
           className={clsx(
             "input",
-            parseClassName<classNamePrefix>(className, "input")
+            leftIcon && "pl-12",
+            rightIcon && "pr-12",
+            parseClassName<classNamePrefix>(className, "input"),
+            isInvalid && "input-error",
+            isInvalid &&
+              parseClassName<classNamePrefix>(className, "input", "error")
           )}
           value={
             inputValue
@@ -160,7 +168,13 @@ export function InputCurrencyComponent({
           <FontAwesomeIcon
             className={clsx(
               "left-4 input-icon",
-              parseClassName<classNamePrefix>(className, "icon")
+              parseClassName<classNamePrefix>(className, "icon"),
+              props.disabled && "opacity-60",
+              props.disabled &&
+                parseClassName<classNamePrefix>(className, "icon", "disabled"),
+              isFocus && "text-primary",
+              isFocus &&
+                parseClassName<classNamePrefix>(className, "icon", "focus")
             )}
             icon={leftIcon}
           />
@@ -169,7 +183,13 @@ export function InputCurrencyComponent({
           <FontAwesomeIcon
             className={clsx(
               "right-4 input-icon",
-              parseClassName<classNamePrefix>(className, "icon")
+              parseClassName<classNamePrefix>(className, "icon"),
+              props.disabled && "opacity-60",
+              props.disabled &&
+                parseClassName<classNamePrefix>(className, "icon", "disabled"),
+              isFocus && "text-primary",
+              isFocus &&
+                parseClassName<classNamePrefix>(className, "icon", "focus")
             )}
             icon={rightIcon}
           />

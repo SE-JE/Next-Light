@@ -62,8 +62,8 @@ export function TableComponent({
   searchColumn,
   searchableColumn,
   onChangeSearchColumn,
-  filter,
-  onChangeFilter,
+  // filter,
+  // onChangeFilter,
   loading,
   topBar,
   onRowClick,
@@ -73,14 +73,14 @@ export function TableComponent({
   searchable,
 }: tableProps) {
   const [displayColumns, setDisplayColumns] = useState<string[]>([]);
-  const [floatingAction, setFloatingAction] = useState(true);
+  const [showFloatingAction, setShowFloatingAction] = useState(true);
   const [floatingActionActive, setFloatingActionActive] = useState<
     false | number
   >(false);
   const [floatingDisplay, setFloatingDisplay] = useState(false);
   const [keyword, setKeyword] = useState<string>("");
   const [keywordSearch] = useLazySearch(keyword);
-  const [actionColumnWidth, setActionColumnWidth] = useState<number>(0);
+  // const [actionColumnWidth, setActionColumnWidth] = useState<number>(0);
 
   useEffect(() => {
     if (columns) {
@@ -91,7 +91,6 @@ export function TableComponent({
   useEffect(() => {
     setKeyword(search || "");
     pagination?.onChange?.(pagination.totalRow, pagination.paginate, 1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
 
   useEffect(() => {
@@ -100,25 +99,20 @@ export function TableComponent({
     } else {
       onChangeSearch?.("");
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [keywordSearch]);
 
   const actionColumnRef = useRef(null);
 
-  useEffect(() => {
-    if (actionColumnRef.current) {
-      const el = actionColumnRef.current as HTMLDivElement;
+  // useEffect(() => {
+  //   if (actionColumnRef.current) {
+  //     const el = actionColumnRef.current as HTMLDivElement;
 
-      setActionColumnWidth(el.offsetWidth);
-    }
-  }, [
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    actionColumnRef.current &&
-      actionColumnRef.current["offsetWidth" as keyof object],
-  ]);
-
-  // console.log(actionColumnWidth);
+  //     setActionColumnWidth(el.offsetWidth);
+  //   }
+  // }, [
+  //   actionColumnRef.current &&
+  //     actionColumnRef.current["offsetWidth" as keyof object],
+  // ]);
 
   return (
     <>
@@ -546,7 +540,7 @@ export function TableComponent({
                             </div>
 
                             {item["action" as keyof object] &&
-                              floatingAction && (
+                              showFloatingAction && (
                                 <div
                                   className="sticky hover:-right-2 bg-background -right-5 z-30 cursor-pointer flex items-center shadow rounded-l-lg"
                                   onClick={() =>

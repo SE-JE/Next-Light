@@ -1,7 +1,6 @@
 import React, { ReactNode } from "react";
 import ExampleLayout from "./_layout";
 import { ScrollContainerComponent } from "@/components/base.components/scroll-container/ScrollContainer.component";
-import { CardComponent } from "@/components/base.components";
 
 export default function ScrollContainer() {
   return (

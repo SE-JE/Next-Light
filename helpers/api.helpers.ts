@@ -1,17 +1,29 @@
 import { useEffect, useState } from 'react';
-import axios, { AxiosProgressEvent } from 'axios';
+import axios, { AxiosResponse } from "axios";
+import Router from "next/router";
+import { token_cookie_name, loginPath, basePath } from "./middleware.helpers";
+import { Decrypt } from "./encryption.helpers";
+import { standIn } from "./standIn.helpers";
 import Cookies from 'js-cookie';
-import Router from 'next/router';
-import { token_cookie_name, loginPath, basePath } from './middleware.helpers';
-// import fileDownload from 'js-file-download';
-import { Decrypt } from './encryption.helpers';
-import { standIn } from './standIn.helpers';
+
+export const authHeader = (bearer?: string): string | null => {
+  if (bearer) return `Bearer ${bearer}`;
+  const token = Cookies.get(token_cookie_name);
+  return token ? `Bearer ${Decrypt(token)}` : null;
+};
+
+const handleErrors = (fetch: AxiosResponse) => {
+  if (fetch.status === 401) Router.push(loginPath);
+  else if (fetch.status === 403) Router.push(basePath);
+  return fetch;
+};
 
 // =========================>
 // ## type of filter params
 // =========================>
 export type getFilterParams = {
-  type?: 'equal' | 'notEqual' | 'in' | 'notIn' | 'range';
+   /** Use filter type with: "eq" Equal, "ne" Not Equal, "in" In, "ni" Not In, "rg" Range. */
+  type?: "eq" | "ne" | "in" | "ni" | "rg";
   column?: string;
   value?: string | string[];
 };
@@ -44,11 +56,11 @@ export type getProps = {
 // ## filter type value
 // =========================>
 export const getFilterTypeValue = {
-  equal: 'eq',
-  notEqual: 'ne',
-  in: 'in',
-  notIn: 'ni',
-  range: 'bw',
+  equal: "eq",
+  notEqual: "ne",
+  in: "in",
+  notIn: "ni",
+  range: "bw",
 };
 
 // =========================>
@@ -62,50 +74,32 @@ export const get = async ({
   includeHeaders,
   bearer,
 }: getProps) => {
-  const fetchUrl = url
-    ? url
-    : `${process.env.NEXT_PUBLIC_API_URL}/${path || ''}`;
-  const fetchHeaders: any = includeHeaders || {};
-
-  if (!fetchHeaders.Authorization) {
-    if (bearer) {
-      fetchHeaders.Authorization = `Bearer ${bearer}`;
-    } else if (Cookies.get(token_cookie_name)) {
-      fetchHeaders.Authorization = `Bearer ${Decrypt(
-        Cookies.get(token_cookie_name)
-      )}`;
-    }
-  }
+  const fetchUrl = url || `${process.env.NEXT_PUBLIC_API_URL}/${path || ""}`;
+  const headers: Record<string, string> = {
+    Authorization: authHeader(bearer) || "",
+    ...includeHeaders,
+  };
 
   const filter: Record<string, any> = {};
   if (params?.filter) {
     params?.filter?.map((val) => {
       filter[val.column as keyof object] = `${
         getFilterTypeValue[val.type as keyof object]
-      }:${Array.isArray(val.value) ? val.value.join(',') : val.value}`;
+      }:${Array.isArray(val.value) ? val.value.join(",") : val.value}`;
     });
   }
 
-  // await axios.get(process.env.NEXT_PUBLIC_CSRF_URL || '');
-  const fetch = await axios
+  return await axios
     .get(fetchUrl, {
-      headers: fetchHeaders,
+      headers,
       params: {
         ...params,
         ...includeParams,
-        filter: params?.filter ? JSON.stringify(filter) : '',
+        filter: params?.filter ? JSON.stringify(filter) : "",
       },
     })
     .then((res) => res)
-    .catch((err) => err.response);
-
-  if (fetch.status == 401) {
-    Router.push(loginPath);
-  } else if (fetch.status == 403) {
-    // Router.push(basePath);
-  } else {
-    return fetch;
-  }
+    .catch((err) => handleErrors(err.response));
 };
 
 // =========================>
@@ -116,46 +110,44 @@ export const useGet = (
   sleep?: boolean
 ) => {
   const [loading, setLoading] = useState<boolean>(true);
-  const [refresh, setRefresh] = useState<boolean>(false);
   const [code, setCode] = useState<number | null>(null);
   const [data, setData] = useState<any | null>(null);
 
-  useEffect(() => {
+  const fetch = async (revalidation: boolean = false) => {
     setLoading(true);
 
-    const fetch = async () => {
-      const cacheData = props.expired
+    const cacheData =
+      props.expired && revalidation
         ? await standIn.get(props.cacheName || `fetch_${props?.path}`)
         : null;
 
-      if (cacheData) {
+    if (cacheData) {
+      setLoading(false);
+      setCode(200);
+      setData(cacheData);
+    } else {
+      const response = await get(props);
+
+      if (response?.status) {
         setLoading(false);
-        setCode(200);
-        setData(cacheData);
-      } else {
-        const response = await get(props);
+        setCode(response?.status);
+        setData(response?.data);
 
-        if (response?.status) {
-          setLoading(false);
-          setCode(response?.status);
-          setData(response?.data);
-
-          if (props.expired) {
-            standIn.set({
-              key: props?.cacheName || `option_${props?.path}`,
-              data: response?.data,
-              expired: props.expired,
-            });
-          }
+        if (props.expired) {
+          standIn.set({
+            key: props?.cacheName || `fetch_${props?.path}`,
+            data: response?.data,
+            expired: props.expired,
+          });
         }
       }
-    };
+    }
+  };
 
+  useEffect(() => {
     if (!sleep && (props.path || props.url)) {
       fetch();
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     props.path,
     props.url,
@@ -166,15 +158,14 @@ export const useGet = (
     props.params?.sortDirection,
     props.params?.filter,
     props.includeParams,
-    // props.includeHeaders,
+    props.includeHeaders,
     props.bearer,
-    refresh,
     sleep,
   ]);
 
-  const reset = () => setRefresh(!refresh);
+  const reset = () => fetch(true);
 
-  return [loading, code, data, reset];
+  return [{ loading, code, data, reset }];
 };
 
 // =========================>
@@ -187,7 +178,7 @@ export type postProps = {
   body?: object;
   includeHeaders?: object;
   bearer?: string;
-  contentType?: 'application/json' | 'multipart/form-data';
+  contentType?: "application/json" | "multipart/form-data";
 };
 
 // =========================>
@@ -202,45 +193,24 @@ export const post = async ({
   bearer,
   contentType,
 }: postProps) => {
-  const fetchUrl = url
-    ? url
-    : `${process.env.NEXT_PUBLIC_API_URL}/${path || ''}`;
-  const fetchHeaders: any = includeHeaders || {};
+  const fetchUrl = url || `${process.env.NEXT_PUBLIC_API_URL}/${path || ""}`;
+  const headers: Record<string, string> = {
+    Authorization: authHeader(bearer) || "",
+    ...includeHeaders,
+  };
 
-  if (!fetchHeaders.Authorization) {
-    if (bearer) {
-      fetchHeaders.Authorization = `Bearer ${bearer}`;
-    } else if (Cookies.get(token_cookie_name)) {
-      fetchHeaders.Authorization = `Bearer ${Decrypt(
-        Cookies.get(token_cookie_name)
-      )}`;
-    }
-  }
+  headers["Content-Type"] =
+    headers["Content-Type"] || contentType || "application/json";
 
-  if (!fetchHeaders['Content-Type']) {
-    fetchHeaders['Content-Type'] = contentType
-      ? contentType
-      : 'application/json';
-  }
-
-  // await axios.get(process.env.NEXT_PUBLIC_CSRF_URL || '');
-  const fetch = await axios
+  return await axios
     .post(fetchUrl, body, {
-      headers: fetchHeaders,
+      headers,
       params: {
         ...params,
       },
     })
     .then((res) => res)
-    .catch((err) => err.response);
-
-  if (fetch.status == 401) {
-    Router.push(loginPath);
-  } else if (fetch.status == 403) {
-    // Router.push(basePath);
-  } else {
-    return fetch;
-  }
+    .catch((err) => handleErrors(err.response));
 };
 
 // =========================>
@@ -253,7 +223,7 @@ export type patchProps = {
   body?: object;
   includeHeaders?: object;
   bearer?: string;
-  contentType?: 'application/json' | 'multipart/form-data';
+  contentType?: "application/json" | "multipart/form-data";
 };
 
 // =========================>
@@ -268,42 +238,24 @@ export const patch = async ({
   bearer,
   contentType,
 }: patchProps) => {
-  const fetchUrl = url
-    ? url
-    : `${process.env.NEXT_PUBLIC_API_URL}/${path || ''}`;
-  const fetchHeaders: any = includeHeaders || {};
+  const fetchUrl = url || `${process.env.NEXT_PUBLIC_API_URL}/${path || ""}`;
+  const headers: Record<string, string> = {
+    Authorization: authHeader(bearer) || "",
+    ...includeHeaders,
+  };
 
-  if (!fetchHeaders.Authorization) {
-    if (bearer) {
-      fetchHeaders.Authorization = `Bearer ${bearer}`;
-    } else if (Cookies.get(token_cookie_name)) {
-      fetchHeaders.Authorization = `Bearer ${Decrypt(
-        Cookies.get(token_cookie_name)
-      )}`;
-    }
-  }
+  headers["Content-Type"] =
+    headers["Content-Type"] || contentType || "application/json";
 
-  if (!fetchHeaders['Content-Type']) {
-    fetchHeaders['Content-Type'] = contentType
-      ? contentType
-      : 'application/json';
-  }
-
-  // await axios.get(process.env.NEXT_PUBLIC_CSRF_URL || '');
-  const fetch = await axios.patch(fetchUrl, body, {
-    headers: fetchHeaders,
-    params: {
-      ...params,
-    },
-  });
-
-  if (fetch.status == 401) {
-    Router.push(loginPath);
-  } else if (fetch.status == 403) {
-    Router.push(basePath);
-  } else {
-    return fetch;
-  }
+  return await axios
+    .patch(fetchUrl, body, {
+      headers,
+      params: {
+        ...params,
+      },
+    })
+    .then((res) => res)
+    .catch((err) => handleErrors(err.response));
 };
 
 // =========================>
@@ -327,49 +279,35 @@ export const destroy = async ({
   includeHeaders,
   bearer,
 }: destroyProps) => {
-  const fetchUrl = url
-    ? url
-    : `${process.env.NEXT_PUBLIC_API_URL}/${path || ''}`;
-  const fetchHeaders: any = includeHeaders || {};
+  const fetchUrl = url || `${process.env.NEXT_PUBLIC_API_URL}/${path || ""}`;
+  const headers: Record<string, string> = {
+    Authorization: authHeader(bearer) || "",
+    ...includeHeaders,
+  };
 
-  if (!fetchHeaders.Authorization) {
-    if (bearer) {
-      fetchHeaders.Authorization = `Bearer ${bearer}`;
-    } else if (Cookies.get(token_cookie_name)) {
-      fetchHeaders.Authorization = `Bearer ${Decrypt(
-        Cookies.get(token_cookie_name)
-      )}`;
-    }
-  }
-
-  const fetch = await axios.delete(fetchUrl, {
-    headers: fetchHeaders,
-    params: {
-      ...params,
-    },
-  });
-
-  if (fetch.status == 401) {
-    Router.push(loginPath);
-  } else if (fetch.status == 403) {
-    Router.push(basePath);
-  } else {
-    return fetch;
-  }
+  return await axios
+    .delete(fetchUrl, {
+      headers: headers,
+      params: {
+        ...params,
+      },
+    })
+    .then((res) => res)
+    .catch((err) => handleErrors(err.response));
 };
 
 // =========================>
 // ## type of download props
 // =========================>
-export type downloadProps = {
-  path?: string;
-  url?: string;
-  params?: object;
-  includeHeaders?: object;
-  bearer?: string;
-  fileName: string;
-  onDownloadProgress: (e: AxiosProgressEvent) => void;
-};
+// export type downloadProps = {
+//   path?: string;
+//   url?: string;
+//   params?: object;
+//   includeHeaders?: object;
+//   bearer?: string;
+//   fileName: string;
+//   onDownloadProgress: (e: AxiosProgressEvent) => void;
+// };
 
 // =========================>
 // ## Download function

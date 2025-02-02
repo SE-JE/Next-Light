@@ -10,7 +10,6 @@ import { InputCurrencyComponent } from "@/components/base.components/input/Input
 import { InputDateComponent } from "@/components/base.components/input/InputDate.component";
 import { InputNumberComponent } from "@/components/base.components/input/InputNumber.component";
 import { SelectComponent } from "@/components/base.components/input/Select.component";
-type ClassNamePrefix = "label" | "tip" | "error" | "input";
 
 export default function Input() {
   return (

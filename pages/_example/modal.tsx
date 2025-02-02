@@ -32,7 +32,7 @@ export default function Modal() {
         title="Judul Modal"
         footer={
           <div className="text-xs text-light-foreground">
-            Click outer "x" or outer modal to close
+            Click outer &quot;x&quot; or outer modal to close
           </div>
         }
         className=""
@@ -50,7 +50,7 @@ export default function Modal() {
         title="Title Page"
         footer={
           <div className="text-xs text-light-foreground">
-            Click outer "x" or outer modal to close
+            Click outer &quot;x&quot; or outer modal to close
           </div>
         }
         className="bg-white"

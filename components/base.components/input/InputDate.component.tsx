@@ -264,7 +264,7 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
 
   const renderDays = () => {
     const days = [];
-    let startDay = moment(startDate);
+    const startDay = moment(startDate);
     for (let i = 0; i < 7; i++) {
       days.push(
         <div key={i} className="text-center font-bold">
@@ -278,7 +278,7 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
   const renderCells = () => {
     const rows = [];
     let days = [];
-    let day = moment(startDate);
+    const day = moment(startDate);
     while (day.isBefore(endDate) || day.isSame(endDate, "day")) {
       for (let i = 0; i < 7; i++) {
         const cloneDay = moment(day);

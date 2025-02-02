@@ -1,64 +1,107 @@
-import { useState, useEffect } from "react";
+import { useReducer, useEffect } from "react";
 import { post, postProps } from "./api.helpers";
 import { validationHelper, ValidationRules } from "./validation.helpers";
 
+// **1. Inisialisasi State**
+const initialState = {
+  formRegisters: [] as { name: string; validations?: ValidationRules }[],
+  formValues: [] as { name: string; value?: any }[],
+  formErrors: [] as { name: string; error?: any }[],
+  loading: false,
+  showConfirm: false,
+};
+
+// **2. Reducer Function**
+const formReducer = (state: typeof initialState, action: any) => {
+  switch (action.type) {
+    case "SET_VALUE":
+      return {
+        ...state,
+        formValues: [
+          ...state.formValues.filter((val) => val.name !== action.payload.name),
+          { name: action.payload.name, value: action.payload.value },
+        ],
+      };
+
+    case "SET_ERRORS":
+      return { ...state, formErrors: action.payload };
+
+    case "REGISTER_FIELD":
+      return {
+        ...state,
+        formRegisters: [
+          ...state.formRegisters.filter(
+            (reg) => reg.name !== action.payload.name
+          ),
+          action.payload,
+        ],
+      };
+
+    case "UNREGISTER_FIELD":
+      return {
+        ...state,
+        formValues: state.formValues.filter(
+          (val) => val.name !== action.payload.name
+        ),
+        formRegisters: state.formRegisters.filter(
+          (reg) => reg.name !== action.payload.name
+        ),
+      };
+
+    case "SET_LOADING":
+      return { ...state, loading: action.payload };
+
+    case "SET_CONFIRM":
+      return { ...state, showConfirm: action.payload };
+
+    case "RESET":
+      return { ...initialState };
+
+    default:
+      return state;
+  }
+};
+
+// **3. Custom Hook useForm**
 export const useForm = (
   submitControl: postProps,
   confirmation?: boolean,
   onSuccess?: (data: any) => void,
   onFailed?: (code: number) => void
 ) => {
-  const [formRegisters, setFormRegisters] = useState<
-    { name: string; validations?: ValidationRules }[]
-  >([]);
-  const [formValues, setFormValues] = useState<{ name: string; value?: any }[]>(
-    []
-  );
-  const [formErrors, setFormErrors] = useState<{ name: string; error?: any }[]>(
-    []
-  );
-  const [loading, setLoading] = useState<boolean>(false);
-  const [showConfirm, setShowConfirm] = useState<boolean>(false);
+  const [state, dispatch] = useReducer(formReducer, initialState);
 
   useEffect(() => {
-    setFormRegisters([]);
-    setFormValues([]);
-    setFormErrors([]);
+    dispatch({ type: "RESET" });
   }, [submitControl?.path]);
 
   const onChange = (name: string, value?: any) => {
-    setFormValues([
-      ...formValues.filter((val) => val.name != name),
-      { name, value: value != undefined ? value : "" },
-    ]);
+    dispatch({ type: "SET_VALUE", payload: { name, value: value ?? "" } });
   };
 
-  const formControl = (name: string) => {
-    return {
-      onChange: (e: any) => onChange(name, e),
-      value: formValues.find((val) => val.name == name)?.value || undefined,
-      error: formErrors.find((val) => val.name == name)?.error || undefined,
-      register: (regName: string, regValidations?: ValidationRules) => {
-        if (!formRegisters.find((reg) => reg.name == regName)) {
-          setFormRegisters([
-            ...formRegisters.filter((reg) => reg.name != regName),
-            { name: regName, validations: regValidations },
-          ]);
-        }
-      },
-      unregister: () => {
-        setFormValues([...formValues.filter((val) => val.name != name)]);
-        setFormRegisters([...formRegisters.filter((reg) => reg.name != name)]);
-      },
-    };
-  };
+  const formControl = (name: string) => ({
+    onChange: (e: any) => onChange(name, e),
+    value:
+      state.formValues.find((val) => val.name === name)?.value || undefined,
+    error:
+      state.formErrors.find((err: { name: string }) => err.name === name)
+        ?.error || undefined,
+    register: (regName: string, regValidations?: ValidationRules) => {
+      dispatch({
+        type: "REGISTER_FIELD",
+        payload: { name: regName, validations: regValidations },
+      });
+    },
+    unregister: () => {
+      dispatch({ type: "UNREGISTER_FIELD", payload: { name } });
+    },
+  });
 
   const fetch = async () => {
-    setLoading(true);
+    dispatch({ type: "SET_LOADING", payload: true });
 
     const formData = new FormData();
-
-    formValues.map((val) => {
+    state.formValues.forEach((val) => {
       formData.append(val.name, val.value);
     });
 
@@ -71,42 +114,35 @@ export const useForm = (
       body: formData,
     });
 
-    if (mutate?.status == 200 || mutate?.status == 201) {
-      setLoading(false);
+    if (mutate?.status === 200 || mutate?.status === 201) {
+      dispatch({ type: "SET_LOADING", payload: false });
       onSuccess?.(mutate.data);
-      setFormValues([]);
-      setFormValues([]);
-      setShowConfirm(false);
-    } else if (mutate?.status == 422) {
-      let errors: { name: string; error?: any }[] = [];
-
-      Object.keys(mutate.data.errors).map((key) => {
-        errors.push({
-          name: key,
-          error: mutate.data.errors[key][0],
-        });
-      });
-
-      setFormErrors(errors);
+      dispatch({ type: "RESET" });
+    } else if (mutate?.status === 422) {
+      const errors = Object.keys(mutate.data.errors).map((key) => ({
+        name: key,
+        error: mutate.data.errors[key][0],
+      }));
+      dispatch({ type: "SET_ERRORS", payload: errors });
       onFailed?.(mutate?.status || 500);
-      setLoading(false);
-      setShowConfirm(false);
+      dispatch({ type: "SET_LOADING", payload: false });
+      dispatch({ type: "SET_CONFIRM", payload: false });
     } else {
       onFailed?.(mutate?.status || 500);
-      setShowConfirm(false);
-      setLoading(false);
+      dispatch({ type: "SET_CONFIRM", payload: false });
+      dispatch({ type: "SET_LOADING", payload: false });
     }
   };
 
   const submit = async (e: any) => {
     e?.preventDefault();
-    setFormErrors([]);
+    dispatch({ type: "SET_ERRORS", payload: [] });
 
     const newErrors: { name: string; error?: any }[] = [];
 
-    formRegisters.map((form) => {
+    state.formRegisters.forEach((form) => {
       const { valid, message } = validationHelper({
-        value: formValues.find((val) => val.name == form.name)?.value,
+        value: state.formValues.find((val) => val.name === form.name)?.value,
         rules: form.validations,
       });
 
@@ -116,12 +152,12 @@ export const useForm = (
     });
 
     if (newErrors.length) {
-      setFormErrors(newErrors);
+      dispatch({ type: "SET_ERRORS", payload: newErrors });
       return;
     }
 
     if (confirmation) {
-      setShowConfirm(true);
+      dispatch({ type: "SET_CONFIRM", payload: true });
     } else {
       fetch();
     }
@@ -131,36 +167,33 @@ export const useForm = (
     fetch();
   };
 
-  const setDefaultValues = (values: object) => {
-    const newValues: { name: string; value?: any }[] = [];
-
-    Object.keys(values).map((keyName: string) => {
-      // if (formRegisters.find((form) => form.name == keyName)) {
-      newValues.push({
-        name: keyName,
-        value: values[keyName as keyof object],
-      });
-      // }
-    });
-    setFormValues(newValues);
+  const setDefaultValues = (values: Record<string, any>) => {
+    const newValues = Object.keys(values).map((keyName) => ({
+      name: keyName,
+      value: values[keyName],
+    }));
+    dispatch({ type: "SET_VALUE", payload: newValues });
   };
 
   return [
     {
       formControl,
-      values: formValues,
-      setValues: setFormValues,
-      errors: formErrors,
-      setErrors: setFormErrors,
+      values: state.formValues,
+      setValues: (values: any) =>
+        dispatch({ type: "SET_VALUE", payload: values }),
+      errors: state.formErrors,
+      setErrors: (errors: any) =>
+        dispatch({ type: "SET_ERRORS", payload: errors }),
       setDefaultValues,
-      registers: formRegisters,
-      setRegisters: setFormRegisters,
+      registers: state.formRegisters,
+      setRegisters: (regs: any) =>
+        dispatch({ type: "REGISTER_FIELD", payload: regs }),
       submit,
-      loading,
+      loading: state.loading,
       confirm: {
-        show: showConfirm,
+        show: state.showConfirm,
         onConfirm,
-        onClose: () => setShowConfirm(false),
+        onClose: () => dispatch({ type: "SET_CONFIRM", payload: false }),
       },
     },
   ];
