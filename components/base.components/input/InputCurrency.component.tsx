@@ -23,7 +23,7 @@ type classNamePrefix =
   | "suggest"
   | "suggest-item";
 
-export interface inputProps
+export interface inputCurrencyProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange"> {
   label?: string;
   tip?: string | ReactNode;
@@ -54,7 +54,7 @@ export function InputCurrencyComponent({
   onChange,
   format,
   ...props
-}: inputProps) {
+}: inputCurrencyProps) {
   const [inputValue, setInputValue] = useState("");
   const [isFocus, setIsFocus] = useState(false);
   const [isInvalid, setIsInvalid] = useState("");

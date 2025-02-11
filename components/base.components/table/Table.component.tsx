@@ -9,7 +9,7 @@ import {
   faRefresh,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import PaginationComponent, { PaginationProps } from "./Pagination.component";
 import { InputComponent, SelectComponent } from "../input";
 import { useLazySearch } from "@/helpers";
@@ -23,64 +23,67 @@ export type tableColumnProps = {
   label: string;
   width?: string;
   sortable?: boolean;
-  // filter?: filterColumnProps;
+  className?: string;
 };
 
 export type tableProps = {
+  headBar?: ReactNode;
+  controlBar?:
+    | boolean
+    | (
+        | "refresh"
+        | "search"
+        | "searchColumn"
+        | "filterColumn"
+        | (() => ReactNode)
+      )[];
   columns: tableColumnProps[];
   data: object[];
   pagination?: PaginationProps;
+  loading?: boolean;
 
   sortBy?: { column: string; direction: "asc" | "desc" };
   onChangeSortBy?: (column: string, direction: "asc" | "desc") => void;
   search?: string;
-  excludeSearch?: boolean;
   onChangeSearch?: (search: string) => void;
   searchableColumn?: string[];
-  searchColumn?: string;
-  onChangeSearchColumn?: (column: string) => void;
+  onChangeSearchableColumn?: (column: string) => void;
   filter?: object;
   onChangeFilter?: (value: object[]) => void;
-  loading?: boolean;
-  topBar?: any;
+
   onRowClick?: (data: object, key: number) => void;
   onRefresh?: () => void;
-  headBar?: any;
-  noControlBar?: boolean;
-  searchable?: boolean;
 };
 
 export function TableComponent({
+  controlBar,
   columns,
   data,
   pagination,
+  loading,
+
   sortBy,
   onChangeSortBy,
   search,
-  excludeSearch,
   onChangeSearch,
-  searchColumn,
   searchableColumn,
-  onChangeSearchColumn,
-  // filter,
-  // onChangeFilter,
-  loading,
-  topBar,
+  onChangeSearchableColumn,
+  filter,
+  onChangeFilter,
+
   onRowClick,
   onRefresh,
-  headBar,
-  noControlBar,
-  searchable,
 }: tableProps) {
   const [displayColumns, setDisplayColumns] = useState<string[]>([]);
-  const [showFloatingAction, setShowFloatingAction] = useState(true);
+  const [showFloatingAction, setShowFloatingAction] = useState(false);
   const [floatingActionActive, setFloatingActionActive] = useState<
     false | number
   >(false);
   const [floatingDisplay, setFloatingDisplay] = useState(false);
   const [keyword, setKeyword] = useState<string>("");
   const [keywordSearch] = useLazySearch(keyword);
-  // const [actionColumnWidth, setActionColumnWidth] = useState<number>(0);
+
+  const actionColumnRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (columns) {
@@ -101,199 +104,117 @@ export function TableComponent({
     }
   }, [keywordSearch]);
 
-  const actionColumnRef = useRef(null);
-
-  // useEffect(() => {
-  //   if (actionColumnRef.current) {
-  //     const el = actionColumnRef.current as HTMLDivElement;
-
-  //     setActionColumnWidth(el.offsetWidth);
-  //   }
-  // }, [
-  //   actionColumnRef.current &&
-  //     actionColumnRef.current["offsetWidth" as keyof object],
-  // ]);
-
   return (
     <>
-      {topBar && (
-        <div className="p-2 rounded-lg bg-white shadow-sm">{topBar}</div>
-      )}
-
-      {!noControlBar && (
-        <div className="flex items-center justify-between my-4">
+      {controlBar && (
+        <div className="py-1 bg-white shadow-2xs flex items-center mb-2">
           {
             // =========================>
-            // ## Input Paginate
+            // ## Display column
             // =========================>
           }
-          <div className="relative z-20">
-            {pagination && (
-              <>
-                <div className="bg-white p-1.5 rounded-md w-24">
-                  <SelectComponent
-                    name="paginate"
-                    options={[
-                      {
-                        value: 10,
-                        label: "10",
-                      },
-                      {
-                        value: 20,
-                        label: "20",
-                      },
-                      {
-                        value: 30,
-                        label: "30",
-                      },
-                      {
-                        value: 50,
-                        label: "50",
-                      },
-                    ]}
-                    value={pagination.paginate}
-                    onChange={(e) => {
-                      pagination.onChange?.(
-                        pagination.totalRow,
-                        Number(e),
-                        pagination.page
-                      );
-                    }}
-                  />
-                </div>
-              </>
-            )}
-          </div>
 
-          {!excludeSearch && (
-            <div className="w-3/4 lg:w-2/3 flex gap-2 justify-end">
-              {
-                // =========================>
-                // ## Display column
-                // =========================>
-              }
-              <div className="bg-white p-1.5 rounded-md relative">
-                <IconButtonComponent
-                  icon={faEyeLowVision}
-                  customPaint={{
-                    bg: "base",
-                    border: "slate-300 ",
-                    color: "slate-400",
-                  }}
-                  onClick={() => {
-                    setFloatingDisplay(!floatingDisplay);
-                  }}
-                  size="sm"
-                />
-                <OutsideClickComponent
-                  onOutsideClick={() => {
-                    setFloatingDisplay(false);
-                  }}
-                >
-                  <div
-                    className={`
-                  absolute -bottom-1 bg-white translate-y-full right-0 p-3 w-[220px] z-20 rounded-lg shadow
-                  ${!floatingDisplay && "scale-y-0 top-0 opacity-0"}
-                `}
-                  >
-                    <label className="text-sm font-semibold mb-2">
-                      Kolom Ditampilkan
-                    </label>
-                    <InputCheckboxComponent
-                      vertical
-                      name="show_column"
-                      options={columns?.map((column) => {
-                        return {
-                          label: column.label,
-                          value: column.selector,
-                        };
-                      })}
-                      onChange={(e) => {
-                        setDisplayColumns(
-                          Array()
-                            .concat(e)
-                            .map((val) => String(val))
-                        );
-                      }}
-                      value={displayColumns}
-                    />
-                  </div>
-                </OutsideClickComponent>
-              </div>
-              {headBar && <div>{headBar}</div>}
-              {(searchable == undefined || searchable == true) && (
-                <div className="bg-white p-1.5 rounded-md flex gap-1.5 w-[350px]">
-                  {
-                    // =========================>
-                    // ## Search column
-                    // =========================>
-                  }
-                  {searchableColumn && searchableColumn?.length > 0 && (
-                    <div className="w-36">
-                      <SelectComponent
-                        name="searchableColumn"
-                        options={[
-                          { label: "Semua", value: "all" },
-                          ...columns
-                            .filter((column) =>
-                              searchableColumn.includes(column.selector)
-                            )
-                            .map((column) => {
-                              return {
-                                label: column.label,
-                                value: column.selector,
-                              };
-                            }),
-                        ]}
-                        value={searchColumn || "all"}
-                        onChange={(e) => onChangeSearchColumn?.(String(e))}
-                      />
-                    </div>
-                  )}
-
-                  {
-                    // =========================>
-                    // ## Input search
-                    // =========================>
-                  }
-                  <div className="w-full min-w-[150px]">
-                    <InputComponent
-                      name="search"
-                      placeholder="Cari disini..."
-                      rightIcon={faMagnifyingGlass}
-                      value={keyword}
-                      onChange={(e) => setKeyword(e)}
-                    />
-                  </div>
-                </div>
-              )}
-              <div className="bg-white p-1.5 rounded-md relative">
-                <IconButtonComponent
-                  icon={faRefresh}
-                  customPaint={{
-                    bg: "base",
-                    border: "slate-300 ",
-                    color: "slate-400",
-                  }}
-                  onClick={() => {
-                    onRefresh?.();
-                  }}
-                  size="sm"
-                />
-              </div>
+          {searchableColumn && searchableColumn?.length > 0 && (
+            <div className="w-36">
+              <SelectComponent
+                name="searchableColumn"
+                options={[
+                  { label: "Semua", value: "all" },
+                  ...columns.map((column) => {
+                    return {
+                      label: column.label,
+                      value: column.selector,
+                    };
+                  }),
+                ]}
+                value={searchableColumn || "all"}
+                onChange={(e) => onChangeSearchableColumn?.(String(e))}
+                className="py-1.5 text-sm"
+              />
             </div>
           )}
+          <div className="w-full min-w-[150px] px-1.5">
+            <InputComponent
+              name="search"
+              placeholder="Cari disini..."
+              rightIcon={faMagnifyingGlass}
+              value={keyword}
+              onChange={(e) => setKeyword(e)}
+              className="py-1.5 text-sm"
+            />
+          </div>
+          <div className="p-1.5 rounded-md relative">
+            <IconButtonComponent
+              icon={faEyeLowVision}
+              variant="simple"
+              className="!text-foreground"
+              onClick={() => {
+                setFloatingDisplay(!floatingDisplay);
+              }}
+              size="sm"
+            />
+            <OutsideClickComponent
+              onOutsideClick={() => {
+                setFloatingDisplay(false);
+              }}
+            >
+              <div
+                className={`
+                  absolute -bottom-4 bg-white translate-y-full right-0 p-2 w-[240px] z-20 rounded-lg shadow
+                  ${!floatingDisplay && "scale-y-0 top-0 opacity-0"}
+                `}
+              >
+                <label className="text-sm font-semibold mb-2">
+                  Kolom Ditampilkan
+                </label>
+                <InputCheckboxComponent
+                  vertical
+                  name="show_column"
+                  options={columns?.map((column) => {
+                    return {
+                      label: column.label,
+                      value: column.selector,
+                    };
+                  })}
+                  onChange={(e) => {
+                    setDisplayColumns(
+                      Array()
+                        .concat(e)
+                        .map((val) => String(val))
+                    );
+                  }}
+                  value={displayColumns}
+                />
+              </div>
+            </OutsideClickComponent>
+          </div>
+          <div className="p-1.5 rounded-md relative">
+            <IconButtonComponent
+              icon={faRefresh}
+              variant="simple"
+              className="!text-foreground"
+              onClick={() => {
+                onRefresh?.();
+              }}
+              size="sm"
+            />
+          </div>
         </div>
       )}
 
       <div className="relative w-full">
         <ScrollContainerComponent
-        // onScroll={(e) =>
-        //   setFloatingAction(
-        //     e.target.scrollLeft + e.target.offsetWidth <=
-        //       e.target.scrollWidth - actionColumnWidth
-        //   )
-        // }
+          scrollFloating
+          onScroll={(e) => {
+            console.log(e.scrollWidth);
+
+            actionColumnRef.current?.clientWidth &&
+              e.scrollLeft &&
+              setShowFloatingAction(
+                e.scrollLeft + e.clientWidth <=
+                  e.scrollWidth - actionColumnRef.current?.clientWidth
+              );
+          }}
         >
           {
             // =========================>
@@ -328,7 +249,7 @@ export function TableComponent({
                   // ## Body Column
                   // =========================>
                 }
-                <div className="flex flex-col gap-y-2">
+                <div className="flex flex-col gap-y-1.5">
                   {[1, 2, 3].map((_, key) => {
                     return (
                       <div
@@ -377,8 +298,8 @@ export function TableComponent({
                     // ## Head Column
                     // =========================>
                   }
-                  <div className="flex gap-4 mb-2">
-                    <div className="w-8 px-4 py-2.5 font-bold">#</div>
+                  <div className="flex gap-4">
+                    <div className="w-8 px-4 py-2.5 font-bold text-sm">#</div>
                     {columns &&
                       columns
                         .filter((column) =>
@@ -396,7 +317,7 @@ export function TableComponent({
                               <div className="flex justify-between gap-2 items-center">
                                 <div
                                   className={`
-                                w-full
+                                w-full text-sm
                                 ${column.sortable ? "cursor-pointer" : ""}
                               `}
                                   onClick={() => {
@@ -454,25 +375,6 @@ export function TableComponent({
                                         )}
                                       </div>
                                     )}
-
-                                  {/* {column.filter && (
-                                    <FilterColumnComponent
-                                      columnLabel={column.label}
-                                      options={column.filter?.options || []}
-                                      type={column.filter?.type || "select"}
-                                      onChange={(e) => {
-                                        const newFilter: any = filter || {};
-                                        newFilter[
-                                          column.selector as keyof object
-                                        ] = e;
-                                        onChangeFilter?.({ ...newFilter });
-                                      }}
-                                      value={
-                                        filter &&
-                                        filter[column.selector as keyof object]
-                                      }
-                                    />
-                                  )} */}
                                 </div>
                               </div>
                             </div>
@@ -484,7 +386,7 @@ export function TableComponent({
                     // ## Body Column
                     // =========================>
                   }
-                  <div className={`flex flex-col gap-y-2`}>
+                  <div className={`flex flex-col gap-y-1.5`}>
                     {data &&
                       data.map((item: object, key) => {
                         return (
@@ -493,11 +395,11 @@ export function TableComponent({
                               animationDelay: `${(key + 1) * 0.05}s`,
                             }}
                             className={`
-                                flex items-center gap-4 rounded-lg shadow-sm relative intro__table__column
-                                ${key % 2 ? "bg-emerald-50" : "bg-white"}
+                                flex items-center gap-4 rounded-lg  relative intro__table__column
+                                ${key % 2 ? "bg-white/40" : "bg-white"}
                                 ${
                                   onRowClick &&
-                                  "cursor-pointer hover:bg-emerald-100"
+                                  "cursor-pointer hover:bg-light-primary/40"
                                 }
                               `}
                             key={key}
@@ -542,7 +444,7 @@ export function TableComponent({
                             {item["action" as keyof object] &&
                               showFloatingAction && (
                                 <div
-                                  className="sticky hover:-right-2 bg-background -right-5 z-30 cursor-pointer flex items-center shadow rounded-l-lg"
+                                  className="sticky bg-background -right-5 z-30 cursor-pointer flex items-center shadow rounded-l-lg"
                                   onClick={() =>
                                     floatingActionActive !== false &&
                                     floatingActionActive == key
@@ -558,7 +460,6 @@ export function TableComponent({
                                           ? faChevronLeft
                                           : faChevronRight
                                       }
-                                      className="text__primary"
                                     />
                                   </div>
 
@@ -586,7 +487,7 @@ export function TableComponent({
       </div>
 
       {pagination && (
-        <div className="mt-2">
+        <div className="mt-4">
           <PaginationComponent {...pagination} />
         </div>
       )}

@@ -23,7 +23,7 @@ type classNamePrefix =
   | "suggest"
   | "suggest-item";
 
-export interface inputProps
+export interface inputNumberProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange"> {
   label?: string;
   tip?: string | ReactNode;
@@ -59,7 +59,7 @@ export function InputNumberComponent({
   min,
   max,
   ...props
-}: inputProps) {
+}: inputNumberProps) {
   const [inputValue, setInputValue] = useState("");
   const [isFocus, setIsFocus] = useState(false);
   const [isInvalid, setIsInvalid] = useState("");

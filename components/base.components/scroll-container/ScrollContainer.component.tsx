@@ -7,12 +7,14 @@ interface ScrollContainerProps {
   children: ReactNode;
   className?: string;
   scrollFloating?: boolean;
+  onScroll?: (e: any) => void;
 }
 
 export function ScrollContainerComponent({
   children,
   className = "",
   scrollFloating = false,
+  onScroll,
 }: ScrollContainerProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const floatingScrollbarRef = useRef<HTMLDivElement | null>(null);
@@ -28,6 +30,7 @@ export function ScrollContainerComponent({
   useEffect(() => {
     const handleScroll = () => {
       if (!containerRef.current) return;
+      onScroll?.(containerRef.current);
       const {
         scrollLeft,
         scrollWidth,
@@ -48,6 +51,7 @@ export function ScrollContainerComponent({
       handleScroll();
       container.addEventListener("scroll", handleScroll);
     }
+
     return () => container?.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -102,16 +106,16 @@ export function ScrollContainerComponent({
       )}
     >
       {isScrollable && showLeftShadow && (
-        <div className="absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-foreground/15 to-transparent pointer-events-none" />
+        <div className="absolute z-10 left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-foreground/15 to-transparent pointer-events-none" />
       )}
       {isScrollable && showRightShadow && (
-        <div className="absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-foreground/15 to-transparent pointer-events-none" />
+        <div className="absolute z-10 right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-foreground/15 to-transparent pointer-events-none" />
       )}
       {isScrollable && showTopShadow && (
-        <div className="absolute top-0 left-0 right-0 h-4 bg-gradient-to-b from-foreground/15 to-transparent pointer-events-none" />
+        <div className="absolute z-10 top-0 left-0 right-0 h-4 bg-gradient-to-b from-foreground/15 to-transparent pointer-events-none" />
       )}
       {isScrollable && showBottomShadow && (
-        <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-foreground/15 to-transparent pointer-events-none" />
+        <div className="absolute z-10 bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-foreground/15 to-transparent pointer-events-none" />
       )}
       <div
         ref={containerRef}

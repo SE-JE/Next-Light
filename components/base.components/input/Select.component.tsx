@@ -539,7 +539,7 @@ export function SelectComponent({
 
         {!!dataOptions?.length &&
           showOption &&
-          loadingOption &&
+          !loadingOption &&
           !!filteredOptions?.length && (
             <div>
               <ul

@@ -11,12 +11,12 @@ import { RadioComponent } from "./Radio.component";
 
 type classNamePrefix = "label" | "tip" | "error" | "input" | "icon";
 
-export type inputCheckboxOptionProps = {
+export type inputRadioOptionProps = {
   value: string | number;
   label: string;
 };
 
-export type inputCheckboxProps = {
+export type inputRadioProps = {
   name: string;
   label?: string;
   tip?: string | ReactNode;
@@ -31,7 +31,7 @@ export type inputCheckboxProps = {
   disabled?: boolean;
   error?: string;
 
-  options?: inputCheckboxOptionProps[];
+  options?: inputRadioOptionProps[];
   serverOptionControl?: getProps;
   customOptions?: any;
   validations?: ValidationRules;
@@ -59,10 +59,10 @@ export function InputRadioComponent({
 
   register,
   onChange,
-}: inputCheckboxProps) {
+}: inputRadioProps) {
   const [isInvalid, setIsInvalid] = useState("");
   const [inputValue, setInputValue] = useState<string | number>("");
-  const [dataOptions, setDataOptions] = useState<inputCheckboxProps[]>([]);
+  const [dataOptions, setDataOptions] = useState<inputRadioProps[]>([]);
   const [loading, setLoading] = useState(false);
 
   // =========================>

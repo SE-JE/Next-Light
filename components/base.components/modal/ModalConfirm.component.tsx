@@ -9,6 +9,7 @@ type classNamePrefix = "base" | "backdrop" | "header" | "footer";
 export type modalConfirmProps = {
   show: boolean;
   onClose: () => void;
+  onSubmit: () => void;
   title?: string | ReactNode;
   children?: any;
   icon?: any;
@@ -19,6 +20,7 @@ export type modalConfirmProps = {
 export function ModalConfirmComponent({
   show,
   onClose,
+  onSubmit,
   title,
   children,
   icon,
@@ -85,12 +87,16 @@ export function ModalConfirmComponent({
 
         <div className="flex justify-center gap-4 py-4">
           <ButtonComponent
-            label="Cancel"
+            label="Batal"
             variant="simple"
             onClick={() => onClose()}
             className="text-foreground"
           />
-          <ButtonComponent label={"Yes"} paint={"warning"} />
+          <ButtonComponent
+            label={"Konfirmasi"}
+            paint={"warning"}
+            onClick={onSubmit}
+          />
         </div>
       </div>
     </>

@@ -19,12 +19,11 @@ export function IconButtonComponent({
   onClick,
   icon,
   loading,
-  customPaint,
   tips,
 }: iconButtonProps) {
   const buttonClasses = clsx(
     "button",
-    !customPaint && buttonVariant[variant][paint],
+    buttonVariant[variant][paint],
     iconButtonContainer[size],
     rounded ? "rounded-full" : buttonRadius[size],
     className
@@ -36,8 +35,6 @@ export function IconButtonComponent({
   );
 
   const iconClasses = clsx(
-    !customPaint && buttonIcon[variant][paint],
-    customPaint?.color && `text-${customPaint.color}`,
     size === "xs"
       ? "text-xs"
       : size === "sm"

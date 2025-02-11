@@ -29,7 +29,7 @@ type CustomDatePickerProps = {
   maxDate?: string;
 };
 
-export interface inputProps
+export interface inputDateProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange"> {
   label?: string;
   tip?: string | ReactNode;
@@ -64,7 +64,7 @@ export function InputDateComponent({
   onChange,
 
   ...props
-}: inputProps) {
+}: inputDateProps) {
   const [inputValue, setInputValue] = useState("");
   const [isFocus, setIsFocus] = useState(false);
   const [isInvalid, setIsInvalid] = useState("");

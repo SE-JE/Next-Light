@@ -4,6 +4,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
+import { SelectComponent } from "../input";
+import { InputRadioComponent } from "../input/InputRadio.component";
 
 export type PaginationProps = {
   totalRow: number;
@@ -71,67 +73,97 @@ export default function PaginationComponent({
   return (
     <>
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          {page > 1 && (
-            <div
-              className="p-3 text-slate-500 cursor-pointer"
-              onClick={() => onChange?.(totalRow, paginate, page - 1)}
-            >
-              <FontAwesomeIcon icon={faChevronLeft} />
-            </div>
-          )}
+        <div className="flex items-center gap-8">
+          <div className="w-50">
+            <InputRadioComponent
+              name="paginate"
+              options={[
+                {
+                  value: 10,
+                  label: "10",
+                },
+                {
+                  value: 20,
+                  label: "20",
+                },
+                {
+                  value: 50,
+                  label: "50",
+                },
+              ]}
+              value={paginate}
+              onChange={(e) => {
+                onChange?.(totalRow, Number(e), page);
+              }}
+              className="py-2 text-sm bg-white border-0"
+            />
+          </div>
+          <div className="flex items-center gap-3">
+            {page > 1 && (
+              <div
+                className="p-3 hover:scale-105 text-sm text-foreground cursor-pointer"
+                onClick={() => onChange?.(totalRow, paginate, page - 1)}
+              >
+                <FontAwesomeIcon icon={faChevronLeft} />
+              </div>
+            )}
 
-          {pagination.first && (
-            <>
-              <div
-                className="px-4 py-1.5 bg-white rounded-md cursor-pointer hover:scale-110"
-                onClick={() => onChange?.(totalRow, paginate, 1)}
-              >
-                1
-              </div>
-              <div className="px-2 py-1.5 text-slate-500 rounded-md">...</div>
-            </>
-          )}
-          {pagination.pages &&
-            pagination.pages.map((itemPage, key) => {
-              return (
+            {pagination.first && (
+              <>
                 <div
-                  key={key}
-                  className={`py-1.5 px-4 rounded-md ${
-                    itemPage == page
-                      ? "bg-light-primary text-primary"
-                      : "bg-white cursor-pointer"
-                  } hover:scale-110`}
-                  onClick={() => onChange?.(totalRow, paginate, itemPage)}
+                  className="w-12 h-8 text-sm flex justify-center items-center bg-white rounded-md cursor-pointer hover:scale-105"
+                  onClick={() => onChange?.(totalRow, paginate, 1)}
                 >
-                  {itemPage}
+                  1
                 </div>
-              );
-            })}
-          {pagination.last && (
-            <>
-              <div className="px-2 py-1.5 text-slate-500 rounded-md">...</div>
+                <div className="px-2 py-1.5 text-foreground rounded-md">
+                  ...
+                </div>
+              </>
+            )}
+            {pagination.pages &&
+              pagination.pages.map((itemPage, key) => {
+                return (
+                  <div
+                    key={key}
+                    className={`w-12 h-8 text-sm flex justify-center items-center rounded-md ${
+                      itemPage == page
+                        ? "bg-light-primary text-primary"
+                        : "bg-white cursor-pointer"
+                    } hover:scale-105`}
+                    onClick={() => onChange?.(totalRow, paginate, itemPage)}
+                  >
+                    {itemPage}
+                  </div>
+                );
+              })}
+            {pagination.last && (
+              <>
+                <div className="px-2 py-1.5 text-foreground rounded-md">
+                  ...
+                </div>
+                <div
+                  className="w-12 h-8 text-sm flex justify-center items-center bg-white rounded-md cursor-pointer hover:scale-105"
+                  onClick={() =>
+                    onChange?.(totalRow, paginate, pagination.lastPage ?? 1)
+                  }
+                >
+                  {pagination.lastPage}
+                </div>
+              </>
+            )}
+            {pagination.lastPage && page < pagination.lastPage && (
               <div
-                className="px-4 py-1.5 bg-white rounded-md cursor-pointer hover:scale-110"
-                onClick={() =>
-                  onChange?.(totalRow, paginate, pagination.lastPage ?? 1)
-                }
+                className="p-3 hover:scale-105 text-sm text-foreground cursor-pointer"
+                onClick={() => onChange?.(totalRow, paginate, page + 1)}
               >
-                {pagination.lastPage}
+                <FontAwesomeIcon icon={faChevronRight} />
               </div>
-            </>
-          )}
-          {pagination.lastPage && page < pagination.lastPage && (
-            <div
-              className="p-3 text-slate-500 cursor-pointer"
-              onClick={() => onChange?.(totalRow, paginate, page + 1)}
-            >
-              <FontAwesomeIcon icon={faChevronRight} />
-            </div>
-          )}
+            )}
+          </div>
         </div>
-        <div className="relative flex items-center gap-5 px-2">
-          <div className="text-slate-500">
+        <div className="relative flex items-center gap-5 px-2 text-sm">
+          <div className="text-foreground">
             {paginate * page - paginate + 1} -{" "}
             {pagination.lastPage && page < pagination.lastPage
               ? paginate * page

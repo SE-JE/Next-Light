@@ -4,7 +4,7 @@ import { ButtonComponent } from "@/components/base.components";
 import { ModalComponent } from "@/components/base.components/modal/Modal.component";
 import { FloatingPageComponent } from "@/components/base.components/modal/FloatingPage.component";
 import { ModalConfirmComponent } from "@/components/base.components/modal/ModalConfirm.component";
-import { ToastComponent } from "@/components/base.components/modal/Toast";
+import { ToastComponent } from "@/components/base.components/modal/Toast.component";
 
 export default function Modal() {
   const [show, setShow] = useState<string | null>(null);
