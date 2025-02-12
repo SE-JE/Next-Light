@@ -15,6 +15,7 @@ export default function Form() {
               construction: {
                 label: "Your Name",
                 placeholder: "Input your name...",
+                name: "name",
               },
             },
           ]}
