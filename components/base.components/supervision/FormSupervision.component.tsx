@@ -15,7 +15,12 @@ import {
   SelectComponent,
   SelectProps,
 } from "../input";
-import { parseClassName, postProps, useForm, ValidationRules } from "@/helpers";
+import {
+  parseClassName,
+  PostPropsType,
+  useForm,
+  ValidationRulesType,
+} from "@/helpers";
 import { ButtonComponent } from "../button";
 import { faQuestionCircle, faSave } from "@fortawesome/free-solid-svg-icons";
 import clsx from "clsx";
@@ -34,7 +39,7 @@ type customConstructionType = ({
 }: {
   formControl: (name: string) => {
     onChange?: (value: any) => void;
-    register?: (regName: string, reqValidation: ValidationRules) => void;
+    register?: (regName: string, reqValidation: ValidationRulesType) => void;
     value?: any;
     error?: string;
   };
@@ -42,9 +47,9 @@ type customConstructionType = ({
   setValues?: (values: { name: string; value?: any }[]) => void;
   errors?: { name: string; error?: any }[];
   setErrors?: (values: { name: string; error?: any }[]) => void;
-  registers?: { name: string; validations?: ValidationRules | undefined }[];
+  registers?: { name: string; validations?: ValidationRulesType | undefined }[];
   setRegisters?: (
-    registers: { name: string; validations?: ValidationRules | undefined }[]
+    registers: { name: string; validations?: ValidationRulesType | undefined }[]
   ) => void;
 }) => ReactNode;
 
@@ -65,7 +70,7 @@ type ConstructionMap = {
 
 type TypeKeys = keyof ConstructionMap;
 
-export type FormProps<
+export type FormType<
   T extends TypeKeys =
     | "default"
     | "check"
@@ -83,10 +88,10 @@ export type FormProps<
   className?: string;
 };
 
-export type formSupervisionProps = {
+export type formSupervisionPropsType = {
   title?: string;
-  forms: FormProps[];
-  submitControl: postProps;
+  forms: FormType[];
+  submitControl: PostPropsType;
   confirmation?: boolean;
   defaultValue?: object | null;
   /** Use custom class with: "title::", "submit::". */
@@ -106,7 +111,7 @@ export default function FormSupervisionComponent({
   onError,
   footerControl,
   className = "",
-}: formSupervisionProps) {
+}: formSupervisionPropsType) {
   const [modal, setModal] = useState<boolean | "success" | "failed">(false);
   const [fresh, setFresh] = useState<boolean>(true);
 
@@ -163,8 +168,6 @@ export default function FormSupervisionComponent({
         setFresh(true);
       }, 500);
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultValue]);
 
   return (

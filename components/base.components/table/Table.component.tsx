@@ -18,7 +18,7 @@ import { OutsideClickComponent } from "../outside-click/OutsideClick.component";
 import { IconButtonComponent } from "../button";
 import { ScrollContainerComponent } from "../scroll-container";
 
-export type tableColumnProps = {
+export type TableColumnType = {
   selector: string;
   label: string;
   width?: string;
@@ -26,7 +26,7 @@ export type tableColumnProps = {
   className?: string;
 };
 
-export type tableProps = {
+export type tablePropsType = {
   headBar?: ReactNode;
   controlBar?:
     | boolean
@@ -37,7 +37,7 @@ export type tableProps = {
         | "filterColumn"
         | (() => ReactNode)
       )[];
-  columns: tableColumnProps[];
+  columns: TableColumnType[];
   data: object[];
   pagination?: PaginationProps;
   loading?: boolean;
@@ -68,12 +68,12 @@ export function TableComponent({
   onChangeSearch,
   searchableColumn,
   onChangeSearchableColumn,
-  filter,
-  onChangeFilter,
+  // filter,
+  // onChangeFilter,
 
   onRowClick,
   onRefresh,
-}: tableProps) {
+}: tablePropsType) {
   const [displayColumns, setDisplayColumns] = useState<string[]>([]);
   const [showFloatingAction, setShowFloatingAction] = useState(false);
   const [floatingActionActive, setFloatingActionActive] = useState<
@@ -106,7 +106,7 @@ export function TableComponent({
 
   return (
     <>
-      {controlBar && (
+      {controlBar != false && (
         <div className="py-1 bg-white shadow-2xs flex items-center mb-2">
           {
             // =========================>
@@ -206,8 +206,6 @@ export function TableComponent({
         <ScrollContainerComponent
           scrollFloating
           onScroll={(e) => {
-            console.log(e.scrollWidth);
-
             actionColumnRef.current?.clientWidth &&
               e.scrollLeft &&
               setShowFloatingAction(
@@ -292,194 +290,198 @@ export function TableComponent({
                   </div>
                 </div>
               ) : (
-                <div className="w-max min-w-full">
-                  {
-                    // =========================>
-                    // ## Head Column
-                    // =========================>
-                  }
-                  <div className="flex gap-4">
-                    <div className="w-8 px-4 py-2.5 font-bold text-sm">#</div>
-                    {columns &&
-                      columns
-                        .filter((column) =>
-                          displayColumns.includes(column.selector)
-                        )
-                        .map((column, key) => {
-                          return (
-                            <div
-                              key={key}
-                              className={`px-4 py-2.5 font-bold`}
-                              style={{
-                                width: column.width ? column.width : "200px",
-                              }}
-                            >
-                              <div className="flex justify-between gap-2 items-center">
-                                <div
-                                  className={`
-                                w-full text-sm
+                <>
+                  <div className="w-max min-w-full">
+                    {
+                      // =========================>
+                      // ## Head Column
+                      // =========================>
+                    }
+                    <div className="flex gap-4">
+                      <div className="w-8 px-4 py-2.5 font-bold text-sm">#</div>
+                      {columns &&
+                        columns
+                          .filter((column) =>
+                            displayColumns.includes(column.selector)
+                          )
+                          .map((column, key) => {
+                            return (
+                              <div
+                                key={key}
+                                className={`px-4 py-2.5 font-bold`}
+                                style={{
+                                  width: column.width ? column.width : "200px",
+                                }}
+                              >
+                                <div className="flex justify-between gap-2 items-center">
+                                  <div
+                                    className={`
+                                w-full text-sm text-foreground capitalize
                                 ${column.sortable ? "cursor-pointer" : ""}
                               `}
-                                  onClick={() => {
-                                    if (column.sortable && onChangeSortBy) {
-                                      onChangeSortBy(
-                                        column.selector,
-                                        sortBy &&
-                                          sortBy?.column == column.selector &&
-                                          sortBy?.direction == "desc"
-                                          ? "asc"
-                                          : "desc"
-                                      );
-                                    }
-                                  }}
-                                >
-                                  {column.label}
-                                </div>
+                                    onClick={() => {
+                                      if (column.sortable && onChangeSortBy) {
+                                        onChangeSortBy(
+                                          column.selector,
+                                          sortBy &&
+                                            sortBy?.column == column.selector &&
+                                            sortBy?.direction == "desc"
+                                            ? "asc"
+                                            : "desc"
+                                        );
+                                      }
+                                    }}
+                                  >
+                                    {column.label}
+                                  </div>
 
-                                <div className="relative flex gap-4">
-                                  {sortBy &&
-                                    sortBy.column == column.selector && (
-                                      <div
-                                        className={`${
-                                          column.sortable
-                                            ? "cursor-pointer"
-                                            : ""
-                                        }`}
-                                        onClick={() => {
-                                          if (
-                                            column.sortable &&
-                                            onChangeSortBy
-                                          ) {
-                                            onChangeSortBy(
-                                              column.selector,
-                                              sortBy &&
-                                                sortBy?.column !=
-                                                  column.selector &&
-                                                sortBy?.direction == "asc"
-                                                ? "desc"
-                                                : "asc"
-                                            );
-                                          }
-                                        }}
-                                      >
-                                        {sortBy.direction == "desc" ? (
-                                          <FontAwesomeIcon
-                                            icon={faArrowDownZA}
-                                            className="text-slate-400"
-                                          />
-                                        ) : (
-                                          <FontAwesomeIcon
-                                            icon={faArrowUpAZ}
-                                            className="text-slate-400"
-                                          />
-                                        )}
-                                      </div>
-                                    )}
+                                  <div className="relative flex gap-4">
+                                    {sortBy &&
+                                      sortBy.column == column.selector && (
+                                        <div
+                                          className={`${
+                                            column.sortable
+                                              ? "cursor-pointer"
+                                              : ""
+                                          }`}
+                                          onClick={() => {
+                                            if (
+                                              column.sortable &&
+                                              onChangeSortBy
+                                            ) {
+                                              onChangeSortBy(
+                                                column.selector,
+                                                sortBy &&
+                                                  sortBy?.column !=
+                                                    column.selector &&
+                                                  sortBy?.direction == "asc"
+                                                  ? "desc"
+                                                  : "asc"
+                                              );
+                                            }
+                                          }}
+                                        >
+                                          {sortBy.direction == "desc" ? (
+                                            <FontAwesomeIcon
+                                              icon={faArrowDownZA}
+                                              className="text-slate-400"
+                                            />
+                                          ) : (
+                                            <FontAwesomeIcon
+                                              icon={faArrowUpAZ}
+                                              className="text-slate-400"
+                                            />
+                                          )}
+                                        </div>
+                                      )}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          );
-                        })}
-                  </div>
-                  {
-                    // =========================>
-                    // ## Body Column
-                    // =========================>
-                  }
-                  <div className={`flex flex-col gap-y-1.5`}>
-                    {data &&
-                      data.map((item: object, key) => {
-                        return (
-                          <div
-                            style={{
-                              animationDelay: `${(key + 1) * 0.05}s`,
-                            }}
-                            className={`
-                                flex items-center gap-4 rounded-lg  relative intro__table__column
+                            );
+                          })}
+                    </div>
+                    {
+                      // =========================>
+                      // ## Body Column
+                      // =========================>
+                    }
+                    <div className={`flex flex-col gap-y-1.5`}>
+                      {data &&
+                        data.map((item: object, key) => {
+                          return (
+                            <div
+                              style={{
+                                animationDelay: `${(key + 1) * 0.05}s`,
+                              }}
+                              className={`
+                                flex items-center gap-4 rounded-lg  relative intro__table__column animate-intro-right
                                 ${key % 2 ? "bg-white/40" : "bg-white"}
                                 ${
                                   onRowClick &&
                                   "cursor-pointer hover:bg-light-primary/40"
                                 }
                               `}
-                            key={key}
-                          >
-                            <div className="w-8 px-4 py-2.5 font-medium">
-                              {pagination && pagination?.page != 1
-                                ? pagination?.paginate *
-                                    (pagination?.page - 1) +
-                                  key +
-                                  1
-                                : key + 1}
-                            </div>
-                            {columns &&
-                              columns
-                                .filter((column) =>
-                                  displayColumns.includes(column.selector)
-                                )
-                                .map((column, columnKey) => {
-                                  return (
-                                    <div
-                                      key={columnKey}
-                                      className="px-4 py-2.5 font-medium"
-                                      style={{
-                                        width: column.width || "200px",
-                                      }}
-                                      onClick={() => {
-                                        onRowClick?.(item, key);
-                                      }}
-                                    >
-                                      {item[column.selector as keyof object] ||
-                                        "-"}
-                                    </div>
-                                  );
-                                })}
-                            <div
-                              ref={actionColumnRef}
-                              className={`flex-1 flex justify-end gap-2 px-4 py-2.5`}
+                              key={key}
                             >
-                              {item["action" as keyof object]}
-                            </div>
+                              <div className="w-8 px-4 py-2 font-medium">
+                                {pagination && pagination?.page != 1
+                                  ? pagination?.paginate *
+                                      (pagination?.page - 1) +
+                                    key +
+                                    1
+                                  : key + 1}
+                              </div>
+                              {columns &&
+                                columns
+                                  .filter((column) =>
+                                    displayColumns.includes(column.selector)
+                                  )
+                                  .map((column, columnKey) => {
+                                    return (
+                                      <div
+                                        key={columnKey}
+                                        className="px-4 py-2 font-medium"
+                                        style={{
+                                          width: column.width || "200px",
+                                        }}
+                                        onClick={() => {
+                                          onRowClick?.(item, key);
+                                        }}
+                                      >
+                                        {item[
+                                          column.selector as keyof object
+                                        ] || "-"}
+                                      </div>
+                                    );
+                                  })}
+                              <div
+                                ref={actionColumnRef}
+                                className={`flex-1 flex justify-end gap-2 px-4 py-2`}
+                              >
+                                {item["action" as keyof object]}
+                              </div>
 
-                            {item["action" as keyof object] &&
-                              showFloatingAction && (
-                                <div
-                                  className="sticky bg-background -right-5 z-30 cursor-pointer flex items-center shadow rounded-l-lg"
-                                  onClick={() =>
-                                    floatingActionActive !== false &&
-                                    floatingActionActive == key
-                                      ? setFloatingActionActive(false)
-                                      : setFloatingActionActive(key)
-                                  }
-                                >
-                                  <div className=" pl-4 pr-7 py-2">
-                                    <FontAwesomeIcon
-                                      icon={
-                                        floatingActionActive === false ||
-                                        floatingActionActive != key
-                                          ? faChevronLeft
-                                          : faChevronRight
-                                      }
-                                    />
-                                  </div>
-
+                              {item["action" as keyof object] &&
+                                showFloatingAction && (
                                   <div
-                                    className={`py-1 flex gap-2 ${
+                                    className="sticky bg-background -right-5 z-30 cursor-pointer flex items-center shadow rounded-l-lg"
+                                    onClick={() =>
                                       floatingActionActive !== false &&
                                       floatingActionActive == key
-                                        ? "w-max pl-2 pr-8"
-                                        : "w-0"
-                                    }`}
+                                        ? setFloatingActionActive(false)
+                                        : setFloatingActionActive(key)
+                                    }
                                   >
-                                    {item["action" as keyof object]}
+                                    <div className=" pl-4 pr-7 py-2">
+                                      <FontAwesomeIcon
+                                        icon={
+                                          floatingActionActive === false ||
+                                          floatingActionActive != key
+                                            ? faChevronLeft
+                                            : faChevronRight
+                                        }
+                                      />
+                                    </div>
+
+                                    <div
+                                      className={`py-1 flex gap-2 ${
+                                        floatingActionActive !== false &&
+                                        floatingActionActive == key
+                                          ? "w-max pl-2 pr-8"
+                                          : "w-0"
+                                      }`}
+                                    >
+                                      {item["action" as keyof object]}
+                                    </div>
                                   </div>
-                                </div>
-                              )}
-                          </div>
-                        );
-                      })}
+                                )}
+                            </div>
+                          );
+                        })}
+                    </div>
                   </div>
-                </div>
+                  {/* <div className="absolute left-0 top-0 bg-background w-[200px] h-full z-30"></div> */}
+                </>
               )}
             </>
           )}

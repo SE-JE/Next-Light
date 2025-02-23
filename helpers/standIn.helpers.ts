@@ -6,14 +6,14 @@ export const cacheName =
     .replace(/[\s_-]+/g, "-")
     .replace(/^-+|-+$/g, "") + ".stand-in";
 
-export type setStandInProps = {
+export type StandInPropsType = {
   key: string;
   data: any;
   expired: number;
 };
 
 export const standIn = {
-  set: ({ key, data, expired }: setStandInProps) => {
+  set: ({ key, data, expired }: StandInPropsType) => {
     const prevData = localStorage.getItem(cacheName)
       ? JSON.parse(localStorage.getItem(cacheName) || "")
       : {};

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { validationLangs } from "./../langs";
 
-export type ValidationRules = {
+export type ValidationRulesType = {
   required?: boolean;
   min?: number;
   max?: number;
@@ -14,7 +14,7 @@ export type ValidationRules = {
   maxFileSize?: number; // New validation rule for max file size in bytes
 };
 
-export type ValidationHelperProps = {
+export type ValidationHelperPropsType = {
   value:
     | string
     | string[]
@@ -26,7 +26,7 @@ export type ValidationHelperProps = {
     | File[]
     | null
     | (string | number)[];
-  rules?: ValidationRules;
+  rules?: ValidationRulesType;
 };
 
 export type ValidationHelperResults = {
@@ -40,7 +40,7 @@ export type ValidationHelperResults = {
 export const validationHelper = ({
   value,
   rules,
-}: ValidationHelperProps): ValidationHelperResults => {
+}: ValidationHelperPropsType): ValidationHelperResults => {
   let errorMessage = "";
 
   // Check required
@@ -148,7 +148,7 @@ export const validationHelper = ({
 // ## validation hook function
 // =========================>
 export const useValidationHelper = (
-  { value, rules }: ValidationHelperProps,
+  { value, rules }: ValidationHelperPropsType,
   sleep = false
 ): [string] => {
   const [message, setMessage] = useState<string>("");

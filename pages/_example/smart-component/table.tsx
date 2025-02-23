@@ -1,11 +1,17 @@
 import { ReactNode } from "react";
 import ExampleLayout from "../_layout";
+import TableSupervisionComponent from "@/components/base.components/supervision/TableSupervision.component";
 
 export default function Table() {
   return (
     <>
       <div>
-        <p className="text-xl">Table</p>
+        <TableSupervisionComponent
+          title="Table Supervision"
+          fetchControl={{
+            url: "http://localhost:8000/api/products",
+          }}
+        />
       </div>
     </>
   );

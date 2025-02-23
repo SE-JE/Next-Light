@@ -21,8 +21,8 @@ const handleErrors = (fetch: AxiosResponse) => {
 // =========================>
 // ## type of filter params
 // =========================>
-export type getFilterParams = {
-   /** Use filter type with: "eq" Equal, "ne" Not Equal, "in" In, "ni" Not In, "rg" Range. */
+export type GetFilterType = {
+  /** Use filter type with: "eq" Equal, "ne" Not Equal, "in" In, "ni" Not In, "rg" Range. */
   type?: "eq" | "ne" | "in" | "ni" | "rg";
   column?: string;
   value?: string | string[];
@@ -31,22 +31,22 @@ export type getFilterParams = {
 // =========================>
 // ## type of get params
 // =========================>
-export type getParams = {
+export type GetParamsType = {
   paginate?: number;
   page?: number;
   sortBy?: string;
   sortDirection?: string;
   search?: string;
-  filter?: getFilterParams[];
+  filter?: GetFilterType[];
 };
 
 // =========================>
 // ## type of get props
 // =========================>
-export type getProps = {
+export type GetPropsType = {
   path?: string;
   url?: string;
-  params?: getParams;
+  params?: GetParamsType;
   includeParams?: object;
   includeHeaders?: object;
   bearer?: string;
@@ -73,7 +73,7 @@ export const get = async ({
   includeParams,
   includeHeaders,
   bearer,
-}: getProps) => {
+}: GetPropsType) => {
   const fetchUrl = url || `${process.env.NEXT_PUBLIC_API_URL}/${path || ""}`;
   const headers: Record<string, string> = {
     Authorization: authHeader(bearer) || "",
@@ -106,7 +106,7 @@ export const get = async ({
 // ## Get hook function
 // =========================>
 export const useGet = (
-  props: getProps & { cacheName?: string; expired?: number },
+  props: GetPropsType & { cacheName?: string; expired?: number },
   sleep?: boolean
 ) => {
   const [loading, setLoading] = useState<boolean>(true);
@@ -171,7 +171,7 @@ export const useGet = (
 // =========================>
 // ## type of post props
 // =========================>
-export type postProps = {
+export type PostPropsType = {
   path?: string;
   url?: string;
   params?: object;
@@ -192,7 +192,7 @@ export const post = async ({
   includeHeaders,
   bearer,
   contentType,
-}: postProps) => {
+}: PostPropsType) => {
   const fetchUrl = url || `${process.env.NEXT_PUBLIC_API_URL}/${path || ""}`;
   const headers: Record<string, string> = {
     Authorization: authHeader(bearer) || "",
@@ -216,7 +216,7 @@ export const post = async ({
 // =========================>
 // ## type of patch props
 // =========================>
-export type patchProps = {
+export type PatchPropsType = {
   path?: string;
   url?: string;
   params?: object;
@@ -237,7 +237,7 @@ export const patch = async ({
   includeHeaders,
   bearer,
   contentType,
-}: patchProps) => {
+}: PatchPropsType) => {
   const fetchUrl = url || `${process.env.NEXT_PUBLIC_API_URL}/${path || ""}`;
   const headers: Record<string, string> = {
     Authorization: authHeader(bearer) || "",
@@ -261,7 +261,7 @@ export const patch = async ({
 // =========================>
 // ## type of destroy props
 // =========================>
-export type destroyProps = {
+export type DestroyPropsType = {
   path?: string;
   url?: string;
   params?: object;
@@ -278,7 +278,7 @@ export const destroy = async ({
   params,
   includeHeaders,
   bearer,
-}: destroyProps) => {
+}: DestroyPropsType) => {
   const fetchUrl = url || `${process.env.NEXT_PUBLIC_API_URL}/${path || ""}`;
   const headers: Record<string, string> = {
     Authorization: authHeader(bearer) || "",

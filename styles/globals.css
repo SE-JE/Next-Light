@@ -7,7 +7,7 @@
 @theme {
   --color-background: #ebf4fc;
   --color-foreground: #575757;
-  --color-light-foreground: #C3C3C3;
+  --color-light-foreground: #9B9B9B;
   --color-primary: #5aafff;
   --color-light-primary: #baddfd;
   --color-secondary: #04a9ca;
@@ -20,6 +20,13 @@
   --color-light-success: #9af8f9;
   --color-disable: #c4c3c3;
   --color-light-disable: #f4f4f4;
+
+  --animate-intro-right: intro_right .2s ease-in-out;
+  @keyframes intro_right {
+    from {
+      transform: translateX(100);
+    }
+  }
 }
 
 body {
@@ -27,7 +34,7 @@ body {
 }
 
 * {
-  @apply transition duration-100;
+  @apply transition duration-75;
 }
 
 @layer base {
