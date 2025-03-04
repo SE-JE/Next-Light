@@ -1,11 +1,12 @@
 import {
+  cn,
   get,
-  getProps,
-  parseClassName,
+  GetPropsType,
+  pcn,
   standIn,
   useLazySearch,
   useValidationHelper,
-  ValidationRules,
+  ValidationRulesType,
 } from "@/helpers";
 import {
   faCheckCircle,
@@ -13,10 +14,9 @@ import {
   faTimes,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import clsx from "clsx";
 import React, { ReactNode, useEffect, useMemo, useState } from "react";
 
-type classNamePrefix =
+type CT =
   | "label"
   | "tip"
   | "error"
@@ -25,14 +25,14 @@ type classNamePrefix =
   | "suggest"
   | "suggest-item";
 
-export type selectOptionProps = {
+export type SelectOptionPropsType = {
   label: string;
   value: string | number;
   searchable?: string[];
   customLabel?: ReactNode;
 };
 
-export interface SelectProps {
+export interface SelectPropsType {
   name: string;
   label?: string;
   placeholder?: string;
@@ -46,22 +46,22 @@ export interface SelectProps {
   value?: string | number | (string | number)[];
   error?: string;
   disabled?: boolean;
-  validations?: ValidationRules;
+  validations?: ValidationRulesType;
   multiple?: boolean;
   autoFocus?: boolean;
 
-  options?: selectOptionProps[];
+  options?: SelectOptionPropsType[];
   searchable?: boolean;
-  serverOptionControl?: getProps & { cacheName?: string };
+  serverOptionControl?: GetPropsType & { cacheName?: string };
   serverSearchable?: boolean;
-  includedOptions?: selectOptionProps[];
+  includedOptions?: SelectOptionPropsType[];
   exceptOptions?: (string | number)[];
-  tempOptions?: selectOptionProps[];
-  newOption?: selectOptionProps;
+  tempOptions?: SelectOptionPropsType[];
+  newOption?: SelectOptionPropsType;
   maxShowOption?: number;
 
   onChange?: (value: string | number | (string | number)[], data?: any) => any;
-  register?: (name: string, validations?: ValidationRules) => void;
+  register?: (name: string, validations?: ValidationRulesType) => void;
   onFocus?: () => void;
   onBlur?: () => void;
 }
@@ -96,7 +96,7 @@ export function SelectComponent({
   onChange,
   onFocus,
   onBlur,
-}: SelectProps) {
+}: SelectPropsType) {
   const [inputShowValue, setInputShowValue] = useState<string>("");
   const [inputValue, setInputValue] = useState<
     string | number | (string | number)[]
@@ -107,10 +107,10 @@ export function SelectComponent({
   const [keydown, setKeydown] = useState(false);
   const [useTemp, setUseTemp] = useState(true);
 
-  const [dataOptions, setDataOptions] = useState<selectOptionProps[]>([]);
-  const [filteredOptions, setFilteredOptions] = useState<selectOptionProps[]>(
-    []
-  );
+  const [dataOptions, setDataOptions] = useState<SelectOptionPropsType[]>([]);
+  const [filteredOptions, setFilteredOptions] = useState<
+    SelectOptionPropsType[]
+  >([]);
   const [loadingOption, setLoadingOption] = useState(false);
   const [activeOption, setActiveOption] = useState(0);
   const [showOption, setShowOption] = useState(false);
@@ -166,14 +166,14 @@ export function SelectComponent({
   useEffect(() => {
     setDataOptions(
       [...options, ...includedOptions].filter(
-        (op: selectOptionProps) => !exceptOptions?.includes(op.value)
+        (op: SelectOptionPropsType) => !exceptOptions?.includes(op.value)
       )
     );
   }, [options]);
 
   const filterOption = (e: any) => {
     if (dataOptions?.length) {
-      let newFilteredOptions: selectOptionProps[] = [];
+      let newFilteredOptions: SelectOptionPropsType[] = [];
 
       if (searchable && !serverSearchable) {
         if (e.target.value) {
@@ -260,7 +260,7 @@ export function SelectComponent({
     if (cacheOptions) {
       setDataOptions(
         [...cacheOptions, ...includedOptions].filter(
-          (op: selectOptionProps) => !exceptOptions?.includes(op.value)
+          (op: SelectOptionPropsType) => !exceptOptions?.includes(op.value)
         )
       );
       setLoadingOption(false);
@@ -268,7 +268,7 @@ export function SelectComponent({
       const mutateOptions = await get(serverControl || {});
       setDataOptions(
         [...mutateOptions?.data, ...includedOptions].filter(
-          (op: selectOptionProps) => !exceptOptions?.includes(op.value)
+          (op: SelectOptionPropsType) => !exceptOptions?.includes(op.value)
         )
       );
       setShowOption(true);
@@ -308,18 +308,15 @@ export function SelectComponent({
       <div className="relative flex flex-col gap-y-0.5">
         <label
           htmlFor={randomId}
-          className={clsx(
+          className={cn(
             "input-label",
-            parseClassName<classNamePrefix>(className, "label"),
+            pcn<CT>(className, "label"),
             disabled && "opacity-50",
-            disabled &&
-              parseClassName<classNamePrefix>(className, "label", "disabled"),
+            disabled && pcn<CT>(className, "label", "disabled"),
             isFocus && "text-primary",
-            isFocus &&
-              parseClassName<classNamePrefix>(className, "label", "focus"),
+            isFocus && pcn<CT>(className, "label", "focus"),
             isInvalid && "text-danger",
-            isInvalid &&
-              parseClassName<classNamePrefix>(className, "label", "focus")
+            isInvalid && pcn<CT>(className, "label", "focus")
           )}
         >
           {label}
@@ -327,12 +324,11 @@ export function SelectComponent({
 
         {tip && (
           <small
-            className={clsx(
+            className={cn(
               "input-tip",
-              parseClassName<classNamePrefix>(className, "tip"),
+              pcn<CT>(className, "tip"),
               disabled && "opacity-60",
-              disabled &&
-                parseClassName<classNamePrefix>(className, "tip", "disabled")
+              disabled && pcn<CT>(className, "tip", "disabled")
             )}
           >
             {tip}
@@ -362,14 +358,13 @@ export function SelectComponent({
                 : ""
             }
             disabled={disabled}
-            className={clsx(
+            className={cn(
               "input",
               leftIcon && "pl-12",
               rightIcon && "pr-12",
-              parseClassName<classNamePrefix>(className, "input"),
+              pcn<CT>(className, "input"),
               isInvalid && "input-error",
-              isInvalid &&
-                parseClassName<classNamePrefix>(className, "input", "error")
+              isInvalid && pcn<CT>(className, "input", "error")
             )}
             value={
               useTemp && tempOptions
@@ -488,19 +483,13 @@ export function SelectComponent({
 
           {leftIcon && (
             <FontAwesomeIcon
-              className={clsx(
+              className={cn(
                 "left-4 input-icon ",
-                parseClassName<classNamePrefix>(className, "icon"),
+                pcn<CT>(className, "icon"),
                 disabled && "opacity-60",
-                disabled &&
-                  parseClassName<classNamePrefix>(
-                    className,
-                    "icon",
-                    "disabled"
-                  ),
+                disabled && pcn<CT>(className, "icon", "disabled"),
                 isFocus && "text-primary",
-                isFocus &&
-                  parseClassName<classNamePrefix>(className, "icon", "focus")
+                isFocus && pcn<CT>(className, "icon", "focus")
               )}
               icon={leftIcon}
             />
@@ -508,11 +497,10 @@ export function SelectComponent({
 
           {!multiple && inputValue && (
             <div
-              className={clsx(
+              className={cn(
                 "right-12 input-icon cursor-pointer hover:text-danger",
                 disabled && "opacity-60 pointer-events-none",
-                disabled &&
-                  parseClassName<classNamePrefix>(className, "icon", "disabled")
+                disabled && pcn<CT>(className, "icon", "disabled")
               )}
               onClick={() => {
                 setInputShowValue("");
@@ -526,11 +514,10 @@ export function SelectComponent({
 
           <label
             htmlFor={randomId}
-            className={clsx(
+            className={cn(
               "right-4 input-icon cursor-pointer hover:text-primary",
               disabled && "opacity-60 pointer-events-none",
-              disabled &&
-                parseClassName<classNamePrefix>(className, "icon", "disabled")
+              disabled && pcn<CT>(className, "icon", "disabled")
             )}
           >
             <FontAwesomeIcon icon={faChevronDown} />
@@ -635,10 +622,7 @@ export function SelectComponent({
 
         {isInvalid && (
           <small
-            className={clsx(
-              "input-error-message",
-              parseClassName<classNamePrefix>(className, "error")
-            )}
+            className={cn("input-error-message", pcn<CT>(className, "error"))}
           >
             {isInvalid}
           </small>

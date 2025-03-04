@@ -14,9 +14,9 @@ import PaginationComponent, { PaginationProps } from "./Pagination.component";
 import { InputComponent, SelectComponent } from "../input";
 import { useLazySearch } from "@/helpers";
 import { InputCheckboxComponent } from "../input/InputCheckbox.component";
-import { OutsideClickComponent } from "../outside-click/OutsideClick.component";
+import { OutsideClickComponent } from "../formater-wrapper/OutsideClick.component";
 import { IconButtonComponent } from "../button";
-import { ScrollContainerComponent } from "../scroll-container";
+import { ScrollContainerComponent } from "../formater-wrapper";
 
 export type TableColumnType = {
   selector: string;
@@ -107,7 +107,7 @@ export function TableComponent({
   return (
     <>
       {controlBar != false && (
-        <div className="py-1 bg-white shadow-2xs flex items-center mb-2">
+        <div className="py-1 bg-white rounded-[6px] border flex items-center mb-2">
           {
             // =========================>
             // ## Display column
@@ -254,7 +254,7 @@ export function TableComponent({
                         style={{
                           animationDelay: `${0.25 + key * 0.05}s`,
                         }}
-                        className="flex items-center gap-4 bg-white rounded-lg shadow-sm relative p-2.5 intro__table__column"
+                        className="flex items-center gap-4 bg-white rounded-lg shadow-sm relative p-2.5"
                         key={key}
                       >
                         <div className="w-16 px-4 py-2.5 font-medium skeleton__loading"></div>
@@ -394,7 +394,7 @@ export function TableComponent({
                                 animationDelay: `${(key + 1) * 0.05}s`,
                               }}
                               className={`
-                                flex items-center gap-4 rounded-lg  relative intro__table__column animate-intro-right
+                                flex items-center gap-4 rounded-[6px] relative animate-intro-right
                                 ${key % 2 ? "bg-white/40" : "bg-white"}
                                 ${
                                   onRowClick &&

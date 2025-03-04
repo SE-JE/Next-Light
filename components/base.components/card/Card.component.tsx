@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { cn } from "@/helpers";
 import React from "react";
 
 export function CardComponent({
@@ -11,7 +11,7 @@ export function CardComponent({
   return (
     <>
       <div
-        className={clsx("px-4 py-2.5 rounded-xl shadow-sm bg-white", className)}
+        className={cn("px-4 py-2.5 rounded-[6px] border bg-white", className)}
       >
         {children}
       </div>

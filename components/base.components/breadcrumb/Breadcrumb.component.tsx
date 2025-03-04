@@ -2,9 +2,11 @@ import React, { ReactNode } from "react";
 import Link from "next/link";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import clsx from "clsx";
+import { cn, pcn } from "@/helpers";
 
-export type BreadcrumbItemProps = {
+type CT = "container" | "active" | "base";
+
+export type BreadcrumbItemPropsType = {
   path: string;
   label: string;
   className?: string;
@@ -12,17 +14,24 @@ export type BreadcrumbItemProps = {
 
 export function BreadcrumbComponent({
   items,
-  className,
+  className = "",
   square = false,
   separatorContent,
 }: {
-  items: BreadcrumbItemProps[];
-  className?: string;
+  items: BreadcrumbItemPropsType[];
   square?: boolean;
   separatorContent?: string | ReactNode;
+
+  /** Use custom class with: "container::", "active::". */
+  className?: string;
 }) {
   return (
-    <nav className={clsx("w-full overflow-auto whitespace-nowrap", className)}>
+    <nav
+      className={cn(
+        "w-full overflow-x-auto overflow-y-hidden whitespace-nowrap",
+        pcn<CT>(className, "container")
+      )}
+    >
       <ol className="flex">
         {items.map((item, index) => {
           const isActive = index === items.length - 1;
@@ -32,16 +41,13 @@ export function BreadcrumbComponent({
               <li>
                 <Link
                   href={item.path}
-                  className={clsx(
+                  className={cn(
                     "capitalize",
-                    isActive ? "text-primary" : "",
-                    square &&
-                      `py-2 px-4 rounded-[20px] ${
-                        isActive
-                          ? "text-primary bg-primary/30"
-                          : "bg-light-foreground/30"
-                      }`,
-                    item.className
+                    pcn<CT>(className, "base"),
+                    square && "py-2 px-4 rounded-[6px] bg-light-foreground/10",
+                    isActive && "text-primary",
+                    isActive && square && "text-primary bg-primary/10",
+                    isActive && pcn<CT>(className, "active")
                   )}
                 >
                   {item.label}

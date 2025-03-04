@@ -33,15 +33,11 @@ export default function Card() {
           </span>
         }
         image="/images/example.png"
-        className={{
-          container: "w-80 mt-4",
-        }}
+        className={"w-80 mt-4"}
       />
 
       <GalleryCardComponent
-        className={{
-          container: "w-80 mt-4",
-        }}
+        className={"w-80 mt-4"}
         src="/images/example.png"
         alt="~ Example Image Gallery ~"
       />
@@ -62,15 +58,13 @@ export default function Card() {
             NextJs - Typescript - Tailwind CSS
           </p>
         }
-        className={{
-          container: "w-[600] mt-4",
-        }}
+        className={"w-[600] mt-4"}
       />
 
       <AlertCardComponent
         leftContent={
           <div
-            className="hidden sm:grid sm:size-16 sm:shrink-0 sm:place-content-center sm:rounded-full sm:border-2 sm:border-primary"
+            className="hidden sm:grid sm:size-16 sm:shrink-0 sm:place-content-center sm:rounded-full sm:border"
             aria-hidden="true"
           >
             <FontAwesomeIcon icon={faBell} className="text-3xl text-primary" />
@@ -86,9 +80,7 @@ export default function Card() {
           </p>
         }
         footer={<p className="text-light-foreground text-xs">5 minute ago</p>}
-        className={{
-          container: "w-[700px] mt-4",
-        }}
+        className={"w-[700px] mt-4"}
       />
 
       <DashboardCardComponent

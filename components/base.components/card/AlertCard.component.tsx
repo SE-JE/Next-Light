@@ -1,5 +1,7 @@
-import clsx from "clsx";
+import { cn, pcn } from "@/helpers";
 import React, { ReactNode } from "react";
+
+type CT = "badge" | "title" | "base";
 
 export function AlertCardComponent({
   title,
@@ -7,25 +9,23 @@ export function AlertCardComponent({
   badge,
   content,
   footer,
-  className,
+  className = "",
 }: {
   title?: string | ReactNode;
   leftContent?: string | ReactNode;
   badge?: string | ReactNode;
   content?: string | ReactNode;
   footer?: string | ReactNode;
-  className?: {
-    container?: string;
-    title?: string;
-    badge?: string;
-  };
+
+  /** Use custom class with: "badge::", "title::". */
+  className?: string;
 }) {
   return (
     <>
       <section
-        className={clsx(
-          "rounded-xl bg-white p-4 shadow-sm sm:p-6",
-          className?.container
+        className={cn(
+          "rounded-[6px] bg-white p-4 border sm:p-6",
+          pcn<CT>(className, "base")
         )}
       >
         <div className="flex items-start sm:gap-8">
@@ -33,18 +33,18 @@ export function AlertCardComponent({
 
           <div>
             <strong
-              className={clsx(
-                "rounded-lg border border-primary text-primary bg-primary/20 px-3 py-1.5 text-xs font-bold",
-                className?.badge
+              className={cn(
+                "rounded-[4px] border text-primary bg-primary/20 px-3 py-1.5 text-xs font-bold",
+                pcn<CT>(className, "badge")
               )}
             >
               {badge}
             </strong>
 
             <h3
-              className={clsx(
+              className={cn(
                 "mt-4 text-lg font-medium sm:text-xl",
-                className?.title
+                pcn<CT>(className, "title")
               )}
             >
               {title}

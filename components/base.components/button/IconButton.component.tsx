@@ -1,47 +1,71 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { iconButtonProps } from "./button.props";
 import {
   buttonVariant,
   buttonRadius,
   iconButtonContainer,
-  buttonIcon,
 } from "./button.decorate";
-import clsx from "clsx";
+import { cn, pcn } from "@/helpers";
+
+type CT = "icon" | "loading" | "base";
+
+export type BconButtonPropsType = {
+  icon: any;
+  type?: "submit" | "button";
+  variant?: "solid" | "outline" | "light" | "simple";
+  paint?: "primary" | "secondary" | "success" | "danger" | "warning";
+  customPaint?: {
+    bg?: string;
+    color?: string;
+    border?: string;
+  };
+  rounded?: boolean | string;
+  disabled?: boolean;
+  size?: "xs" | "sm" | "md" | "lg";
+  onClick?: any;
+  loading?: boolean;
+  hover?: boolean;
+  tips?: string | undefined;
+
+  /** Use custom class with: "icon::", "loading::". */
+  className?: string;
+};
 
 export function IconButtonComponent({
   type = "button",
   variant = "solid",
   paint = "primary",
   rounded,
-  className,
   disabled,
   size = "md",
   onClick,
   icon,
   loading,
   tips,
-}: iconButtonProps) {
-  const buttonClasses = clsx(
+  className = "",
+}: BconButtonPropsType) {
+  const buttonClasses = cn(
     "button",
     buttonVariant[variant][paint],
     iconButtonContainer[size],
     rounded ? "rounded-full" : buttonRadius[size],
-    className
+    pcn<CT>(className, "base")
   );
 
-  const loadingClasses = clsx(
+  const loadingClasses = cn(
     "button-loading",
-    size === "sm" ? "w-3 h-3" : size === "lg" ? "w-5 h-5" : "w-4 h-4"
+    size === "sm" ? "w-3 h-3" : size === "lg" ? "w-5 h-5" : "w-4 h-4",
+    pcn<CT>(className, "base")
   );
 
-  const iconClasses = clsx(
+  const iconClasses = cn(
     size === "xs"
       ? "text-xs"
       : size === "sm"
       ? "text-sm mb-0.5"
       : size === "lg"
       ? "text-xl mb-0.5"
-      : "text-base mb-0.5"
+      : "text-base mb-0.5",
+    pcn<CT>(className, "base")
   );
 
   return (

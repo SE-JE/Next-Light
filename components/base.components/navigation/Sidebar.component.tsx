@@ -1,10 +1,43 @@
 import React, { ReactNode, useEffect, useState } from "react";
-import { sidebarProps } from "./sidebar.props";
-import clsx from "clsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import { cn, pcn } from "@/helpers";
+
+type CT = "backdrop" | "base" | "head-item" | "item" | "child-item";
+
+export type SidebarItemType = {
+  label: string;
+  key?: number;
+  leftContent?: any;
+  rightContent?: any;
+  path?: string;
+  items?: SidebarItemType[];
+  className?: string;
+};
+
+export type SidebarHeadItemType = {
+  label: string;
+  collapse?: boolean;
+  items?: SidebarItemType[];
+  className?: string;
+};
+
+export type sidebarProps = {
+  head?: any;
+  items?: SidebarHeadItemType[];
+  basePath?: string;
+  show?: boolean;
+  toggle?: boolean;
+  onToggleChange?: () => void;
+  children?: any;
+  hasAccess?: number[];
+  onChange?: () => void;
+
+  /** Use custom class with: "backdrop::", "head-item::", "item::", "child-item::". */
+  className?: string;
+};
 
 function ListWrapper({
   path,
@@ -30,7 +63,7 @@ export function SidebarComponent({
   onToggleChange,
   // onChange,
   // hasAccess,
-  className,
+  className = "",
 }: sidebarProps) {
   const router = useRouter();
   // const { getActive } = useToggleContext();
@@ -86,45 +119,51 @@ export function SidebarComponent({
     });
   }, []);
 
+  const styles = {
+    backdrop: cn(
+      "absolute top-0 left-0 w-full h-full bg-background bg-opacity-50 blur-md z-20 md:hidden",
+      toggle ? "scale-100 md:scale-0" : "scale-0",
+      pcn<CT>(className, "backdrop")
+    ),
+    base: cn(
+      "flex flex-col fixed w-64 h-screen px-2 py-4 overflow-y-auto bg-white z-20 rounded-r-[8px] border-r scroll",
+      toggle ? "scale-x-100 md:scale-x-0" : "scale-x-0 md:scale-x-100",
+      pcn<CT>(className, "base")
+    ),
+    headItem:
+      "flex justify-between items-center text-light-foreground font-semibold py-2 text-xs uppercase",
+    item: "flex items-center justify-between px-2 py-2 gap-2 transition-colors duration-300 transform hover:text-primary cursor-pointer transition-none",
+    childItem:
+      "flex items-center justify-between px-2 py-2 gap-2 transition-colors duration-300 transform hover:text-primary cursor-pointer transition-none border-l-2",
+  };
+
   return (
     <>
-      <div
-        className={`absolute top-0 left-0 w-full h-full bg-background bg-opacity-50 blur-md z-20 md:hidden ${
-          toggle ? "scale-100 md:scale-0" : "scale-0"
-        }`}
-        onClick={() => onToggleChange?.()}
-      ></div>
-      <aside
-        className={clsx(
-          `flex flex-col ${
-            toggle ? "scale-x-100 md:scale-x-0" : "scale-x-0 md:scale-x-100"
-          } fixed w-64 h-screen px-2 py-4 overflow-y-auto bg-white z-20 rounded-r-[12px] shadow-sm`,
-          className?.container
-        )}
-      >
+      <div className={styles.backdrop} onClick={() => onToggleChange?.()}></div>
+      <aside className={styles.base}>
         {head}
-
         <nav className="flex flex-col flex-1 mt-3">
           {items?.map((menu_head, menu_head_key) => {
             return (
               <>
                 <div className="px-2 pt-2">
                   <div
-                    className={clsx(
-                      `flex justify-between items-center text-light-foreground font-semibold py-2 text-xs uppercase ${
-                        menu_head?.collapse && "cursor-pointer"
-                      }`,
-                      className?.headList
+                    className={cn(
+                      styles.headItem,
+                      menu_head?.collapse && "cursor-pointer",
+                      pcn<CT>(className, "head-item"),
+                      menu_head?.className
                     )}
                     onClick={() => setShow(String(menu_head_key))}
                   >
-                    <div>{menu_head?.label}</div>
+                    {menu_head?.label}
                     {menu_head.collapse && (
                       <FontAwesomeIcon
                         icon={faChevronDown}
-                        className={`text-xs
-                            ${checkShow(String(menu_head_key)) && "rotate-180"}
-                          `}
+                        className={cn(
+                          "text-xs",
+                          checkShow(String(menu_head_key)) && "rotate-180"
+                        )}
                       />
                     )}
                   </div>
@@ -143,23 +182,23 @@ export function SidebarComponent({
                             }
                           >
                             <div
-                              className={clsx(
-                                `flex items-center justify-between px-2 py-2 gap-2 transition-colors duration-300 transform hover:text-primary cursor-pointer transition-none ${
-                                  menu?.path && cekActive(menu?.path || "")
-                                    ? "text-primary border-l-2 border-primary pl-4"
-                                    : ""
-                                }`,
-                                className?.menuList
+                              className={cn(
+                                styles.item,
+                                menu?.path &&
+                                  cekActive(menu?.path || "") &&
+                                  "text-primary border-l-2 border-primary pl-4",
+                                pcn<CT>(className, "item"),
+                                menu?.className
                               )}
                             >
                               <div className="flex gap-2 items-center">
-                                {menu?.left_content}
+                                {menu?.leftContent}
                                 <span className="text-sm font-medium">
                                   {menu?.label}
                                 </span>
                               </div>
                               <div className="flex gap-2 items-center">
-                                {menu?.right_content}
+                                {menu?.rightContent}
 
                                 {menu?.items?.length && (
                                   <FontAwesomeIcon
@@ -195,24 +234,23 @@ export function SidebarComponent({
                                         }
                                       >
                                         <div
-                                          className={clsx(
-                                            `flex items-center justify-between px-2 py-2 gap-2 transition-colors duration-300 transform hover:text-primary cursor-pointer transition-none border-l-2 ${
-                                              child?.path &&
-                                              cekActive(child?.path || "")
-                                                ? "text-primary border-primary pl-4"
-                                                : ""
-                                            }`,
-                                            className?.childList
+                                          className={cn(
+                                            styles.childItem,
+                                            child?.path &&
+                                              cekActive(child?.path || "") &&
+                                              "text-primary border-primary pl-4",
+                                            pcn<CT>(className, "child-item"),
+                                            child?.className
                                           )}
                                         >
                                           <div className="flex gap-2 items-center">
-                                            {child?.left_content}
+                                            {child?.leftContent}
                                             <span className="text-sm font-medium">
                                               {child?.label}
                                             </span>
                                           </div>
                                           <div className="flex gap-2 items-center">
-                                            {child?.right_content}
+                                            {child?.rightContent}
 
                                             {child?.items?.length && (
                                               <FontAwesomeIcon

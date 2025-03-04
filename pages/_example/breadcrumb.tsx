@@ -1,11 +1,14 @@
 import React, { ReactNode } from "react";
 import ExampleLayout from "./_layout";
 import { BreadcrumbComponent } from "@/components/base.components/breadcrumb";
+import { CardComponent } from "@/components/base.components";
 
 export default function Breadcrumb() {
   return (
     <>
-      <div>
+      <CardComponent>
+        <p className="text-xl mb-4">Breadcrumb</p>
+
         <BreadcrumbComponent
           items={[
             {
@@ -23,7 +26,7 @@ export default function Breadcrumb() {
           ]}
         />
         <BreadcrumbComponent
-          className="mt-5"
+          className="container::mt-4"
           items={[
             {
               label: "Home",
@@ -42,7 +45,7 @@ export default function Breadcrumb() {
         />
 
         <BreadcrumbComponent
-          className="mt-5"
+          className="container::mt-4"
           items={[
             {
               label: "Home",
@@ -61,7 +64,7 @@ export default function Breadcrumb() {
         />
 
         <BreadcrumbComponent
-          className="mt-5"
+          className="container::mt-4"
           items={[
             {
               label: "Home",
@@ -78,12 +81,12 @@ export default function Breadcrumb() {
           ]}
           square
           separatorContent={
-            <span className="mx-2 bg-light-foreground/30 py-2 px-4 rounded-[20px]">
+            <span className="mx-2 bg-light-foreground/10 py-2 px-4 rounded-[6px]">
               /
             </span>
           }
         />
-      </div>
+      </CardComponent>
     </>
   );
 }

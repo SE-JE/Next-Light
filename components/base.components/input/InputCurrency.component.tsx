@@ -1,10 +1,5 @@
-import {
-  parseClassName,
-  useValidationHelper,
-  ValidationRules,
-} from "@/helpers";
+import { cn, pcn, useValidationHelper, ValidationRulesType } from "@/helpers";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import clsx from "clsx";
 import React, {
   InputHTMLAttributes,
   ReactNode,
@@ -12,9 +7,9 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { CurrencyFormatComponent } from "../format";
+import { CurrencyFormatComponent } from "../formater-wrapper";
 
-type classNamePrefix =
+type CT =
   | "label"
   | "tip"
   | "error"
@@ -23,7 +18,7 @@ type classNamePrefix =
   | "suggest"
   | "suggest-item";
 
-export interface inputCurrencyProps
+export interface InputCurrencyPropsType
   extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange"> {
   label?: string;
   tip?: string | ReactNode;
@@ -32,9 +27,9 @@ export interface inputCurrencyProps
   className?: string;
   value?: string;
   error?: string;
-  validations?: ValidationRules;
+  validations?: ValidationRulesType;
   onChange?: (value: string) => any;
-  register?: (name: string, validations?: ValidationRules) => void;
+  register?: (name: string, validations?: ValidationRulesType) => void;
   format?: {
     locale?: string;
     currency?: string;
@@ -54,7 +49,7 @@ export function InputCurrencyComponent({
   onChange,
   format,
   ...props
-}: inputCurrencyProps) {
+}: InputCurrencyPropsType) {
   const [inputValue, setInputValue] = useState("");
   const [isFocus, setIsFocus] = useState(false);
   const [isInvalid, setIsInvalid] = useState("");
@@ -87,18 +82,15 @@ export function InputCurrencyComponent({
     <div className="relative flex flex-col gap-y-0.5">
       <label
         htmlFor={randomId}
-        className={clsx(
+        className={cn(
           "input-label",
-          parseClassName<classNamePrefix>(className, "label"),
+          pcn<CT>(className, "label"),
           props.disabled && "opacity-50",
-          props.disabled &&
-            parseClassName<classNamePrefix>(className, "label", "disabled"),
+          props.disabled && pcn<CT>(className, "label", "disabled"),
           isFocus && "text-primary",
-          isFocus &&
-            parseClassName<classNamePrefix>(className, "label", "focus"),
+          isFocus && pcn<CT>(className, "label", "focus"),
           isInvalid && "text-danger",
-          isInvalid &&
-            parseClassName<classNamePrefix>(className, "label", "focus")
+          isInvalid && pcn<CT>(className, "label", "focus")
         )}
       >
         {label}
@@ -106,12 +98,11 @@ export function InputCurrencyComponent({
 
       {tip && (
         <small
-          className={clsx(
+          className={cn(
             "input-tip",
-            parseClassName<classNamePrefix>(className, "tip"),
+            pcn<CT>(className, "tip"),
             props.disabled && "opacity-60",
-            props.disabled &&
-              parseClassName<classNamePrefix>(className, "tip", "disabled")
+            props.disabled && pcn<CT>(className, "tip", "disabled")
           )}
         >
           {tip}
@@ -122,14 +113,13 @@ export function InputCurrencyComponent({
         <input
           {...props}
           id={randomId}
-          className={clsx(
+          className={cn(
             "input",
             leftIcon && "pl-12",
             rightIcon && "pr-12",
-            parseClassName<classNamePrefix>(className, "input"),
+            pcn<CT>(className, "input"),
             isInvalid && "input-error",
-            isInvalid &&
-              parseClassName<classNamePrefix>(className, "input", "error")
+            isInvalid && pcn<CT>(className, "input", "error")
           )}
           value={
             inputValue
@@ -166,30 +156,26 @@ export function InputCurrencyComponent({
 
         {leftIcon && (
           <FontAwesomeIcon
-            className={clsx(
+            className={cn(
               "left-4 input-icon",
-              parseClassName<classNamePrefix>(className, "icon"),
+              pcn<CT>(className, "icon"),
               props.disabled && "opacity-60",
-              props.disabled &&
-                parseClassName<classNamePrefix>(className, "icon", "disabled"),
+              props.disabled && pcn<CT>(className, "icon", "disabled"),
               isFocus && "text-primary",
-              isFocus &&
-                parseClassName<classNamePrefix>(className, "icon", "focus")
+              isFocus && pcn<CT>(className, "icon", "focus")
             )}
             icon={leftIcon}
           />
         )}
         {rightIcon && (
           <FontAwesomeIcon
-            className={clsx(
+            className={cn(
               "right-4 input-icon",
-              parseClassName<classNamePrefix>(className, "icon"),
+              pcn<CT>(className, "icon"),
               props.disabled && "opacity-60",
-              props.disabled &&
-                parseClassName<classNamePrefix>(className, "icon", "disabled"),
+              props.disabled && pcn<CT>(className, "icon", "disabled"),
               isFocus && "text-primary",
-              isFocus &&
-                parseClassName<classNamePrefix>(className, "icon", "focus")
+              isFocus && pcn<CT>(className, "icon", "focus")
             )}
             icon={rightIcon}
           />
@@ -198,10 +184,7 @@ export function InputCurrencyComponent({
 
       {isInvalid && (
         <small
-          className={clsx(
-            "input-error-message",
-            parseClassName<classNamePrefix>(className, "error")
-          )}
+          className={cn("input-error-message", pcn<CT>(className, "error"))}
         >
           {isInvalid}
         </small>

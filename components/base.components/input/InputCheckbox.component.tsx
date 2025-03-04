@@ -1,43 +1,44 @@
 import React, { ReactNode, useEffect, useState } from "react";
 import {
+  cn,
   get,
-  getProps,
-  parseClassName,
+  GetPropsType,
+  pcn,
   useValidationHelper,
-  ValidationRules,
+  ValidationRulesType,
 } from "../../../helpers";
 import { CheckboxComponent } from "./Checkbox.component";
-import clsx from "clsx";
 
-type classNamePrefix = "label" | "tip" | "error" | "input" | "icon";
+type CT = "label" | "tip" | "error" | "input" | "icon";
 
-export type inputCheckboxOptionProps = {
+export type InputCheckboxOptionPropsType = {
   value: string | number;
   label: string;
 };
 
-export type inputCheckboxProps = {
+export type InputCheckboxPropsType = {
   name: string;
   label?: string;
   tip?: string | ReactNode;
   vertical?: boolean;
 
-  /** Use custom class with: "label::", "tip::", "error::", "icon::", "suggest::", "suggest-item::". */
-  className?: string;
-  /** Use custom class with: "label::", "checked::", "error::". */
-  classNameCheckbox?: string;
-
   value?: string[] | number[];
   disabled?: boolean;
   error?: string;
 
-  options?: inputCheckboxOptionProps[];
-  serverOptionControl?: getProps;
+  options?: InputCheckboxOptionPropsType[];
+  serverOptionControl?: GetPropsType;
   customOptions?: any;
-  validations?: ValidationRules;
+  validations?: ValidationRulesType;
 
   onChange?: (value: string[] | number[]) => any;
-  register?: (name: string, validations?: ValidationRules) => void;
+  register?: (name: string, validations?: ValidationRulesType) => void;
+
+  /** Use custom class with: "label::", "tip::", "error::", "icon::", "suggest::", "suggest-item::". */
+  className?: string;
+
+  /** Use custom class with: "label::", "checked::", "error::". */
+  classNameCheckbox?: string;
 };
 
 export function InputCheckboxComponent({
@@ -59,10 +60,10 @@ export function InputCheckboxComponent({
 
   register,
   onChange,
-}: inputCheckboxProps) {
+}: InputCheckboxPropsType) {
   const [isInvalid, setIsInvalid] = useState("");
   const [inputValue, setInputValue] = useState<string[] | number[]>([]);
-  const [dataOptions, setDataOptions] = useState<inputCheckboxProps[]>([]);
+  const [dataOptions, setDataOptions] = useState<InputCheckboxPropsType[]>([]);
   const [loading, setLoading] = useState(false);
 
   // =========================>
@@ -120,15 +121,13 @@ export function InputCheckboxComponent({
     <>
       <div className="w-full relative flex flex-col gap-y-0.5">
         <label
-          className={clsx(
+          className={cn(
             "input-label",
-            parseClassName<classNamePrefix>(className, "label"),
+            pcn<CT>(className, "label"),
             disabled && "opacity-50",
-            disabled &&
-              parseClassName<classNamePrefix>(className, "label", "disabled"),
+            disabled && pcn<CT>(className, "label", "disabled"),
             isInvalid && "text-danger",
-            isInvalid &&
-              parseClassName<classNamePrefix>(className, "label", "focus")
+            isInvalid && pcn<CT>(className, "label", "focus")
           )}
         >
           {label}
@@ -136,12 +135,11 @@ export function InputCheckboxComponent({
 
         {tip && (
           <small
-            className={clsx(
+            className={cn(
               "input-tip",
-              parseClassName<classNamePrefix>(className, "tip"),
+              pcn<CT>(className, "tip"),
               disabled && "opacity-60",
-              disabled &&
-                parseClassName<classNamePrefix>(className, "tip", "disabled")
+              disabled && pcn<CT>(className, "tip", "disabled")
             )}
           >
             {tip}
@@ -149,14 +147,13 @@ export function InputCheckboxComponent({
         )}
 
         <div
-          className={clsx(
+          className={cn(
             `input overflow-auto input-scroll w-full flex flex-nowrap gap-y-2 gap-4 ${
               vertical && `flex-col flex-wrap ${vertical}`
             }`,
-            parseClassName<classNamePrefix>(className, "input"),
+            pcn<CT>(className, "input"),
             isInvalid && "input-error",
-            isInvalid &&
-              parseClassName<classNamePrefix>(className, "input", "error")
+            isInvalid && pcn<CT>(className, "input", "error")
           )}
         >
           {loading &&

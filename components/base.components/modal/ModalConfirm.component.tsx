@@ -1,12 +1,12 @@
 import { ReactNode, useEffect } from "react";
 import { faQuestion } from "@fortawesome/free-solid-svg-icons";
-import clsx from "clsx";
 import { ButtonComponent } from "../button";
-import { parseClassName } from "@/helpers";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-type classNamePrefix = "base" | "backdrop" | "header" | "footer";
+import { cn, pcn } from "@/helpers";
 
-export type modalConfirmProps = {
+type CT = "base" | "backdrop" | "header" | "footer";
+
+export type ModalConfirmPropsType = {
   show: boolean;
   onClose: () => void;
   onSubmit: () => void;
@@ -14,6 +14,8 @@ export type modalConfirmProps = {
   children?: any;
   icon?: any;
   footer?: string | ReactNode;
+
+  /** Use custom class with: "backdrop::", "header::", "footer::". */
   className?: string;
 };
 
@@ -26,7 +28,7 @@ export function ModalConfirmComponent({
   icon,
   footer,
   className = "",
-}: modalConfirmProps) {
+}: ModalConfirmPropsType) {
   useEffect(() => {
     if (show) {
       document.getElementsByTagName("body")[0].style.overflow = "hidden";
@@ -38,27 +40,27 @@ export function ModalConfirmComponent({
   return (
     <>
       <div
-        className={clsx(
+        className={cn(
           "modal-backdrop",
           !show && "opacity-0 scale-0 -translate-y-full",
-          parseClassName<classNamePrefix>(className, "backdrop")
+          pcn<CT>(className, "backdrop")
         )}
         onClick={() => onClose()}
       ></div>
 
       <div
-        className={clsx(
+        className={cn(
           "modal",
           "w-[calc(100vw-2rem)] md:w-[50vw] max-w-[300px]",
           !show && "-translate-y-full opacity-0 scale-y-0",
-          parseClassName<classNamePrefix>(className, "base")
+          pcn<CT>(className, "base")
         )}
       >
         {title && (
           <div
-            className={clsx(
+            className={cn(
               "flex flex-col gap-4 items-center",
-              parseClassName<classNamePrefix>(className, "header")
+              pcn<CT>(className, "header")
             )}
           >
             <div className="mt-4">
@@ -75,12 +77,7 @@ export function ModalConfirmComponent({
         {show && children}
 
         {footer && (
-          <div
-            className={clsx(
-              "modal-footer",
-              parseClassName<classNamePrefix>(className, "footer")
-            )}
-          >
+          <div className={cn("modal-footer", pcn<CT>(className, "footer"))}>
             {show && footer}
           </div>
         )}

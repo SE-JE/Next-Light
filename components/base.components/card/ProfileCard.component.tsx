@@ -1,6 +1,8 @@
-import clsx from "clsx";
+import { cn, pcn } from "@/helpers";
 import Image from "next/image";
 import React from "react";
+
+type CT = "image" | "base" | "content";
 
 export function ProfileCardComponent({
   image = "",
@@ -8,24 +10,23 @@ export function ProfileCardComponent({
   short,
   description,
   footer,
-  className,
+  className = "",
 }: {
   name: string;
   short?: string;
   image?: string;
   description?: string | React.ReactNode;
   footer?: string | React.ReactNode;
-  className?: {
-    container?: string;
-    image?: string;
-  };
+
+  /** Use custom class with: "image::", "content::". */
+  className?: string;
 }) {
   return (
     <>
       <div
-        className={clsx(
-          "relative block overflow-hidden rounded-lg bg-white p-4 sm:p-6",
-          className?.container
+        className={cn(
+          "relative block overflow-hidden rounded-[6px] border bg-white p-4 sm:p-6",
+          pcn<CT>(className, "base")
         )}
       >
         <span className="absolute inset-x-0 bottom-0 h-1 bg-primary"></span>
@@ -38,14 +39,14 @@ export function ProfileCardComponent({
                 alt={image}
                 width={400}
                 height={400}
-                className={clsx(
-                  "size-16 rounded-2xl object-cover shadow-sm",
-                  className?.image
+                className={cn(
+                  "size-16 rounded-full object-cover shadow-sm",
+                  pcn<CT>(className, "image")
                 )}
               />
             </div>
           )}
-          <div>
+          <div className={pcn<CT>(className, "content")}>
             <h3 className="text-lg font-bold sm:text-xl">{name}</h3>
 
             <p className="mt-1 text-xs font-medium text-light-foreground">

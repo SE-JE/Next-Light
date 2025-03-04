@@ -16,9 +16,14 @@ export default function ExampleLayout({ children }: { children: ReactNode }) {
           <SidebarComponent
             basePath="/_example"
             head={
-              <a href="#" className="px-4 text-2xl font-extrabold italic">
-                NEXT-LIGHT v.3
-              </a>
+              <div className="px-4">
+                <a href="#" className="text-2xl font-extrabold italic">
+                  NEXT-LIGHT v.3
+                </a>
+                <p className="text-sm -mt-1 font-semibold text-slate-400">
+                  The Magic Starter Template
+                </p>
+              </div>
             }
             items={[
               {
@@ -26,7 +31,7 @@ export default function ExampleLayout({ children }: { children: ReactNode }) {
                 items: [
                   {
                     label: "Dashboard",
-                    left_content: <FontAwesomeIcon icon={faTableCells} />,
+                    leftContent: <FontAwesomeIcon icon={faTableCells} />,
                     path: "/",
                   },
                 ],
@@ -37,57 +42,57 @@ export default function ExampleLayout({ children }: { children: ReactNode }) {
                 items: [
                   {
                     label: "Accordion",
-                    left_content: <FontAwesomeIcon icon={faStar} />,
+                    leftContent: <FontAwesomeIcon icon={faStar} />,
                     path: "/accordion",
                   },
                   {
                     label: "Breadcrumb",
-                    left_content: <FontAwesomeIcon icon={faStar} />,
+                    leftContent: <FontAwesomeIcon icon={faStar} />,
                     path: "/breadcrumb",
                   },
                   {
                     label: "Button",
-                    left_content: <FontAwesomeIcon icon={faStar} />,
+                    leftContent: <FontAwesomeIcon icon={faStar} />,
                     path: "/button",
                   },
                   {
                     label: "Card",
-                    left_content: <FontAwesomeIcon icon={faStar} />,
+                    leftContent: <FontAwesomeIcon icon={faStar} />,
                     path: "/card",
                   },
                   {
                     label: "Carousel",
-                    left_content: <FontAwesomeIcon icon={faStar} />,
+                    leftContent: <FontAwesomeIcon icon={faStar} />,
                     path: "/carousel",
                   },
                   {
                     label: "Input",
-                    left_content: <FontAwesomeIcon icon={faStar} />,
+                    leftContent: <FontAwesomeIcon icon={faStar} />,
                     path: "/input",
                   },
                   {
                     label: "Modal",
-                    left_content: <FontAwesomeIcon icon={faStar} />,
+                    leftContent: <FontAwesomeIcon icon={faStar} />,
                     path: "/modal",
                   },
                   {
                     label: "Scroll Container",
-                    left_content: <FontAwesomeIcon icon={faStar} />,
+                    leftContent: <FontAwesomeIcon icon={faStar} />,
                     path: "/scroll-container",
                   },
                   {
                     label: "Table",
-                    left_content: <FontAwesomeIcon icon={faStar} />,
+                    leftContent: <FontAwesomeIcon icon={faStar} />,
                     path: "/table",
                   },
                   {
                     label: "Typography",
-                    left_content: <FontAwesomeIcon icon={faStar} />,
+                    leftContent: <FontAwesomeIcon icon={faStar} />,
                     path: "/typography",
                   },
                   {
                     label: "Wizard",
-                    left_content: <FontAwesomeIcon icon={faStar} />,
+                    leftContent: <FontAwesomeIcon icon={faStar} />,
                     path: "/wizard",
                   },
                 ],
@@ -124,38 +129,33 @@ export default function ExampleLayout({ children }: { children: ReactNode }) {
                 items: [
                   {
                     label: "Sidebar",
-                    left_content: <FontAwesomeIcon icon={faStar} />,
+                    leftContent: <FontAwesomeIcon icon={faStar} />,
                     path: "/sidebar",
                   },
                   {
                     label: "Headbar",
-                    left_content: <FontAwesomeIcon icon={faStar} />,
+                    leftContent: <FontAwesomeIcon icon={faStar} />,
                     path: "/headbar",
                   },
                   {
                     label: "Tabbar",
-                    left_content: <FontAwesomeIcon icon={faStar} />,
+                    leftContent: <FontAwesomeIcon icon={faStar} />,
                     path: "/tabbar",
                   },
                   {
                     label: "Navbar",
-                    left_content: <FontAwesomeIcon icon={faStar} />,
+                    leftContent: <FontAwesomeIcon icon={faStar} />,
                     path: "/navbar",
                   },
                   {
-                    label: "Mega Navbar",
-                    left_content: <FontAwesomeIcon icon={faStar} />,
-                    path: "/mega-navbar",
-                  },
-                  {
                     label: "Footer",
-                    left_content: <FontAwesomeIcon icon={faStar} />,
-                    path: "/mega-navbar",
+                    leftContent: <FontAwesomeIcon icon={faStar} />,
+                    path: "/footer",
                   },
                   {
                     label: "Bottombar",
-                    left_content: <FontAwesomeIcon icon={faStar} />,
-                    path: "/tabbar",
+                    leftContent: <FontAwesomeIcon icon={faStar} />,
+                    path: "/bottombar",
                   },
                 ],
               },
@@ -165,19 +165,15 @@ export default function ExampleLayout({ children }: { children: ReactNode }) {
                 items: [
                   {
                     label: "Fetching Hook",
-                    path: "/",
+                    path: "/helper/fetching",
                   },
                   {
                     label: "Form Hook",
-                    path: "/",
+                    path: "/helper/form",
                   },
                   {
                     label: "Caching",
-                    path: "/",
-                  },
-                  {
-                    label: "Lazy Load",
-                    path: "/",
+                    path: "/helper/caching",
                   },
                 ],
               },

@@ -1,38 +1,38 @@
-import clsx from "clsx";
+import { cn, pcn } from "@/helpers";
 import Image from "next/image";
 import React from "react";
+
+type CT = "label" | "image" | "base";
 
 export function GalleryCardComponent({
   src,
   alt = "",
-  className,
+  className = "",
 }: {
   src: string;
   alt?: string;
-  className?: {
-    container?: string;
-    image?: string;
-    label?: string;
-  };
+
+  /** Use custom class with: "label::", "image::". */
+  className?: string;
 }) {
   return (
     <>
-      <div className={className?.container}>
+      <div className={pcn<CT>(className, "base")}>
         <Image
           src={src}
           alt={src}
           width={400}
           height={300}
-          className={clsx(
-            "w-full rounded-bl-3xl rounded-tr-3xl object-cover aspect-[4/3] shadow-sm",
-            className?.image
+          className={cn(
+            "w-full rounded-bl-4xl rounded-tr-3xl object-cover aspect-[4/3]",
+            pcn<CT>(className, "image")
           )}
         />
 
         <div
-          className={clsx(
+          className={cn(
             "mt-1 text-center text-sm text-light-foreground",
-            className?.label
+            pcn<CT>(className, "label")
           )}
         >
           {alt}

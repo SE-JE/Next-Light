@@ -1,11 +1,11 @@
 import React, { ReactNode, useEffect, useRef } from "react";
 
-interface OutsideClickHandlerProps {
+interface OutsideClickHandlerPropsType {
   children: ReactNode;
   onOutsideClick: () => void;
 }
 
-export const OutsideClickComponent: React.FC<OutsideClickHandlerProps> = ({
+export const OutsideClickComponent: React.FC<OutsideClickHandlerPropsType> = ({
   children,
   onOutsideClick,
 }) => {

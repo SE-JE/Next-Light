@@ -1,11 +1,14 @@
 import React, { ReactNode } from "react";
 import ExampleLayout from "./_layout";
-import { AccordionComponent } from "@/components/base.components";
+import {
+  AccordionComponent,
+  CardComponent,
+} from "@/components/base.components";
 
 export default function Accordion() {
   return (
     <>
-      <div className="bg-white px-4 py-3 rounded-xl">
+      <CardComponent>
         <p className="text-xl mb-4">Accordion</p>
 
         <AccordionComponent
@@ -55,7 +58,7 @@ export default function Accordion() {
           ]}
           horizontal
         />
-      </div>
+      </CardComponent>
     </>
   );
 }

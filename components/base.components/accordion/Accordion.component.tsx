@@ -1,58 +1,61 @@
+import { cn, pcn } from "@/helpers";
 import {
   faChevronDown,
   faChevronLeft,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import clsx from "clsx";
 import React, { ReactNode, useEffect, useState } from "react";
 
-export type AccordionProps = {
+type CT = "container" | "head" | "active" | "base";
+
+export type AccordionPropsType = {
   setActive?: number | null;
   items: { head: ReactNode; content: ReactNode }[];
   horizontal?: boolean;
-  className?: {
-    container?: string;
-    head?: string;
-    content?: string;
-  };
+  className?: string;
 };
 
 export function AccordionComponent({
   items,
   setActive = null,
   horizontal = false,
-  className = {},
-}: AccordionProps) {
+
+  /** Use custom class with: "container::", "head::", "active::". */
+  className = "",
+}: AccordionPropsType) {
   const [isActive, setIsActive] = useState<number | null>(setActive);
 
   useEffect(() => {
     setIsActive(setActive);
   }, [setActive]);
 
+  const styles = {
+    container: cn(
+      "bg-white border rounded-lg flex",
+      horizontal ? "flex-row w-min" : "flex-col",
+      pcn<CT>(className, "container")
+    ),
+    head: cn(
+      "flex justify-between items-center gap-4 font-semibold cursor-pointer",
+      horizontal ? "flex-col px-2 py-4" : "py-2 px-4",
+      pcn<CT>(className, "head")
+    ),
+  };
+
   return (
-    <div
-      className={clsx(
-        "bg-white border rounded-lg flex",
-        horizontal ? "flex-row w-min" : "flex-col",
-        className.container
-      )}
-    >
+    <div className={styles?.container}>
       {items.map(({ head, content }, key) => (
         <div
           key={key}
-          className={clsx(horizontal ? "border-r flex" : "border-b")}
+          className={cn(horizontal ? "border-r flex" : "border-b")}
         >
           <div
-            className={clsx(
-              "flex justify-between items-center gap-4 font-semibold cursor-pointer",
-              horizontal ? "flex-col px-2 py-4" : "py-2 px-4",
-              className.head
-            )}
+            className={styles?.head}
             onClick={() => setIsActive(isActive === key ? null : key)}
           >
             <div>{head}</div>
             <div
-              className={clsx(
+              className={cn(
                 "w-min transition-transform",
                 isActive !== key && "rotate-180"
               )}
@@ -63,7 +66,7 @@ export function AccordionComponent({
             </div>
           </div>
           <div
-            className={clsx(
+            className={cn(
               "transition-all overflow-hidden",
               horizontal
                 ? isActive === key
@@ -72,7 +75,8 @@ export function AccordionComponent({
                 : isActive === key
                 ? "max-h-max pb-4 px-4"
                 : "max-h-0 pb-0 px-4",
-              className.content
+              pcn<CT>(className, "base"),
+              isActive === key && pcn<CT>(className, "active")
             )}
           >
             {content}

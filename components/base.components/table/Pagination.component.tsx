@@ -4,7 +4,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
-import { SelectComponent } from "../input";
 import { InputRadioComponent } from "../input/InputRadio.component";
 
 export type PaginationProps = {
@@ -73,7 +72,7 @@ export default function PaginationComponent({
   return (
     <>
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-6">
           <div className="w-50">
             <InputRadioComponent
               name="paginate"
@@ -95,10 +94,10 @@ export default function PaginationComponent({
               onChange={(e) => {
                 onChange?.(totalRow, Number(e), page);
               }}
-              className="py-2 text-sm bg-white border-0"
+              className="py-2 text-sm bg-white"
             />
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             {page > 1 && (
               <div
                 className="p-3 hover:scale-105 text-sm text-foreground cursor-pointer"
@@ -111,12 +110,12 @@ export default function PaginationComponent({
             {pagination.first && (
               <>
                 <div
-                  className="w-12 h-8 text-sm flex justify-center items-center bg-white rounded-md cursor-pointer hover:scale-105"
+                  className="w-12 h-8 text-sm flex justify-center items-center bg-white rounded-[6px] border cursor-pointer hover:scale-105"
                   onClick={() => onChange?.(totalRow, paginate, 1)}
                 >
                   1
                 </div>
-                <div className="px-2 py-1.5 text-foreground rounded-md">
+                <div className="px-2 py-1.5 text-foreground rounded-[6px]">
                   ...
                 </div>
               </>
@@ -126,7 +125,7 @@ export default function PaginationComponent({
                 return (
                   <div
                     key={key}
-                    className={`w-12 h-8 text-sm flex justify-center items-center rounded-md ${
+                    className={`w-12 h-8 text-sm flex justify-center items-center rounded-[6px] border ${
                       itemPage == page
                         ? "bg-light-primary text-primary"
                         : "bg-white cursor-pointer"
@@ -139,11 +138,11 @@ export default function PaginationComponent({
               })}
             {pagination.last && (
               <>
-                <div className="px-2 py-1.5 text-foreground rounded-md">
+                <div className="px-2 py-1.5 text-foreground rounded-[6px]">
                   ...
                 </div>
                 <div
-                  className="w-12 h-8 text-sm flex justify-center items-center bg-white rounded-md cursor-pointer hover:scale-105"
+                  className="w-12 h-8 text-sm flex justify-center items-center bg-white rounded-[6px] border cursor-pointer hover:scale-105"
                   onClick={() =>
                     onChange?.(totalRow, paginate, pagination.lastPage ?? 1)
                   }

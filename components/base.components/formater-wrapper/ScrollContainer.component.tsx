@@ -1,13 +1,15 @@
-import { parseClassName } from "@/helpers";
-import clsx from "clsx";
+import { cn, pcn } from "@/helpers";
 import { useRef, useState, useEffect, ReactNode } from "react";
-type classNamePrefix = "base" | "container" | "floating-scroll";
 
-interface ScrollContainerProps {
+type CT = "base" | "container" | "floating-scroll";
+
+interface ScrollContainerPropsType {
   children: ReactNode;
-  className?: string;
   scrollFloating?: boolean;
   onScroll?: (e: any) => void;
+
+  /** Use custom class with: "container::", "floating-scroll::"". */
+  className?: string;
 }
 
 export function ScrollContainerComponent({
@@ -15,7 +17,7 @@ export function ScrollContainerComponent({
   className = "",
   scrollFloating = false,
   onScroll,
-}: ScrollContainerProps) {
+}: ScrollContainerPropsType) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const floatingScrollbarRef = useRef<HTMLDivElement | null>(null);
   const floatingScrollbarContainerRef = useRef<HTMLDivElement | null>(null);
@@ -99,12 +101,7 @@ export function ScrollContainerComponent({
   }, [containerWidth]);
 
   return (
-    <div
-      className={clsx(
-        "relative",
-        parseClassName<classNamePrefix>(className, "base")
-      )}
-    >
+    <div className={cn("relative", pcn<CT>(className, "base"))}>
       {isScrollable && showLeftShadow && (
         <div className="absolute z-10 left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-foreground/15 to-transparent pointer-events-none" />
       )}
@@ -119,10 +116,10 @@ export function ScrollContainerComponent({
       )}
       <div
         ref={containerRef}
-        className={clsx(
+        className={cn(
           "w-full overflow-x-auto scroll",
           scrollFloating && "scroll-none",
-          parseClassName<classNamePrefix>(className, "base")
+          pcn<CT>(className, "base")
         )}
       >
         {children}

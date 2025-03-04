@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { cn } from "@/helpers";
 import Link from "next/link";
 import React, { ReactNode } from "react";
 
@@ -19,8 +19,8 @@ export function DashboardCardComponent({
     <>
       <Link href={path || ""}>
         <div
-          className={clsx(
-            `bg-white shadow-sm py-4 px-6 rounded-lg flex justify-between gap-4 items-center`,
+          className={cn(
+            `bg-white border py-4 px-6 rounded-[6px] flex justify-between gap-4 items-center`,
             className
           )}
         >

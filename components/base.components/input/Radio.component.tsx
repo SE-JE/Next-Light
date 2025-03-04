@@ -1,9 +1,9 @@
+import { cn, pcn } from "@/helpers";
 import { useEffect, useMemo, useState } from "react";
-import clsx from "clsx";
-import { parseClassName } from "@/helpers";
-type classNamePrefix = "label" | "checked" | "error" | "input";
 
-export type RadioProps = {
+type CT = "label" | "checked" | "error" | "input";
+
+export type RadioPropsType = {
   name: string;
   label?: string;
   disabled?: boolean;
@@ -24,7 +24,7 @@ export function RadioComponent({
   checked,
   error,
   className = "",
-}: RadioProps) {
+}: RadioPropsType) {
   const randomId = useMemo(() => Math.random().toString(36).substring(7), []);
   const [isInvalid, setIsInvalid] = useState("");
 
@@ -56,22 +56,20 @@ export function RadioComponent({
           }`}
         >
           <div
-            className={clsx(
-              `flex justify-center items-center rounded-full w-5 h-5 active:outline border-2 border-light-foreground`,
-              checked && "border-[5px] outline-light-primary border-primary",
-              checked && parseClassName<classNamePrefix>(className, "checked"),
-              parseClassName<classNamePrefix>(className, "input")
+            className={cn(
+              `flex justify-center items-center rounded-full w-5 h-5 active:outline border border-light-foreground`,
+              checked && "border-[5px] outline-light-primary !border-primary",
+              checked && pcn<CT>(className, "checked"),
+              pcn<CT>(className, "input")
             )}
           ></div>
           <div
-            className={clsx(
+            className={cn(
               "whitespace-nowrap",
-              parseClassName<classNamePrefix>(className, "label"),
+              pcn<CT>(className, "label"),
               checked && "font-semibold",
-              checked &&
-                parseClassName<classNamePrefix>(className, "label", "checked"),
-              disabled &&
-                parseClassName<classNamePrefix>(className, "label", "disabled")
+              checked && pcn<CT>(className, "label", "checked"),
+              disabled && pcn<CT>(className, "label", "disabled")
             )}
           >
             {label}
@@ -79,10 +77,7 @@ export function RadioComponent({
         </label>
         {isInvalid && (
           <small
-            className={clsx(
-              "input-error-message",
-              parseClassName<classNamePrefix>(className, "error")
-            )}
+            className={cn("input-error-message", pcn<CT>(className, "error"))}
           >
             {isInvalid}
           </small>

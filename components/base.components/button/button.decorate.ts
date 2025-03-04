@@ -21,11 +21,11 @@ export const buttonVariant = {
     success: "bg-success text-white",
   },
   outline: {
-    primary: "border-2 border-primary text-primary",
-    secondary: "border-2 border-secondary text-secondary",
-    warning: "border-2 border-warning text-warning",
-    danger: "border-2 border-danger text-danger",
-    success: "border-2 border-success text-success",
+    primary: "border text-primary",
+    secondary: "border text-secondary",
+    warning: "border text-warning",
+    danger: "border text-danger",
+    success: "border text-success",
   },
   light: {
     primary: "bg-light-primary text-primary",
@@ -75,8 +75,8 @@ export const buttonIcon = {
 };
 
 export const buttonRadius = {
-  lg: "rounded-lg",
-  md: "rounded-md",
-  sm: "rounded-md",
-  xs: "rounded-md",
+  lg: "rounded-sm",
+  md: "rounded-sm",
+  sm: "rounded-sm",
+  xs: "rounded-xs",
 };

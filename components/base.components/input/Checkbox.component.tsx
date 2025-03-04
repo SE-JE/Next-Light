@@ -1,11 +1,10 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
-import clsx from "clsx";
-import { parseClassName } from "@/helpers";
+import { cn, pcn } from "@/helpers";
 import { useEffect, useMemo, useState } from "react";
-type classNamePrefix = "label" | "checked" | "error" | "input";
+type CT = "label" | "checked" | "error" | "base";
 
-export type CheckboxProps = {
+export type CheckboxPropsType = {
   name: string;
   label?: string;
   disabled?: boolean;
@@ -13,6 +12,7 @@ export type CheckboxProps = {
   onChange?: () => void;
   checked?: boolean;
   error?: string;
+
   /** Use custom class with: "label::", "checked::", "error::". */
   className?: string;
 };
@@ -26,7 +26,7 @@ export function CheckboxComponent({
   disabled = false,
   error = "",
   className = "",
-}: CheckboxProps) {
+}: CheckboxPropsType) {
   const randomId = useMemo(() => Math.random().toString(36).substring(7), []);
 
   const [isInvalid, setIsInvalid] = useState("");
@@ -58,24 +58,22 @@ export function CheckboxComponent({
         }`}
       >
         <div
-          className={clsx(
-            `flex justify-center items-center rounded-md border-2 w-6 h-6 transition-colors border-light-foreground text-light-foreground`,
+          className={cn(
+            `flex justify-center items-center rounded-md border w-6 h-6 transition-colors border-light-foreground text-light-foreground`,
             checked && "border-light-primary bg-primary text-white",
-            checked && parseClassName<classNamePrefix>(className, "checked"),
-            parseClassName<classNamePrefix>(className, "input")
+            checked && pcn<CT>(className, "checked"),
+            pcn<CT>(className, "base")
           )}
         >
           {checked && <FontAwesomeIcon icon={faCheck} className="text-sm" />}
         </div>
         <span
-          className={clsx(
+          className={cn(
             "whitespace-nowrap",
-            parseClassName<classNamePrefix>(className, "label"),
+            pcn<CT>(className, "label"),
             checked && "font-semibold",
-            checked &&
-              parseClassName<classNamePrefix>(className, "label", "checked"),
-            disabled &&
-              parseClassName<classNamePrefix>(className, "label", "disabled")
+            checked && pcn<CT>(className, "label", "checked"),
+            disabled && pcn<CT>(className, "label", "disabled")
           )}
         >
           {label}
@@ -84,10 +82,7 @@ export function CheckboxComponent({
 
       {isInvalid && (
         <small
-          className={clsx(
-            "input-error-message",
-            parseClassName<classNamePrefix>(className, "error")
-          )}
+          className={cn("input-error-message", pcn<CT>(className, "error"))}
         >
           {isInvalid}
         </small>

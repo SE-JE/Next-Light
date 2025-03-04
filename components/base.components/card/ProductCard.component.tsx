@@ -1,29 +1,30 @@
-import clsx from "clsx";
+import { cn, pcn } from "@/helpers";
 import Image from "next/image";
 import React from "react";
+
+type CT = "image" | "base" | "content";
 
 export function ProductCardComponent({
   image = "",
   name,
   price,
   description,
-  className,
+  className = "",
 }: {
   name: string;
   price?: string;
   image?: string;
   description?: string | React.ReactNode;
-  className?: {
-    container?: string;
-    image?: string;
-  };
+
+  /** Use custom class with: "image::", "content::". */
+  className?: string;
 }) {
   return (
     <>
       <div
-        className={clsx(
-          "rounded-lg p-2 shadow-sm bg-white",
-          className?.container
+        className={cn(
+          "rounded-[6px] border p-2 bg-white",
+          pcn<CT>(className, "base")
         )}
       >
         <Image
@@ -31,13 +32,13 @@ export function ProductCardComponent({
           alt={image}
           width={400}
           height={300}
-          className={clsx(
-            "h-56 w-full rounded-md object-cover",
-            className?.image
+          className={cn(
+            "h-56 w-full rounded-[4px] object-cover",
+            pcn<CT>(className, "image")
           )}
         />
 
-        <div className="p-2">
+        <div className={cn("p-2", pcn<CT>(className, "content"))}>
           <dl>
             <div>
               <dt className="sr-only">Name</dt>

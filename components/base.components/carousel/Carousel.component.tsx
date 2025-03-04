@@ -1,9 +1,12 @@
+import { cn, pcn } from "@/helpers";
 import {
   faChevronLeft,
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState, useRef, useEffect } from "react";
+
+type CT = "item" | "prev-button" | "next-button" | "navigation" | "base";
 
 interface CarouselItem {
   background: string;
@@ -12,9 +15,19 @@ interface CarouselItem {
 
 interface CarouselProps {
   items: CarouselItem[];
+  noButton?: boolean;
+  noNavigation?: boolean;
+
+  /** Use custom class with: "item::", "prev-button::", "next-button::", "navigation::". */
+  className?: string;
 }
 
-export function CarouselComponent({ items }: CarouselProps) {
+export function CarouselComponent({
+  items,
+  className = "",
+  noButton,
+  noNavigation,
+}: CarouselProps) {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const touchStartX = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
@@ -49,8 +62,31 @@ export function CarouselComponent({ items }: CarouselProps) {
     };
   }, []);
 
+  const styles = {
+    base: cn(
+      "relative w-full overflow-hidden rounded-[6px]",
+      pcn<CT>(className, "base")
+    ),
+    item: cn(
+      "flex-shrink-0 w-full aspect-[16/6] flex items-center justify-center bg-cover bg-center",
+      pcn<CT>(className, "item")
+    ),
+    prevButton: cn(
+      "absolute top-1/2 left-4 transform -translate-y-1/2 bg-light-foreground/40 text-white p-2 rounded-[6px] cursor-pointer",
+      pcn<CT>(className, "prev-button")
+    ),
+    nextButton: cn(
+      "absolute top-1/2 right-4 transform -translate-y-1/2 bg-light-foreground/40 text-white p-2 rounded-[6px] cursor-pointer",
+      pcn<CT>(className, "next-button")
+    ),
+    navigation: cn(
+      "absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2",
+      pcn<CT>(className, "navigation")
+    ),
+  };
+
   return (
-    <div className="relative w-full overflow-hidden rounded-2xl">
+    <div className={styles.base}>
       <div
         className="flex transition-transform duration-500"
         style={{ transform: `translateX(-${currentIndex * 100}%)` }}
@@ -60,7 +96,7 @@ export function CarouselComponent({ items }: CarouselProps) {
         {items.map((item, index) => (
           <div
             key={index}
-            className="flex-shrink-0 w-full aspect-[16/6] flex items-center justify-center bg-cover bg-center"
+            className={styles.item}
             style={{ backgroundImage: `url(${item.background})` }}
           >
             {item.content}
@@ -68,30 +104,30 @@ export function CarouselComponent({ items }: CarouselProps) {
         ))}
       </div>
 
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-        {items.map((_, index) => (
-          <button
-            key={index}
-            className={`w-8 h-1 rounded-full ${
-              currentIndex === index ? "bg-primary" : "bg-light-foreground/40"
-            }`}
-            onClick={() => setCurrentIndex(index)}
-          ></button>
-        ))}
-      </div>
+      {!noNavigation && (
+        <div className={styles.navigation}>
+          {items.map((_, index) => (
+            <button
+              key={index}
+              className={`w-8 h-1 rounded-full ${
+                currentIndex === index ? "bg-primary" : "bg-light-foreground/40"
+              }`}
+              onClick={() => setCurrentIndex(index)}
+            ></button>
+          ))}
+        </div>
+      )}
 
-      <button
-        className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-light-foreground/40 text-white p-2 rounded-full cursor-pointer"
-        onClick={handlePrev}
-      >
-        <FontAwesomeIcon icon={faChevronLeft} />
-      </button>
-      <button
-        className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-light-foreground/40 text-white p-2 rounded-full cursor-pointer"
-        onClick={handleNext}
-      >
-        <FontAwesomeIcon icon={faChevronRight} />
-      </button>
+      {!noButton && (
+        <>
+          <button className={styles.prevButton} onClick={handlePrev}>
+            <FontAwesomeIcon icon={faChevronLeft} />
+          </button>
+          <button className={styles.nextButton} onClick={handleNext}>
+            <FontAwesomeIcon icon={faChevronRight} />
+          </button>
+        </>
+      )}
     </div>
   );
 }
