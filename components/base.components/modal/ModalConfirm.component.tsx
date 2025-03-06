@@ -65,7 +65,7 @@ export function ModalConfirmComponent({
         className={cn(
           "modal-backdrop",
           !show && "opacity-0 scale-0 -translate-y-full",
-          pcn<CT>(className, "backdrop"),
+          pcn<CT>(className, "backdrop")
         )}
         onClick={() => onClose()}
       ></div>
@@ -75,14 +75,14 @@ export function ModalConfirmComponent({
           "modal rounded-[6px] border-t-4 !border-primary",
           "w-[calc(100vw-2rem)] md:w-[50vw] max-w-[300px]",
           !show && "-translate-y-full opacity-0 scale-y-0",
-          pcn<CT>(className, "base"),
+          pcn<CT>(className, "base")
         )}
       >
         {title && (
           <div
             className={cn(
               "flex flex-col gap-2 items-center text-primary",
-              pcn<CT>(className, "header"),
+              pcn<CT>(className, "header")
             )}
           >
             <div className="mt-4">
@@ -154,7 +154,7 @@ export function ModalConfirmComponent({
         className="!border-danger header::text-danger"
       >
         <p className="px-3 pb-2 text-sm">
-          Gagal {title || ""}, cek data dan koneksi internet dan coba kembali!
+          Gagal {title || ""}! cek data dan koneksi internet dan coba kembali!
         </p>
       </ToastComponent>
 
