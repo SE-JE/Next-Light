@@ -5,7 +5,7 @@ export default function Example() {
   return (
     <>
       <div>
-        <p className="text-xl">Dashboard</p>
+        <p className="text-xl mb-4">Apa Itu Next-Light</p>
       </div>
     </>
   );

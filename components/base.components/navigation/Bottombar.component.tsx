@@ -24,7 +24,7 @@ export function BottombarComponent({
 
   const styles = {
     base: cn(
-      "fixed left-1/2 -translate-x-1/2 w-[96%] max-w-[400px] p-2 px-4 bg-white border rounded-[6px] z-40 shadow-lg",
+      "fixed left-1/2 -translate-x-1/2 w-[96%] max-w-[400px] p-2 px-4 bg-white border rounded-[6px] z-40",
       isKeyboardOpen ? "-bottom-60" : "bottom-3",
       pcn(className, "base")
     ),

@@ -276,29 +276,30 @@ export function TableComponent({
               ?.filter((c) => typeof c == "function")
               ?.map((c: () => ReactNode) => c?.())}
 
-          {typeof controlBar != "boolean" &&
-            controlBar?.includes("searchColumn") && (
-              <div className="w-48 px-1.5">
-                <SelectComponent
-                  name="searchableColumn"
-                  placeholder="Pencarian..."
-                  options={[
-                    ...columns.map((column) => {
-                      return {
-                        label: column.label,
-                        value: column.selector,
-                      };
-                    }),
-                  ]}
-                  value={searchableColumn || []}
-                  onChange={(e) => onChangeSearchableColumn?.(String(e))}
-                  className="py-1.5 text-sm"
-                  multiple
-                />
-              </div>
-            )}
+          {(typeof controlBar == "boolean" ||
+            controlBar?.includes("searchColumn")) && (
+            <div className="w-48 px-1.5">
+              <SelectComponent
+                name="searchableColumn"
+                placeholder="Pencarian..."
+                options={[
+                  ...columns.map((column) => {
+                    return {
+                      label: column.label,
+                      value: column.selector,
+                    };
+                  }),
+                ]}
+                value={searchableColumn || []}
+                onChange={(e) => onChangeSearchableColumn?.(String(e))}
+                className="py-1.5 text-sm"
+                multiple
+              />
+            </div>
+          )}
 
-          {typeof controlBar != "boolean" && controlBar?.includes("search") && (
+          {(typeof controlBar == "boolean" ||
+            controlBar?.includes("search")) && (
             <div className="w-full min-w-[150px] px-1.5">
               <InputComponent
                 name="search"
@@ -311,36 +312,36 @@ export function TableComponent({
             </div>
           )}
 
-          {typeof controlBar != "boolean" &&
-            controlBar?.includes("filterColumn") && (
-              <div className="p-1.5 rounded-md relative">
-                <IconButtonComponent
-                  icon={faEyeLowVision}
-                  variant="simple"
-                  className="!text-foreground"
-                  onClick={() => {
-                    setFloatingDisplay(!floatingDisplay);
-                  }}
-                  size="sm"
-                />
-                {renderFloatingDisplay()}
-              </div>
-            )}
+          {(typeof controlBar == "boolean" ||
+            controlBar?.includes("filterColumn")) && (
+            <div className="p-1.5 rounded-md relative">
+              <IconButtonComponent
+                icon={faEyeLowVision}
+                variant="simple"
+                className="!text-foreground"
+                onClick={() => {
+                  setFloatingDisplay(!floatingDisplay);
+                }}
+                size="sm"
+              />
+              {renderFloatingDisplay()}
+            </div>
+          )}
 
-          {typeof controlBar != "boolean" &&
-            controlBar?.includes("refresh") && (
-              <div className="p-1.5 rounded-md relative mr-2">
-                <IconButtonComponent
-                  icon={faRefresh}
-                  variant="simple"
-                  className="!text-foreground"
-                  onClick={() => {
-                    onRefresh?.();
-                  }}
-                  size="sm"
-                />
-              </div>
-            )}
+          {(typeof controlBar == "boolean" ||
+            controlBar?.includes("refresh")) && (
+            <div className="p-1.5 rounded-md relative mr-2">
+              <IconButtonComponent
+                icon={faRefresh}
+                variant="simple"
+                className="!text-foreground"
+                onClick={() => {
+                  onRefresh?.();
+                }}
+                size="sm"
+              />
+            </div>
+          )}
         </div>
       )}
 

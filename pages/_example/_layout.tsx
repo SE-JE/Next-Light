@@ -3,9 +3,6 @@ import {
   SidebarContentComponent,
 } from "@/components/base.components";
 import { ToggleProvider } from "@/context/ToggleContext";
-import { faStar } from "@fortawesome/free-regular-svg-icons";
-import { faTableCells } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { ReactNode } from "react";
 
 export default function ExampleLayout({ children }: { children: ReactNode }) {
@@ -27,11 +24,10 @@ export default function ExampleLayout({ children }: { children: ReactNode }) {
             }
             items={[
               {
-                label: "Dashboard",
+                label: "Introduction",
                 items: [
                   {
-                    label: "Dashboard",
-                    leftContent: <FontAwesomeIcon icon={faTableCells} />,
+                    label: "Apa Itu Next-Light",
                     path: "/",
                   },
                 ],
@@ -42,57 +38,46 @@ export default function ExampleLayout({ children }: { children: ReactNode }) {
                 items: [
                   {
                     label: "Accordion",
-                    leftContent: <FontAwesomeIcon icon={faStar} />,
                     path: "/accordion",
                   },
                   {
                     label: "Breadcrumb",
-                    leftContent: <FontAwesomeIcon icon={faStar} />,
                     path: "/breadcrumb",
                   },
                   {
                     label: "Button",
-                    leftContent: <FontAwesomeIcon icon={faStar} />,
                     path: "/button",
                   },
                   {
                     label: "Card",
-                    leftContent: <FontAwesomeIcon icon={faStar} />,
                     path: "/card",
                   },
                   {
                     label: "Carousel",
-                    leftContent: <FontAwesomeIcon icon={faStar} />,
                     path: "/carousel",
                   },
                   {
                     label: "Input",
-                    leftContent: <FontAwesomeIcon icon={faStar} />,
                     path: "/input",
                   },
                   {
                     label: "Modal",
-                    leftContent: <FontAwesomeIcon icon={faStar} />,
                     path: "/modal",
                   },
                   {
                     label: "Scroll Container",
-                    leftContent: <FontAwesomeIcon icon={faStar} />,
                     path: "/scroll-container",
                   },
                   {
                     label: "Table",
-                    leftContent: <FontAwesomeIcon icon={faStar} />,
                     path: "/table",
                   },
                   {
                     label: "Typography",
-                    leftContent: <FontAwesomeIcon icon={faStar} />,
                     path: "/typography",
                   },
                   {
                     label: "Wizard",
-                    leftContent: <FontAwesomeIcon icon={faStar} />,
                     path: "/wizard",
                   },
                 ],
@@ -129,32 +114,26 @@ export default function ExampleLayout({ children }: { children: ReactNode }) {
                 items: [
                   {
                     label: "Sidebar",
-                    leftContent: <FontAwesomeIcon icon={faStar} />,
                     path: "/sidebar",
                   },
                   {
                     label: "Headbar",
-                    leftContent: <FontAwesomeIcon icon={faStar} />,
                     path: "/headbar",
                   },
                   {
                     label: "Tabbar",
-                    leftContent: <FontAwesomeIcon icon={faStar} />,
                     path: "/tabbar",
                   },
                   {
                     label: "Navbar",
-                    leftContent: <FontAwesomeIcon icon={faStar} />,
                     path: "/navbar",
                   },
                   {
                     label: "Footer",
-                    leftContent: <FontAwesomeIcon icon={faStar} />,
                     path: "/footer",
                   },
                   {
                     label: "Bottombar",
-                    leftContent: <FontAwesomeIcon icon={faStar} />,
                     path: "/bottombar",
                   },
                 ],
