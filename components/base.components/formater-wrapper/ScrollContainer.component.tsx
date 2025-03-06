@@ -22,30 +22,30 @@ export function ScrollContainerComponent({
   const floatingScrollbarRef = useRef<HTMLDivElement | null>(null);
   const floatingScrollbarContainerRef = useRef<HTMLDivElement | null>(null);
 
-  const [showLeftShadow, setShowLeftShadow] = useState(false);
-  const [showRightShadow, setShowRightShadow] = useState(false);
-  const [showTopShadow, setShowTopShadow] = useState(false);
-  const [showBottomShadow, setShowBottomShadow] = useState(false);
-  const [isScrollable, setIsScrollable] = useState(false);
+  // const [showLeftShadow, setShowLeftShadow] = useState(false);
+  // const [showRightShadow, setShowRightShadow] = useState(false);
+  // const [showTopShadow, setShowTopShadow] = useState(false);
+  // const [showBottomShadow, setShowBottomShadow] = useState(false);
+  // const [isScrollable, setIsScrollable] = useState(false);
   const [containerWidth, setContainerWidth] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => {
       if (!containerRef.current) return;
       onScroll?.(containerRef.current);
-      const {
-        scrollLeft,
-        scrollWidth,
-        clientWidth,
-        scrollTop,
-        scrollHeight,
-        clientHeight,
-      } = containerRef.current;
-      setShowLeftShadow(scrollLeft > 0);
-      setShowRightShadow(scrollLeft + clientWidth < scrollWidth);
-      setShowTopShadow(scrollTop > 0);
-      setShowBottomShadow(scrollTop + clientHeight < scrollHeight);
-      setIsScrollable(scrollWidth > clientWidth || scrollHeight > clientHeight);
+      // const {
+      //   scrollLeft,
+      //   scrollWidth,
+      //   clientWidth,
+      //   scrollTop,
+      //   scrollHeight,
+      //   clientHeight,
+      // } = containerRef.current;
+      // setShowLeftShadow(scrollLeft > 0);
+      // setShowRightShadow(scrollLeft + clientWidth < scrollWidth);
+      // setShowTopShadow(scrollTop > 0);
+      // setShowBottomShadow(scrollTop + clientHeight < scrollHeight);
+      // setIsScrollable(scrollWidth > clientWidth || scrollHeight > clientHeight);
     };
 
     const container = containerRef.current;
@@ -102,7 +102,7 @@ export function ScrollContainerComponent({
 
   return (
     <div className={cn("relative", pcn<CT>(className, "base"))}>
-      {isScrollable && showLeftShadow && (
+      {/* {isScrollable && showLeftShadow && (
         <div className="absolute z-10 left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-foreground/15 to-transparent pointer-events-none" />
       )}
       {isScrollable && showRightShadow && (
@@ -113,7 +113,7 @@ export function ScrollContainerComponent({
       )}
       {isScrollable && showBottomShadow && (
         <div className="absolute z-10 bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-foreground/15 to-transparent pointer-events-none" />
-      )}
+      )} */}
       <div
         ref={containerRef}
         className={cn(

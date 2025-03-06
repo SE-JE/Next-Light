@@ -156,7 +156,7 @@ body {
   }
 
   .modal {
-    @apply isolate fixed left-1/2 -translate-x-1/2 top-[1rem] md:top-[15vh] opacity-100 bg-white z-40 shadow-xs border-t-4 border-primary;
+    @apply isolate fixed left-1/2 -translate-x-1/2 top-[1rem] md:top-[15vh] opacity-100 bg-white z-40 rounded-[6px] border-t-4 !border-primary;
   }
 
   .modal-header {
@@ -164,15 +164,15 @@ body {
   }
 
   .modal-footer {
-    @apply px-4 py-2.5 mt-4 bg-background;
+    @apply px-4 py-2.5 mt-4 bg-background rounded-b-[6px];
   }
 
   .floating-page {
-    @apply fixed top-[1rem] right-0 bg-background lg:top-0 h-screen z-40 border-t-4 md:border-t-0 md:border-l-4 border-primary shadow-[0px_-4px_10px_-4px_rgba(0,0,0,0.25)] md:shadow-[-4px_0px_10px_-4px_rgba(0,0,0,0.25)] overflow-hidden;
+    @apply fixed top-[1rem] right-0 bg-background lg:top-0 h-screen z-40 border-t-4 md:border-t-0 md:border-l-4 !border-primary overflow-hidden;
   }
 
   .toast {
-    @apply isolate fixed right-5 bottom-5 opacity-100 bg-white z-40 shadow-xs border-t-4 border-primary;
+    @apply isolate fixed right-5 bottom-5 opacity-100 bg-white z-40 rounded-[6px] border-t-4 !border-primary;
   }
 
   .modal-backdrop {
@@ -190,11 +190,10 @@ body {
 
   .skeleton-loading::after {
       content: "";
-      @apply absolute w-full h-full top-0 left-0 z-[60];
-      background: #f1f1f1;
-      background: linear-gradient(100deg, #f1f1f1 10%, #fff 20%, #f1f1f1 35%);
+      @apply absolute w-full h-full top-0 left-0 z-10 rounded-[6px];
+      background: linear-gradient(100deg, #f4f8ff 10%, #fff 20%, #f4f8ff 35%);
       background-size: 200% 100%;
-      animation: 1s loading ease-out infinite;
+      animation: 2s loading ease-out infinite;
   }
 
   @keyframes loading {
@@ -220,7 +219,7 @@ body {
   .scroll::-webkit-scrollbar-thumb,
   .scroll-sm::-webkit-scrollbar-thumb, 
   .scroll-lg::-webkit-scrollbar-thumb {
-    @apply bg-light-primary/60 cursor-pointer;
+    @apply bg-light-primary/60 cursor-pointer rounded-[3px];
   }
 
   body::-webkit-scrollbar-thumb:hover,

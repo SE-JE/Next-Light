@@ -5,172 +5,126 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
 import { InputRadioComponent } from "../input/InputRadio.component";
+import { cn, pcn } from "@/helpers";
 
-export type PaginationProps = {
+type CT = "item" | "active" | "base";
+
+export type PaginationPropsType = {
   totalRow: number;
   paginate: number;
   page: number;
   onChange?: (totalRow: number, paginate: number, page: number) => void;
+  className?: string;
 };
 
 export default function PaginationComponent({
   totalRow,
-  paginate,
-  page,
+  paginate = 10,
+  page = 1,
   onChange,
-}: PaginationProps) {
-  const [pagination, setPagination] = useState<{
-    first: boolean;
-    pages: number[];
-    last: boolean;
-    lastPage?: number;
-  }>({
-    first: false,
-    pages: [],
-    last: false,
-  });
+  className = "",
+}: PaginationPropsType) {
+  const [pages, setPages] = useState<number[]>([]);
+  const lastPage = Math.ceil(totalRow / paginate);
 
   useEffect(() => {
+    let newPages = [];
     if (totalRow > paginate) {
-      let newPages = [];
-      const lastPage = Math.ceil(totalRow / paginate);
-
-      if (page > 1 && page < lastPage) {
-        if (page > 2) {
-          newPages = [page - 1, page, page + 1];
-        } else {
-          newPages = [1, page, page + 1];
-        }
-      } else if (page <= 1 && lastPage > 2) {
-        newPages = [page, page + 1, page + 2];
-      } else if (lastPage == 2) {
-        if (page == 2) {
-          newPages = [1, page];
-        } else {
-          newPages = [page, 2];
-        }
-      } else {
-        newPages = [page - 2, page - 1, page];
-      }
-
-      setPagination({
-        first: page > 3,
-        pages: newPages,
-        last: page + 1 < lastPage && lastPage > 3,
-        lastPage: lastPage,
-      });
+      const start = Math.max(1, page - 1);
+      const end = Math.min(lastPage, page + 1);
+      newPages = Array.from({ length: end - start + 1 }, (_, i) => start + i);
     } else {
-      setPagination({
-        first: false,
-        pages: [1],
-        last: false,
-        lastPage: 1,
-      });
+      newPages = [1];
     }
+    setPages(newPages);
   }, [totalRow, page, paginate]);
 
-  return (
-    <>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-6">
-          <div className="w-50">
-            <InputRadioComponent
-              name="paginate"
-              options={[
-                {
-                  value: 10,
-                  label: "10",
-                },
-                {
-                  value: 20,
-                  label: "20",
-                },
-                {
-                  value: 50,
-                  label: "50",
-                },
-              ]}
-              value={paginate}
-              onChange={(e) => {
-                onChange?.(totalRow, Number(e), page);
-              }}
-              className="py-2 text-sm bg-white"
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            {page > 1 && (
-              <div
-                className="p-3 hover:scale-105 text-sm text-foreground cursor-pointer"
-                onClick={() => onChange?.(totalRow, paginate, page - 1)}
-              >
-                <FontAwesomeIcon icon={faChevronLeft} />
-              </div>
-            )}
+  const styles = {
+    base: cn("flex items-center justify-between", pcn<CT>(className, "base")),
+    item: cn(
+      "w-12 h-8 text-sm flex justify-center items-center bg-white rounded-[6px] border cursor-pointer",
+      pcn<CT>(className, "item")
+    ),
+    activeItem: cn(
+      "bg-light-primary/50 text-primary",
+      pcn<CT>(className, "active")
+    ),
+    overflow: "py-1.5 px-2 text-foreground text-sm",
+  };
 
-            {pagination.first && (
-              <>
-                <div
-                  className="w-12 h-8 text-sm flex justify-center items-center bg-white rounded-[6px] border cursor-pointer hover:scale-105"
-                  onClick={() => onChange?.(totalRow, paginate, 1)}
-                >
-                  1
-                </div>
-                <div className="px-2 py-1.5 text-foreground rounded-[6px]">
-                  ...
-                </div>
-              </>
-            )}
-            {pagination.pages &&
-              pagination.pages.map((itemPage, key) => {
-                return (
-                  <div
-                    key={key}
-                    className={`w-12 h-8 text-sm flex justify-center items-center rounded-[6px] border ${
-                      itemPage == page
-                        ? "bg-light-primary text-primary"
-                        : "bg-white cursor-pointer"
-                    } hover:scale-105`}
-                    onClick={() => onChange?.(totalRow, paginate, itemPage)}
-                  >
-                    {itemPage}
-                  </div>
-                );
-              })}
-            {pagination.last && (
-              <>
-                <div className="px-2 py-1.5 text-foreground rounded-[6px]">
-                  ...
-                </div>
-                <div
-                  className="w-12 h-8 text-sm flex justify-center items-center bg-white rounded-[6px] border cursor-pointer hover:scale-105"
-                  onClick={() =>
-                    onChange?.(totalRow, paginate, pagination.lastPage ?? 1)
-                  }
-                >
-                  {pagination.lastPage}
-                </div>
-              </>
-            )}
-            {pagination.lastPage && page < pagination.lastPage && (
-              <div
-                className="p-3 hover:scale-105 text-sm text-foreground cursor-pointer"
-                onClick={() => onChange?.(totalRow, paginate, page + 1)}
+  return (
+    <div className={styles.base}>
+      <div className="flex items-center gap-6">
+        <InputRadioComponent
+          name="paginate"
+          options={[10, 20, 50].map((val) => ({
+            value: val,
+            label: String(val),
+          }))}
+          value={paginate}
+          onChange={(e) => onChange?.(totalRow, Number(e), 1)}
+          className="py-1.5 text-sm bg-white"
+        />
+        <div className="flex items-center gap-2">
+          {page > 1 && (
+            <button
+              className={styles.overflow}
+              onClick={() => onChange?.(totalRow, paginate, page - 1)}
+            >
+              <FontAwesomeIcon icon={faChevronLeft} />
+            </button>
+          )}
+
+          {page > 2 && (
+            <>
+              <button
+                className={styles.item}
+                onClick={() => onChange?.(totalRow, paginate, 1)}
               >
-                <FontAwesomeIcon icon={faChevronRight} />
-              </div>
-            )}
-          </div>
-        </div>
-        <div className="relative flex items-center gap-5 px-2 text-sm">
-          <div className="text-foreground">
-            {paginate * page - paginate + 1} -{" "}
-            {pagination.lastPage && page < pagination.lastPage
-              ? paginate * page
-              : totalRow}{" "}
-            dari {totalRow}
-          </div>
+                1
+              </button>
+              {page > 3 && <span className={styles.overflow}>...</span>}
+            </>
+          )}
+
+          {pages.map((p) => (
+            <button
+              key={p}
+              className={cn(styles.item, p === page && styles.activeItem)}
+              onClick={() => onChange?.(totalRow, paginate, p)}
+            >
+              {p}
+            </button>
+          ))}
+
+          {page < lastPage - 1 && (
+            <>
+              {page < lastPage - 2 && (
+                <span className={styles.overflow}>...</span>
+              )}
+              <button
+                className={styles.item}
+                onClick={() => onChange?.(totalRow, paginate, lastPage)}
+              >
+                {lastPage}
+              </button>
+            </>
+          )}
+
+          {page < lastPage && (
+            <button
+              className={styles.overflow}
+              onClick={() => onChange?.(totalRow, paginate, page + 1)}
+            >
+              <FontAwesomeIcon icon={faChevronRight} />
+            </button>
+          )}
         </div>
       </div>
-    </>
+      <div className="text-sm text-foreground">
+        {Math.min(totalRow, paginate * (page - 1) + 1)} -{" "}
+        {Math.min(totalRow, paginate * page)} / {totalRow}
+      </div>
+    </div>
   );
 }

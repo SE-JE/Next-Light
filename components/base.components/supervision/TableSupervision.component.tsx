@@ -1,7 +1,7 @@
 import React, { ReactNode, useEffect, useMemo, useState } from "react";
 import {
   FloatingPageComponent,
-  floatingPageProps,
+  FloatingPagePropsType,
 } from "../modal/FloatingPage.component";
 import { GetPropsType, useGet } from "@/helpers";
 import { useRouter } from "next/router";
@@ -24,7 +24,7 @@ export type TableSupervisionColumnType = {
 export type TableSupervisionFormType = {
   forms: string[] | (FormType & { visibility: "*" | "create" | "update" })[];
   customDefaultValue?: object;
-  modalControl?: floatingPageProps;
+  modalControl?: FloatingPagePropsType;
   contentType?: "application/json" | "multipart/form-data";
 };
 
@@ -245,18 +245,34 @@ TableSupervisionPropsType) {
                 ...form,
               };
         })
-      : data?.forms || data?.data?.at(0)
-      ? Object.keys(data.data[0]).map((col) => {
-          return {
-            col: 12,
-            type: "text",
-            construction: {
-              name: col,
-              label: col,
-            },
-          };
-        })
-      : [];
+      : data?.forms ||
+          data?.columns ||
+          columnControl?.map((col) => {
+            return {
+              col: 12,
+              type: "text",
+              construction: {
+                name: typeof col == "string" ? col : col?.selector,
+                label: typeof col == "string" ? col : col?.label,
+                placeholder: `Masukkan ${
+                  typeof col == "string" ? col : col?.label
+                }...`,
+              },
+            };
+          }) ||
+          (data?.data?.at(0)
+            ? Object.keys(data.data[0]).map((col) => {
+                return {
+                  col: 12,
+                  type: "text",
+                  construction: {
+                    name: col,
+                    label: col,
+                    placeholder: `Masukkan ${col}...`,
+                  },
+                };
+              })
+            : []);
   }, [formControl, data]);
 
   return (
@@ -276,21 +292,48 @@ TableSupervisionPropsType) {
             setPaginate(pageSize);
           },
         }}
+        sortBy={sort}
+        onChangeSortBy={(e) =>
+          setSort({ column: e.column, direction: e.direction })
+        }
+        search={search}
+        onChangeSearch={(e) => setSearch(e)}
+        onRefresh={() => {}}
+        onRowClick={() => {}}
+        controlBar={[
+          () => {
+            return (
+              <div className="pl-2 pr-4 mr-2 border-r">
+                <ButtonComponent
+                  label="Tambah Data"
+                  size="sm"
+                  onClick={() => setModal("form")}
+                />
+              </div>
+            );
+          },
+          "search",
+          "filterColumn",
+          "refresh",
+        ]}
       />
 
       <FloatingPageComponent
         show={modal === "form"}
         onClose={() => setModal(null)}
         title="Tambah Data"
+        className="bg-white"
       >
         <div className="p-4">
           <FormSupervisionComponent
             forms={forms as FormType[]}
             submitControl={{
-              path: `${fetchControl.url}/${
-                (dataSelected as { id: number })?.id
+              path: `${fetchControl.path}/${
+                (dataSelected as { id: number })?.id || ""
               }`,
-              url: fetchControl.url,
+              url: `${fetchControl.url}/${
+                (dataSelected as { id: number })?.id || ""
+              }`,
             }}
           />
         </div>

@@ -9,8 +9,16 @@ export default function Table() {
         <TableSupervisionComponent
           title="Table Supervision"
           fetchControl={{
-            url: "http://localhost:8000/api/products",
+            url: "http://localhost:8000/api/features",
           }}
+          columnControl={[
+            {
+              selector: "name",
+              label: "Nama",
+              sortable: true,
+              width: "300px",
+            },
+          ]}
         />
       </div>
     </>
