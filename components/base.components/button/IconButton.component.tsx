@@ -8,7 +8,7 @@ import { cn, pcn } from "@/helpers";
 
 type CT = "icon" | "loading" | "base";
 
-export type BconButtonPropsType = {
+export type IconButtonPropsType = {
   icon: any;
   type?: "submit" | "button";
   variant?: "solid" | "outline" | "light" | "simple";
@@ -42,7 +42,7 @@ export function IconButtonComponent({
   loading,
   tips,
   className = "",
-}: BconButtonPropsType) {
+}: IconButtonPropsType) {
   const buttonClasses = cn(
     "button",
     buttonVariant[variant][paint],

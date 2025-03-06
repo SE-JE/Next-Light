@@ -11,7 +11,7 @@ export default function Form() {
           title="Generated Form Supervision"
           forms={[
             {
-              col: "3",
+              col: "9",
               construction: {
                 label: "Your Name",
                 placeholder: "Input your name...",
@@ -22,6 +22,7 @@ export default function Form() {
           submitControl={{
             path: "/",
           }}
+          confirmation
         />
       </CardComponent>
     </>

@@ -4,7 +4,6 @@ import React, {
   InputHTMLAttributes,
   ReactNode,
   useEffect,
-  useMemo,
   useState,
 } from "react";
 import { CurrencyFormatComponent } from "../formater-wrapper";
@@ -55,11 +54,18 @@ export function InputCurrencyComponent({
   const [isInvalid, setIsInvalid] = useState("");
   const [isFirst, setIsFirst] = useState(true);
 
+  // =========================>
+  // ## initial
+  // =========================>
   useEffect(() => {
     register?.(props.name || "", validations);
-  }, [register, validations]);
+  }, [props.name, validations]);
 
-  const randomId = useMemo(() => Math.random().toString(36).substring(7), []);
+  const [randomId, setRandomId] = useState("");
+
+  useEffect(() => {
+    setRandomId(Math.random().toString(36).substring(7));
+  }, []);
 
   const [errorMessage] = useValidationHelper(
     {

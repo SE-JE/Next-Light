@@ -13,8 +13,8 @@ export const authHeader = (bearer?: string): string | null => {
 };
 
 const handleErrors = (fetch: AxiosResponse) => {
-  if (fetch.status === 401) Router.push(loginPath);
-  else if (fetch.status === 403) Router.push(basePath);
+  if (fetch?.status === 401) Router.push(loginPath);
+  else if (fetch?.status === 403) Router.push(basePath);
   return fetch;
 };
 

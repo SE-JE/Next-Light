@@ -1,5 +1,5 @@
 import { cn, pcn } from "@/helpers";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 type CT = "label" | "checked" | "error" | "input";
 
@@ -25,8 +25,15 @@ export function RadioComponent({
   error,
   className = "",
 }: RadioPropsType) {
-  const randomId = useMemo(() => Math.random().toString(36).substring(7), []);
+  // =========================>
+  // ## initial
+  // =========================>
+  const [randomId, setRandomId] = useState("");
   const [isInvalid, setIsInvalid] = useState("");
+
+  useEffect(() => {
+    setRandomId(Math.random().toString(36).substring(7));
+  }, []);
 
   // =========================>
   // ## invalid handler

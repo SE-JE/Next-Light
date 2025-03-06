@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { cn, pcn } from "@/helpers";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 type CT = "label" | "checked" | "error" | "base";
 
 export type CheckboxPropsType = {
@@ -27,7 +27,11 @@ export function CheckboxComponent({
   error = "",
   className = "",
 }: CheckboxPropsType) {
-  const randomId = useMemo(() => Math.random().toString(36).substring(7), []);
+  const [randomId, setRandomId] = useState("");
+
+  useEffect(() => {
+    setRandomId(Math.random().toString(36).substring(7));
+  }, []);
 
   const [isInvalid, setIsInvalid] = useState("");
 

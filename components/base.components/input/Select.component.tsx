@@ -14,7 +14,7 @@ import {
   faTimes,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { ReactNode, useEffect, useMemo, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 
 type CT =
   | "label"
@@ -122,9 +122,13 @@ export function SelectComponent({
   // =========================>
   useEffect(() => {
     register?.(name || "", validations);
-  }, [register, validations]);
+  }, [name, validations]);
 
-  const randomId = useMemo(() => Math.random().toString(36).substring(7), []);
+  const [randomId, setRandomId] = useState("");
+
+  useEffect(() => {
+    setRandomId(Math.random().toString(36).substring(7));
+  }, []);
 
   // =========================>
   // ## invalid handler

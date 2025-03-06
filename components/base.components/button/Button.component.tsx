@@ -11,7 +11,7 @@ type CT = "icon" | "loading" | "base";
 
 export type ButtonPropsType = {
   type?: "submit" | "button";
-  label: string | ReactNode;
+  label?: string | ReactNode;
   variant?: "solid" | "outline" | "light" | "simple";
   paint?: "primary" | "secondary" | "success" | "danger" | "warning";
   rounded?: boolean | string;

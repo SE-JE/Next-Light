@@ -19,6 +19,26 @@ export default function Table() {
               width: "300px",
             },
           ]}
+          formControl={{
+            forms: [
+              {
+                col: "12 lg:4",
+                construction: {
+                  name: "code",
+                  label: "Kode",
+                  placeholder: "Masukkan kode...",
+                },
+              },
+              {
+                col: "12 lg:8",
+                construction: {
+                  name: "name",
+                  label: "Nama",
+                  placeholder: "Masukkan nama...",
+                },
+              },
+            ],
+          }}
         />
       </div>
     </>

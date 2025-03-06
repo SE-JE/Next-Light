@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { Fragment, ReactNode, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/router";
@@ -145,7 +145,7 @@ export function SidebarComponent({
         <nav className="flex flex-col flex-1 mt-3">
           {items?.map((menu_head, menu_head_key) => {
             return (
-              <>
+              <Fragment key={menu_head_key}>
                 <div className="px-2 pt-2">
                   <div
                     className={cn(
@@ -171,9 +171,8 @@ export function SidebarComponent({
                   {(!menu_head?.collapse || checkShow(String(menu_head_key))) &&
                     menu_head?.items?.map((menu, menu_key) => {
                       return (
-                        <>
+                        <Fragment key={`${menu_head_key}.${menu_key}`}>
                           <ListWrapper
-                            key={`${menu_head_key}.${menu_key}`}
                             path={
                               menu?.path ? `${basePath || ""}${menu?.path}` : ""
                             }
@@ -219,9 +218,10 @@ export function SidebarComponent({
                                 checkShow(`${menu_head_key}.${menu_key}`) &&
                                 menu?.items?.map((child, menu_child_key) => {
                                   return (
-                                    <>
+                                    <Fragment
+                                      key={`${menu_head_key}.${menu_key}.${menu_child_key}`}
+                                    >
                                       <ListWrapper
-                                        key={`${menu_head_key}.${menu_key}.${menu_child_key}`}
                                         path={
                                           child?.path
                                             ? `${basePath || ""}${child?.path}`
@@ -265,16 +265,16 @@ export function SidebarComponent({
                                           </div>
                                         </div>
                                       </ListWrapper>
-                                    </>
+                                    </Fragment>
                                   );
                                 })}
                             </div>
                           </div>
-                        </>
+                        </Fragment>
                       );
                     })}
                 </div>
-              </>
+              </Fragment>
             );
           })}
         </nav>

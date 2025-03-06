@@ -156,7 +156,7 @@ body {
   }
 
   .modal {
-    @apply isolate fixed left-1/2 -translate-x-1/2 top-[1rem] md:top-[15vh] opacity-100 bg-white z-40 rounded-[6px] border-t-4 !border-primary;
+    @apply isolate fixed left-1/2 -translate-x-1/2 top-[1rem] md:top-[15vh] opacity-100 bg-white z-40;
   }
 
   .modal-header {
@@ -172,7 +172,7 @@ body {
   }
 
   .toast {
-    @apply isolate fixed right-5 bottom-5 opacity-100 bg-white z-40 rounded-[6px] border-t-4 !border-primary;
+    @apply isolate fixed right-5 bottom-5 opacity-100 bg-white z-40;
   }
 
   .modal-backdrop {

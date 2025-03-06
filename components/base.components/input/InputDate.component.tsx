@@ -5,7 +5,6 @@ import React, {
   InputHTMLAttributes,
   ReactNode,
   useEffect,
-  useMemo,
   useState,
 } from "react";
 
@@ -70,9 +69,13 @@ export function InputDateComponent({
   // =========================>
   useEffect(() => {
     register?.(props.name || "", validations);
-  }, [register, validations]);
+  }, [props.name, validations]);
 
-  const randomId = useMemo(() => Math.random().toString(36).substring(7), []);
+  const [randomId, setRandomId] = useState("");
+
+  useEffect(() => {
+    setRandomId(Math.random().toString(36).substring(7));
+  }, []);
 
   // =========================>
   // ## invalid handler

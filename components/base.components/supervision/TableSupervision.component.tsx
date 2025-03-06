@@ -11,6 +11,8 @@ import { TableColumnType, TableComponent } from "../table/Table.component";
 import FormSupervisionComponent, {
   FormType,
 } from "./FormSupervision.component";
+import { ModalConfirmComponent } from "../modal";
+import { faQuestionCircle } from "@fortawesome/free-regular-svg-icons";
 
 export type TableSupervisionColumnType = {
   selector: string;
@@ -22,7 +24,7 @@ export type TableSupervisionColumnType = {
 };
 
 export type TableSupervisionFormType = {
-  forms: string[] | (FormType & { visibility: "*" | "create" | "update" })[];
+  forms: string[] | (FormType & { visibility?: "*" | "create" | "update" })[];
   customDefaultValue?: object;
   modalControl?: FloatingPagePropsType;
   contentType?: "application/json" | "multipart/form-data";
@@ -67,8 +69,7 @@ export default function TableSupervisionComponent({
   columnControl,
   formControl,
   actionControl,
-}: // includeFilters,
-TableSupervisionPropsType) {
+}: TableSupervisionPropsType) {
   const router = useRouter();
   const {
     page: pageParams,
@@ -335,9 +336,39 @@ TableSupervisionPropsType) {
                 (dataSelected as { id: number })?.id || ""
               }`,
             }}
+            onSuccess={() => {
+              reset();
+              setModal(null);
+            }}
           />
         </div>
       </FloatingPageComponent>
+
+      <ModalConfirmComponent
+        show={modal === "delete"}
+        onClose={() => setModal(null)}
+        icon={faQuestionCircle}
+        title={`Menghapus Data?`}
+        submitControl={{
+          onSubmit: {
+            method: "destroy",
+            path: `${fetchControl.path}/${
+              (dataSelected as { id: number })?.id || ""
+            }`,
+            url: `${fetchControl.url}/${
+              (dataSelected as { id: number })?.id || ""
+            }`,
+          },
+          onSuccess: () => {
+            reset();
+            setModal(null);
+          },
+        }}
+      >
+        <p className="px-2 pb-2 text-sm text-center">
+          Yakin yang dihapus sudah benar?
+        </p>
+      </ModalConfirmComponent>
     </>
   );
 }

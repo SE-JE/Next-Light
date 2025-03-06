@@ -70,8 +70,8 @@ export function InputCheckboxComponent({
   // ## initial
   // =========================>
   useEffect(() => {
-    register?.(name, validations);
-  }, [register, name, validations]);
+    register?.(name || "", validations);
+  }, [name, validations]);
 
   useEffect(() => {
     if (value) {

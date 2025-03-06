@@ -1,17 +1,15 @@
 import { useReducer, useEffect } from "react";
-import { post, postProps } from "./api.helpers";
-import { validationHelper, ValidationRules } from "./validation.helpers";
+import { post, PostPropsType } from "./api.helpers";
+import { validationHelper, ValidationRulesType } from "./validation.helpers";
 
-// **1. Inisialisasi State**
 const initialState = {
-  formRegisters: [] as { name: string; validations?: ValidationRules }[],
+  formRegisters: [] as { name: string; validations?: ValidationRulesType }[],
   formValues: [] as { name: string; value?: any }[],
   formErrors: [] as { name: string; error?: any }[],
   loading: false,
   showConfirm: false,
 };
 
-// **2. Reducer Function**
 const formReducer = (state: typeof initialState, action: any) => {
   switch (action.type) {
     case "SET_VALUE":
@@ -62,9 +60,8 @@ const formReducer = (state: typeof initialState, action: any) => {
   }
 };
 
-// **3. Custom Hook useForm**
 export const useForm = (
-  submitControl: postProps,
+  submitControl: PostPropsType,
   confirmation?: boolean,
   onSuccess?: (data: any) => void,
   onFailed?: (code: number) => void
@@ -86,15 +83,15 @@ export const useForm = (
     error:
       state.formErrors.find((err: { name: string }) => err.name === name)
         ?.error || undefined,
-    register: (regName: string, regValidations?: ValidationRules) => {
+    register: (regName: string, regValidations?: ValidationRulesType) => {
       dispatch({
         type: "REGISTER_FIELD",
         payload: { name: regName, validations: regValidations },
       });
     },
-    unregister: () => {
-      dispatch({ type: "UNREGISTER_FIELD", payload: { name } });
-    },
+    // unregister: () => {
+    //   dispatch({ type: "UNREGISTER_FIELD", payload: { name } });
+    // },
   });
 
   const fetch = async () => {

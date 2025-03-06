@@ -1,19 +1,36 @@
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { faQuestion } from "@fortawesome/free-solid-svg-icons";
-import { ButtonComponent } from "../button";
+import { ButtonComponent, ButtonPropsType } from "../button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { cn, pcn } from "@/helpers";
+import {
+  cn,
+  destroy,
+  DestroyPropsType,
+  pcn,
+  post,
+  PostPropsType,
+} from "@/helpers";
+import { ToastComponent } from "./Toast.component";
 
 type CT = "base" | "backdrop" | "header" | "footer";
 
 export type ModalConfirmPropsType = {
   show: boolean;
-  onClose: () => void;
-  onSubmit: () => void;
   title?: string | ReactNode;
   children?: any;
   icon?: any;
   footer?: string | ReactNode;
+
+  submitControl?: ButtonPropsType & {
+    onSubmit?:
+      | ((PostPropsType | DestroyPropsType) & {
+          method?: "post" | "destroy";
+        })
+      | (() => void);
+    onSuccess?: () => void;
+    onError?: () => void;
+  };
+  onClose: () => void;
 
   /** Use custom class with: "backdrop::", "header::", "footer::". */
   className?: string;
@@ -21,14 +38,19 @@ export type ModalConfirmPropsType = {
 
 export function ModalConfirmComponent({
   show,
-  onClose,
-  onSubmit,
   title,
   children,
   icon,
   footer,
+
+  submitControl,
+  onClose,
+
   className = "",
 }: ModalConfirmPropsType) {
+  const [toast, setToast] = useState<boolean | "success" | "failed">(false);
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     if (show) {
       document.getElementsByTagName("body")[0].style.overflow = "hidden";
@@ -50,7 +72,7 @@ export function ModalConfirmComponent({
 
       <div
         className={cn(
-          "modal",
+          "modal rounded-[6px] border-t-4 !border-primary",
           "w-[calc(100vw-2rem)] md:w-[50vw] max-w-[300px]",
           !show && "-translate-y-full opacity-0 scale-y-0",
           pcn<CT>(className, "base")
@@ -59,18 +81,18 @@ export function ModalConfirmComponent({
         {title && (
           <div
             className={cn(
-              "flex flex-col gap-4 items-center",
+              "flex flex-col gap-2 items-center text-primary",
               pcn<CT>(className, "header")
             )}
           >
             <div className="mt-4">
               <FontAwesomeIcon
                 icon={icon || faQuestion}
-                className={`text-xl text-warning`}
+                className={`text-2xl`}
               />
             </div>
 
-            <h6 className="text-lg font-semibold text-foreground">{title}</h6>
+            <h6 className="text-lg font-semibold">{title}</h6>
           </div>
         )}
 
@@ -82,20 +104,68 @@ export function ModalConfirmComponent({
           </div>
         )}
 
-        <div className="flex justify-center gap-4 py-4">
+        <div className="flex justify-center gap-4 pt-2 pb-4">
           <ButtonComponent
             label="Batal"
             variant="simple"
             onClick={() => onClose()}
             className="text-foreground"
+            size="sm"
           />
           <ButtonComponent
             label={"Konfirmasi"}
             paint={"warning"}
-            onClick={onSubmit}
+            loading={loading}
+            onClick={async () => {
+              setLoading(true);
+              if (typeof submitControl?.onSubmit == "function") {
+                submitControl?.onSubmit?.();
+              } else {
+                const actions = {
+                  post,
+                  destroy,
+                };
+
+                const response = await actions[
+                  submitControl?.onSubmit?.method || "post"
+                ]?.(submitControl?.onSubmit || {});
+
+                if (response?.status == 200 || response?.status == 201) {
+                  setToast("success");
+                  submitControl?.onSuccess?.();
+                  setLoading(false);
+                } else {
+                  setToast("failed");
+                  submitControl?.onError?.();
+                  setLoading(false);
+                }
+              }
+            }}
+            size="sm"
+            {...submitControl}
           />
         </div>
       </div>
+
+      <ToastComponent
+        show={toast == "failed"}
+        onClose={() => setToast(false)}
+        title="Gagal"
+        className="!border-danger header::text-danger"
+      >
+        <p className="px-3 pb-2 text-sm">
+          Gagal {title || ""}, cek data dan koneksi internet dan coba kembali!
+        </p>
+      </ToastComponent>
+
+      <ToastComponent
+        show={toast == "success"}
+        onClose={() => setToast(false)}
+        title="Berhasil"
+        className="!border-success header::text-success"
+      >
+        <p className="px-3 pb-2 text-sm">Berhasil {title || ""}!</p>
+      </ToastComponent>
     </>
   );
 }

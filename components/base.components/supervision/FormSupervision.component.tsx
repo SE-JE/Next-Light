@@ -1,32 +1,33 @@
 import React, { ReactNode, useEffect, useState } from "react";
 import {
   InputCheckboxComponent,
-  inputCheckboxProps,
+  InputCheckboxPropsType,
   InputComponent,
   InputCurrencyComponent,
-  inputCurrencyProps,
+  InputCurrencyPropsType,
   InputDateComponent,
-  inputDateProps,
+  InputDatePropsType,
   InputNumberComponent,
-  inputNumberProps,
-  inputProps,
+  InputNumberPropsType,
+  InputPropsType,
   InputRadioComponent,
-  inputRadioProps,
+  InputRadioPropsType,
   SelectComponent,
-  SelectProps,
+  SelectPropsType,
 } from "../input";
 import {
-  parseClassName,
+  cn,
+  pcn,
   PostPropsType,
   useForm,
   ValidationRulesType,
 } from "@/helpers";
 import { ButtonComponent } from "../button";
-import { faQuestionCircle, faSave } from "@fortawesome/free-solid-svg-icons";
-import clsx from "clsx";
+import { faSave } from "@fortawesome/free-solid-svg-icons";
 import { ModalConfirmComponent, ToastComponent } from "../modal";
+import { faQuestionCircle } from "@fortawesome/free-regular-svg-icons";
 
-type classNamePrefix = "base" | "title" | "submit";
+type CT = "base" | "title" | "submit";
 
 type customConstructionType = ({
   formControl,
@@ -54,17 +55,17 @@ type customConstructionType = ({
 }) => ReactNode;
 
 type ConstructionMap = {
-  default: inputProps;
-  check: inputCheckboxProps;
-  currency: inputCurrencyProps;
-  date: inputDateProps;
+  default: InputPropsType;
+  check: InputCheckboxPropsType;
+  currency: InputCurrencyPropsType;
+  date: InputDatePropsType;
   // file: InputFileProps;
   // image: InputImageProps;
   // map: InputMapProps;
-  number: inputNumberProps;
+  number: InputNumberPropsType;
   // time: InputTimeProps;
-  radio: inputRadioProps;
-  select: SelectProps;
+  radio: InputRadioPropsType;
+  select: SelectPropsType;
   custom: customConstructionType;
 };
 
@@ -82,23 +83,27 @@ export type FormType<
     | "custom"
 > = {
   construction?: ConstructionMap[T];
+  type?: T;
+
   /** Use responsive class with: "sm::", "md::", "lg::", "xl::". */
   col?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | string;
-  type?: T;
   className?: string;
 };
 
 export type formSupervisionPropsType = {
   title?: string;
   forms: FormType[];
-  submitControl: PostPropsType;
   confirmation?: boolean;
   defaultValue?: object | null;
-  /** Use custom class with: "title::", "submit::". */
-  className?: string;
+
+  submitControl: PostPropsType;
+  footerControl?: () => ReactNode;
+
   onSuccess?: () => void;
   onError?: (code: number) => void;
-  footerControl?: () => ReactNode;
+
+  /** Use custom class with: "title::", "submit::". */
+  className?: string;
 };
 
 export default function FormSupervisionComponent({
@@ -170,13 +175,22 @@ export default function FormSupervisionComponent({
     }
   }, [defaultValue]);
 
+  const generateColClass = (col: string | number) => {
+    return String(col)
+      .split(" ")
+      .map((c) =>
+        c.includes(":") ? `${c.replace(":", ":col-span-")}` : `col-span-${c}`
+      )
+      .join(" ");
+  };
+
   return (
     <>
       {title && (
         <h4
-          className={clsx(
+          className={cn(
             "text-lg font-semibold mb-4",
-            parseClassName<classNamePrefix>(className, "title")
+            pcn<CT>(className, "title")
           )}
         >
           {title}
@@ -184,24 +198,20 @@ export default function FormSupervisionComponent({
       )}
 
       <form
-        className={clsx(
-          "grid grid-cols-12 gap-3",
-          parseClassName<classNamePrefix>(className, "base")
-        )}
+        className={cn("grid grid-cols-12 gap-4", pcn<CT>(className, "base"))}
         onSubmit={submit}
       >
         {fresh &&
           forms.map((form, key) => {
             const inputType = form.type || "default";
+
             return (
               <React.Fragment key={key}>
                 <div
-                  className={`${form?.className}`}
-                  style={{
-                    gridColumn: `span ${form?.col ? form.col : "12"} / span ${
-                      form?.col ? form.col : "12"
-                    }`,
-                  }}
+                  className={cn(
+                    form?.className,
+                    generateColClass(form?.col || "12")
+                  )}
                 >
                   {inputType == "custom" ? (
                     <>
@@ -217,41 +227,41 @@ export default function FormSupervisionComponent({
                     </>
                   ) : inputType == "check" ? (
                     <InputCheckboxComponent
-                      {...(form.construction as inputCheckboxProps)}
+                      {...(form.construction as InputCheckboxPropsType)}
                       {...formControl(form.construction?.name || "input_name")}
                     />
                   ) : inputType == "currency" ? (
                     <InputCurrencyComponent
-                      {...(form.construction as inputNumberProps)}
+                      {...(form.construction as InputNumberPropsType)}
                       {...formControl(form.construction?.name || "input_name")}
                       autoFocus={key == 0}
                     />
                   ) : inputType == "date" ? (
                     <InputDateComponent
-                      {...(form.construction as inputDateProps)}
+                      {...(form.construction as InputDatePropsType)}
                       {...formControl(form.construction?.name || "input_name")}
                       autoFocus={key == 0}
                     />
                   ) : inputType == "number" ? (
                     <InputNumberComponent
-                      {...(form.construction as inputNumberProps)}
+                      {...(form.construction as InputNumberPropsType)}
                       {...formControl(form.construction?.name || "input_name")}
                       autoFocus={key == 0}
                     />
                   ) : inputType == "radio" ? (
                     <InputRadioComponent
-                      {...(form.construction as inputRadioProps)}
+                      {...(form.construction as InputRadioPropsType)}
                       {...formControl(form.construction?.name || "input_name")}
                     />
                   ) : inputType == "select" ? (
                     <SelectComponent
-                      {...(form.construction as SelectProps)}
+                      {...(form.construction as SelectPropsType)}
                       {...formControl(form.construction?.name || "input_name")}
                       autoFocus={key == 0}
                     />
                   ) : (
                     <InputComponent
-                      {...(form.construction as inputProps)}
+                      {...(form.construction as InputPropsType)}
                       {...formControl(form.construction?.name || "input_name")}
                       autoFocus={key == 0}
                     />
@@ -269,10 +279,7 @@ export default function FormSupervisionComponent({
                   label="Simpan"
                   icon={faSave}
                   loading={loading}
-                  className={parseClassName<classNamePrefix>(
-                    className,
-                    "submit"
-                  )}
+                  className={pcn<CT>(className, "submit")}
                 />
               </div>
             </>
@@ -285,25 +292,34 @@ export default function FormSupervisionComponent({
         onClose={() => confirm.onClose()}
         icon={faQuestionCircle}
         title="Yakin"
-        onSubmit={() => confirm.onConfirm()}
+        submitControl={{
+          onSubmit: () => confirm?.onConfirm(),
+          paint: "primary",
+        }}
       >
-        Apakah data yang di masukkan sudah benar?
+        <p className="px-2 pb-2 text-sm text-center">
+          Yakin semua data sudah benar?
+        </p>
       </ModalConfirmComponent>
 
       <ToastComponent
         show={modal == "failed"}
         onClose={() => setModal(false)}
         title="Gagal"
+        className="!border-danger header::text-danger"
       >
-        Data gagal di simpan, cek data dan koneksi internet dan coba kembali!
+        <p className="px-3 pb-2 text-sm">
+          Data gagal di simpan, cek data dan koneksi internet dan coba kembali!
+        </p>
       </ToastComponent>
 
       <ToastComponent
         show={modal == "success"}
         onClose={() => setModal(false)}
         title="Berhasil"
+        className="!border-success header::text-success"
       >
-        Data berhasil di simpan!
+        <p className="px-3 pb-2 text-sm">Data berhasil di simpan!</p>
       </ToastComponent>
     </>
   );
