@@ -54,7 +54,7 @@ export type TableSupervisionPropsType = {
         | ((
             row: object,
             setModal: (type: "form" | "delete" | "show") => void,
-            setDataSelected: () => void
+            setDataSelected: () => void,
           ) => ReactNode[])
       )[];
   permissionCode?: number;
@@ -111,7 +111,7 @@ export default function TableSupervisionComponent({
         // filter: filter,
       },
     },
-    setToLoading
+    setToLoading,
   );
 
   useEffect(() => {
@@ -161,13 +161,13 @@ export default function TableSupervisionComponent({
           }
         })
       : data?.columns || data?.data?.at(0)
-      ? Object.keys(data.data[0]).map((col) => {
-          return {
-            selector: col,
-            label: col,
-          };
-        })
-      : [];
+        ? Object.keys(data.data[0]).map((col) => {
+            return {
+              selector: col,
+              label: col,
+            };
+          })
+        : [];
   }, [columnControl, data]);
 
   // ============================

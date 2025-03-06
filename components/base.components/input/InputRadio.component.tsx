@@ -126,7 +126,7 @@ export function InputRadioComponent({
             disabled && "opacity-50",
             disabled && pcn<CT>(className, "label", "disabled"),
             isInvalid && "text-danger",
-            isInvalid && pcn<CT>(className, "label", "focus")
+            isInvalid && pcn<CT>(className, "label", "focus"),
           )}
         >
           {label}
@@ -138,7 +138,7 @@ export function InputRadioComponent({
               "input-tip",
               pcn<CT>(className, "tip"),
               disabled && "opacity-60",
-              disabled && pcn<CT>(className, "tip", "disabled")
+              disabled && pcn<CT>(className, "tip", "disabled"),
             )}
           >
             {tip}
@@ -152,7 +152,7 @@ export function InputRadioComponent({
             }`,
             pcn<CT>(className, "input"),
             isInvalid && "input-error",
-            isInvalid && pcn<CT>(className, "input", "error")
+            isInvalid && pcn<CT>(className, "input", "error"),
           )}
         >
           {loading &&

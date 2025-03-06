@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 export const useLazySearch = (keyword: string) => {
-  const [keywordSearch, setKeywordSearch] = useState('');
+  const [keywordSearch, setKeywordSearch] = useState("");
   const [doSearch, setDoSearch] = useState(false);
 
   useEffect(() => {

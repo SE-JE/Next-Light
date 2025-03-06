@@ -6,7 +6,7 @@ interface ToggleContextInterface {
 }
 
 const ToggleContext = createContext<ToggleContextInterface | undefined>(
-  undefined
+  undefined,
 );
 
 export const ToggleProvider: React.FC<{ children: React.ReactNode }> = ({

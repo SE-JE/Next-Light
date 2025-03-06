@@ -25,14 +25,14 @@ export function GalleryCardComponent({
           height={300}
           className={cn(
             "w-full rounded-bl-4xl rounded-tr-3xl object-cover aspect-[4/3]",
-            pcn<CT>(className, "image")
+            pcn<CT>(className, "image"),
           )}
         />
 
         <div
           className={cn(
             "mt-1 text-center text-sm text-light-foreground",
-            pcn<CT>(className, "label")
+            pcn<CT>(className, "label"),
           )}
         >
           {alt}

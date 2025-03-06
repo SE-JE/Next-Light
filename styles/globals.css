@@ -3,7 +3,7 @@
 @theme {
   --color-background: #ebf4fc;
   --color-foreground: #575757;
-  --color-light-foreground: #9B9B9B;
+  --color-light-foreground: #9b9b9b;
   --color-primary: #5aafff;
   --color-light-primary: #baddfd;
   --color-secondary: #04a9ca;
@@ -17,7 +17,7 @@
   --color-disable: #c4c3c3;
   --color-light-disable: #f4f4f4;
 
-  --animate-intro-right: intro_right .2s ease-in-out;
+  --animate-intro-right: intro_right 0.2s ease-in-out;
   @keyframes intro_right {
     from {
       transform: translateX(100);
@@ -26,7 +26,7 @@
 }
 
 body {
-	@apply bg-background text-foreground max-w-full overflow-x-hidden font-normal;
+  @apply bg-background text-foreground max-w-full overflow-x-hidden font-normal;
 }
 
 * {
@@ -34,7 +34,6 @@ body {
 }
 
 @layer base {
-  
 }
 
 @layer components {
@@ -58,27 +57,27 @@ body {
   .button:active {
     transform: scale(1);
     filter: brightness(0.9);
-    box-shadow: inset 0 0 5px 0 rgba(0, 0, 0, .25);
+    box-shadow: inset 0 0 5px 0 rgba(0, 0, 0, 0.25);
   }
 
   .button-loading {
-      border-radius: 50%;
-      display: inline-block;
-      border-top: 2.5px solid;
-      border-left: 2.5px solid;
-      border-right: 2.5px solid transparent;
-      box-sizing: border-box;
-      animation: rotation 1s linear infinite;
+    border-radius: 50%;
+    display: inline-block;
+    border-top: 2.5px solid;
+    border-left: 2.5px solid;
+    border-right: 2.5px solid transparent;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
   }
 
   @keyframes rotation {
-      0% {
-          transform: rotate(0deg);
-      }
-      100% {
-          transform: rotate(360deg);
-      }
-  } 
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
 
   .input {
     @apply px-4 py-2 rounded-[6px] text-foreground bg-background w-full transition duration-150 ease-in-out focus:outline-none border border-slate-300 shadow-inner placeholder:font-normal placeholder:text-light-foreground focus:border-primary disabled:opacity-60;
@@ -97,35 +96,35 @@ body {
   }
 
   .input-icon {
-      @apply absolute top-1/2 -translate-y-1/2 text-light-foreground;
+    @apply absolute top-1/2 -translate-y-1/2 text-light-foreground;
   }
 
   .input-error-message {
-      @apply text-xs text-danger;
+    @apply text-xs text-danger;
   }
 
   .input-tip {
-      @apply text-xs text-light-foreground;
+    @apply text-xs text-light-foreground;
   }
 
   .input-suggest-container {
-      @apply py-2 rounded-lg absolute left-0 w-full bg-background shadow z-30 overflow-hidden ease-in-out max-h-[200px] overflow-y-auto;
+    @apply py-2 rounded-lg absolute left-0 w-full bg-background shadow z-30 overflow-hidden ease-in-out max-h-[200px] overflow-y-auto;
   }
 
   .input-suggest {
-      @apply py-1 px-4 cursor-pointer w-full list-none text-foreground hover:text-primary;
+    @apply py-1 px-4 cursor-pointer w-full list-none text-foreground hover:text-primary;
   }
 
   .input-values-container {
-      @apply flex gap-2 flex-nowrap w-max;
+    @apply flex gap-2 flex-nowrap w-max;
   }
 
   .input-values-item {
-      @apply flex text-sm px-1 pl-2 justify-between bg-white text-foreground items-center rounded-[4px];
+    @apply flex text-sm px-1 pl-2 justify-between bg-white text-foreground items-center rounded-[4px];
   }
 
   .input-values-delete {
-      @apply text-sm cursor-pointer pl-2 pr-1 py-1 hover:text-danger;
+    @apply text-sm cursor-pointer pl-2 pr-1 py-1 hover:text-danger;
   }
 
   .input-scroll::-webkit-scrollbar {
@@ -142,17 +141,17 @@ body {
   }
 
   .input-scroll::-webkit-scrollbar-track {
-    box-shadow: inset 0 0 3px rgba(0, 0, 0, .1);
+    box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
   }
 
   .input-scroll::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, .1);
+    background: rgba(0, 0, 0, 0.1);
     border-radius: 10px;
   }
 
   .input-scroll::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, .1);
+    background: rgba(0, 0, 0, 0.1);
   }
 
   .modal {
@@ -178,28 +177,26 @@ body {
   .modal-backdrop {
     @apply isolate fixed left-0 top-0 z-40 w-screen h-screen bg-light-foreground/20 backdrop-blur-[1px];
   }
-
-  
 }
 
 @layer utilities {
   .skeleton-loading {
     position: relative;
     overflow: hidden;
-}
+  }
 
   .skeleton-loading::after {
-      content: "";
-      @apply absolute w-full h-full top-0 left-0 z-10 rounded-[6px];
-      background: linear-gradient(100deg, #f4f8ff 10%, #fff 20%, #f4f8ff 35%);
-      background-size: 200% 100%;
-      animation: 2s loading ease-out infinite;
+    content: "";
+    @apply absolute w-full h-full top-0 left-0 z-10 rounded-[6px];
+    background: linear-gradient(100deg, #f4f8ff 10%, #fff 20%, #f4f8ff 35%);
+    background-size: 200% 100%;
+    animation: 2s loading ease-out infinite;
   }
 
   @keyframes loading {
-      to {
-          background-position-x: -200%;
-      }
+    to {
+      background-position-x: -200%;
+    }
   }
 
   body::-webkit-scrollbar,
@@ -214,10 +211,10 @@ body {
   .scroll-lg::-webkit-scrollbar {
     @apply w-[14px] h-[14px];
   }
-  
+
   body::-webkit-scrollbar-thumb,
   .scroll::-webkit-scrollbar-thumb,
-  .scroll-sm::-webkit-scrollbar-thumb, 
+  .scroll-sm::-webkit-scrollbar-thumb,
   .scroll-lg::-webkit-scrollbar-thumb {
     @apply bg-light-primary/60 cursor-pointer rounded-[3px];
   }

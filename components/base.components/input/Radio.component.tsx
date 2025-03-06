@@ -67,7 +67,7 @@ export function RadioComponent({
               `flex justify-center items-center rounded-full w-5 h-5 active:outline border border-light-foreground`,
               checked && "border-[5px] outline-light-primary !border-primary",
               checked && pcn<CT>(className, "checked"),
-              pcn<CT>(className, "input")
+              pcn<CT>(className, "input"),
             )}
           ></div>
           <div
@@ -76,7 +76,7 @@ export function RadioComponent({
               pcn<CT>(className, "label"),
               checked && "font-semibold",
               checked && pcn<CT>(className, "label", "checked"),
-              disabled && pcn<CT>(className, "label", "disabled")
+              disabled && pcn<CT>(className, "label", "disabled"),
             )}
           >
             {label}

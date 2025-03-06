@@ -66,7 +66,7 @@ export function InputComponent({
   const [activeSuggestion, setActiveSuggestion] = useState(0);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [dataSuggestions, setDataSuggestions] = useState<string[] | undefined>(
-    []
+    [],
   );
   const [filteredSuggestions, setFilteredSuggestions] = useState<
     string[] | undefined
@@ -93,7 +93,7 @@ export function InputComponent({
       value: inputValue,
       rules: validations,
     },
-    isFirst
+    isFirst,
   );
 
   useEffect(() => {
@@ -149,7 +149,7 @@ export function InputComponent({
           .filter(
             (suggestion) =>
               suggestion.toLowerCase().indexOf(e.target.value.toLowerCase()) >
-              -1
+              -1,
           )
           .slice(0, 10);
       } else {
@@ -203,7 +203,7 @@ export function InputComponent({
             isFocus && "text-primary",
             isFocus && pcn<CT>(className, "label", "focus"),
             isInvalid && "text-danger",
-            isInvalid && pcn<CT>(className, "label", "focus")
+            isInvalid && pcn<CT>(className, "label", "focus"),
           )}
         >
           {label}
@@ -215,7 +215,7 @@ export function InputComponent({
               "input-tip",
               pcn<CT>(className, "tip"),
               props.disabled && "opacity-60",
-              props.disabled && pcn<CT>(className, "tip", "disabled")
+              props.disabled && pcn<CT>(className, "tip", "disabled"),
             )}
           >
             {tip}
@@ -232,7 +232,7 @@ export function InputComponent({
               rightIcon && "pr-12",
               pcn<CT>(className, "base"),
               isInvalid && "input-error",
-              isInvalid && pcn<CT>(className, "base", "error")
+              isInvalid && pcn<CT>(className, "base", "error"),
             )}
             value={inputValue}
             onChange={(e) => {
@@ -267,7 +267,7 @@ export function InputComponent({
                 props.disabled && "opacity-60",
                 props.disabled && pcn<CT>(className, "icon", "disabled"),
                 isFocus && "text-primary",
-                isFocus && pcn<CT>(className, "icon", "focus")
+                isFocus && pcn<CT>(className, "icon", "focus"),
               )}
               icon={leftIcon}
             />
@@ -281,7 +281,7 @@ export function InputComponent({
                 props.disabled && "opacity-60",
                 props.disabled && pcn<CT>(className, "icon", "disabled"),
                 isFocus && "text-primary",
-                isFocus && pcn<CT>(className, "icon", "focus")
+                isFocus && pcn<CT>(className, "icon", "focus"),
               )}
               icon={rightIcon}
             />
@@ -298,7 +298,7 @@ export function InputComponent({
                   pcn<CT>(className, "suggest"),
                   isFocus
                     ? "opacity-100 scale-y-100 -translate-y-0"
-                    : "opacity-0 scale-y-0 -translate-y-1/2"
+                    : "opacity-0 scale-y-0 -translate-y-1/2",
                 )}
               >
                 {filteredSuggestions.map((suggestion, key) => {
@@ -310,7 +310,7 @@ export function InputComponent({
                         inputValue == suggestion &&
                           "bg-light-primary text-primary",
                         inputValue == suggestion &&
-                          pcn<CT>(className, "suggest-item", "active")
+                          pcn<CT>(className, "suggest-item", "active"),
                       )}
                       key={suggestion}
                       onMouseDown={() => {

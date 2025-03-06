@@ -40,7 +40,7 @@ export function ModalComponent({
         className={cn(
           "modal-backdrop",
           !show && "opacity-0 scale-0 -translate-y-full",
-          pcn<CT>(className, "backdrop")
+          pcn<CT>(className, "backdrop"),
         )}
         onClick={() => onClose()}
       ></div>
@@ -50,7 +50,7 @@ export function ModalComponent({
           "modal",
           "w-[calc(100vw-2rem)] md:w-[50vw] max-w-[500px]",
           !show && "-translate-y-full opacity-0 scale-y-0",
-          pcn<CT>(className, "base")
+          pcn<CT>(className, "base"),
         )}
       >
         {title && (

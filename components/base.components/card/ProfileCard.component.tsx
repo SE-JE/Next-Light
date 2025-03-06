@@ -26,7 +26,7 @@ export function ProfileCardComponent({
       <div
         className={cn(
           "relative block overflow-hidden rounded-[6px] border bg-white p-4 sm:p-6",
-          pcn<CT>(className, "base")
+          pcn<CT>(className, "base"),
         )}
       >
         <span className="absolute inset-x-0 bottom-0 h-1 bg-primary"></span>
@@ -41,7 +41,7 @@ export function ProfileCardComponent({
                 height={400}
                 className={cn(
                   "size-16 rounded-full object-cover shadow-sm",
-                  pcn<CT>(className, "image")
+                  pcn<CT>(className, "image"),
                 )}
               />
             </div>

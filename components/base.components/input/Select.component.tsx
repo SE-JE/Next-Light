@@ -138,7 +138,7 @@ export function SelectComponent({
       value: inputValue,
       rules: validations,
     },
-    isFirst
+    isFirst,
   );
 
   useEffect(() => {
@@ -154,8 +154,8 @@ export function SelectComponent({
       Array.isArray(dataOptions) &&
         setInputShowValue(
           (newOption ? [newOption, ...dataOptions] : dataOptions)?.find(
-            (option) => option.value == value
-          )?.label || ""
+            (option) => option.value == value,
+          )?.label || "",
         );
       setIsFirst(false);
     } else {
@@ -170,8 +170,8 @@ export function SelectComponent({
   useEffect(() => {
     setDataOptions(
       [...options, ...includedOptions].filter(
-        (op: SelectOptionPropsType) => !exceptOptions?.includes(op.value)
-      )
+        (op: SelectOptionPropsType) => !exceptOptions?.includes(op.value),
+      ),
     );
   }, [options]);
 
@@ -186,7 +186,7 @@ export function SelectComponent({
               (Option) =>
                 Option.label
                   ?.toLowerCase()
-                  .indexOf(e.target.value.toLowerCase()) > -1
+                  .indexOf(e.target.value.toLowerCase()) > -1,
             )
             .slice(0, maxShowOption);
         } else {
@@ -258,22 +258,22 @@ export function SelectComponent({
     };
 
     const cacheOptions = await standIn.get(
-      serverOptionControl?.cacheName || `option_${serverOptionControl?.path}`
+      serverOptionControl?.cacheName || `option_${serverOptionControl?.path}`,
     );
 
     if (cacheOptions) {
       setDataOptions(
         [...cacheOptions, ...includedOptions].filter(
-          (op: SelectOptionPropsType) => !exceptOptions?.includes(op.value)
-        )
+          (op: SelectOptionPropsType) => !exceptOptions?.includes(op.value),
+        ),
       );
       setLoadingOption(false);
     } else {
       const mutateOptions = await get(serverControl || {});
       setDataOptions(
         [...mutateOptions?.data, ...includedOptions].filter(
-          (op: SelectOptionPropsType) => !exceptOptions?.includes(op.value)
-        )
+          (op: SelectOptionPropsType) => !exceptOptions?.includes(op.value),
+        ),
       );
       setShowOption(true);
       standIn.set({
@@ -320,7 +320,7 @@ export function SelectComponent({
             isFocus && "text-primary",
             isFocus && pcn<CT>(className, "label", "focus"),
             isInvalid && "text-danger",
-            isInvalid && pcn<CT>(className, "label", "focus")
+            isInvalid && pcn<CT>(className, "label", "focus"),
           )}
         >
           {label}
@@ -332,7 +332,7 @@ export function SelectComponent({
               "input-tip",
               pcn<CT>(className, "tip"),
               disabled && "opacity-60",
-              disabled && pcn<CT>(className, "tip", "disabled")
+              disabled && pcn<CT>(className, "tip", "disabled"),
             )}
           >
             {tip}
@@ -368,14 +368,14 @@ export function SelectComponent({
               rightIcon && "pr-12",
               pcn<CT>(className, "input"),
               isInvalid && "input-error",
-              isInvalid && pcn<CT>(className, "input", "error")
+              isInvalid && pcn<CT>(className, "input", "error"),
             )}
             value={
               useTemp && tempOptions
                 ? tempOptions.at(0)?.label
                 : serverSearchable
-                ? keyword
-                : inputShowValue
+                  ? keyword
+                  : inputShowValue
             }
             onChange={(e) => {
               setUseTemp(false);
@@ -396,7 +396,7 @@ export function SelectComponent({
               setUseTemp(false);
               const value = e.target.value;
               const valueOption = dataOptions?.find(
-                (option) => option.label?.toLowerCase() == value?.toLowerCase()
+                (option) => option.label?.toLowerCase() == value?.toLowerCase(),
               );
 
               if (!keydown) {
@@ -454,7 +454,7 @@ export function SelectComponent({
                           <span className="">
                             {
                               dataOptions?.find(
-                                (option) => option.value == item
+                                (option) => option.value == item,
                               )?.label
                             }
                           </span>
@@ -464,10 +464,10 @@ export function SelectComponent({
                             onClick={() => {
                               const values = Array().concat(inputValue);
                               const index = values.findIndex(
-                                (val: string | number) => val == item
+                                (val: string | number) => val == item,
                               );
                               setInputValue(
-                                values.filter((_, val) => val != index)
+                                values.filter((_, val) => val != index),
                               );
                               if (
                                 !values.filter((_, val) => val != index)?.length
@@ -493,7 +493,7 @@ export function SelectComponent({
                 disabled && "opacity-60",
                 disabled && pcn<CT>(className, "icon", "disabled"),
                 isFocus && "text-primary",
-                isFocus && pcn<CT>(className, "icon", "focus")
+                isFocus && pcn<CT>(className, "icon", "focus"),
               )}
               icon={leftIcon}
             />
@@ -504,7 +504,7 @@ export function SelectComponent({
               className={cn(
                 "right-12 input-icon cursor-pointer hover:text-danger",
                 disabled && "opacity-60 pointer-events-none",
-                disabled && pcn<CT>(className, "icon", "disabled")
+                disabled && pcn<CT>(className, "icon", "disabled"),
               )}
               onClick={() => {
                 setInputShowValue("");
@@ -521,7 +521,7 @@ export function SelectComponent({
             className={cn(
               "right-4 input-icon cursor-pointer hover:text-primary",
               disabled && "opacity-60 pointer-events-none",
-              disabled && pcn<CT>(className, "icon", "disabled")
+              disabled && pcn<CT>(className, "icon", "disabled"),
             )}
           >
             <FontAwesomeIcon icon={faChevronDown} />
@@ -580,7 +580,7 @@ export function SelectComponent({
                           onChange?.(option.value, option);
                         } else {
                           const values: string[] | number[] = Array.isArray(
-                            inputValue
+                            inputValue,
                           )
                             ? Array()
                                 .concat(inputValue)

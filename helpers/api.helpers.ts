@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import axios, { AxiosResponse } from "axios";
 import Router from "next/router";
 import { token_cookie_name, loginPath, basePath } from "./middleware.helpers";
 import { Decrypt } from "./encryption.helpers";
 import { standIn } from "./standIn.helpers";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 
 export const authHeader = (bearer?: string): string | null => {
   if (bearer) return `Bearer ${bearer}`;
@@ -107,7 +107,7 @@ export const get = async ({
 // =========================>
 export const useGet = (
   props: GetPropsType & { cacheName?: string; expired?: number },
-  sleep?: boolean
+  sleep?: boolean,
 ) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [code, setCode] = useState<number | null>(null);

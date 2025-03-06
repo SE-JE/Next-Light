@@ -198,8 +198,8 @@
 //             }}
 //             className={`
 //               bg-background text-slate-400 w-full border-[1px] shadow-inner relative flex flex-col gap-y-5 justify-center items-center m-auto rounded-lg bg-cover bg-no-repeat
-//               ${dragActive ? 'border-primary' : 'border-emerald-100'}   
-//               ${!disabled && 'cursor-pointer '} 
+//               ${dragActive ? 'border-primary' : 'border-emerald-100'}
+//               ${!disabled && 'cursor-pointer '}
 //               ${isInvalid && 'outline__danger'}
 //             `}
 //             onDragEnter={handleDrag}

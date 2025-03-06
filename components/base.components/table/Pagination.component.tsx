@@ -43,11 +43,11 @@ export default function PaginationComponent({
     base: cn("flex items-center justify-between", pcn<CT>(className, "base")),
     item: cn(
       "w-12 h-8 text-sm flex justify-center items-center bg-white rounded-[6px] border cursor-pointer",
-      pcn<CT>(className, "item")
+      pcn<CT>(className, "item"),
     ),
     activeItem: cn(
       "bg-light-primary/50 text-primary",
-      pcn<CT>(className, "active")
+      pcn<CT>(className, "active"),
     ),
     overflow: "py-1.5 px-2 text-foreground text-sm",
   };

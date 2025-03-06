@@ -24,7 +24,7 @@ export function ProductCardComponent({
       <div
         className={cn(
           "rounded-[6px] border p-2 bg-white",
-          pcn<CT>(className, "base")
+          pcn<CT>(className, "base"),
         )}
       >
         <Image
@@ -34,7 +34,7 @@ export function ProductCardComponent({
           height={300}
           className={cn(
             "h-56 w-full rounded-[4px] object-cover",
-            pcn<CT>(className, "image")
+            pcn<CT>(className, "image"),
           )}
         />
 

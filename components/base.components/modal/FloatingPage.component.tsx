@@ -40,7 +40,7 @@ export function FloatingPageComponent({
         className={cn(
           "modal-backdrop",
           !show && "opacity-0 scale-0 -translate-y-full",
-          pcn<CT>(className, "backdrop")
+          pcn<CT>(className, "backdrop"),
         )}
         onClick={() => onClose()}
       ></div>
@@ -50,7 +50,7 @@ export function FloatingPageComponent({
           "floating-page",
           "w-[100vw] md:w-[50vw] max-w-[700px]",
           !show && "top-[200vh] md:top-0 md:-right-[100vw]",
-          pcn<CT>(className, "base")
+          pcn<CT>(className, "base"),
         )}
       >
         {title && (
@@ -77,7 +77,7 @@ export function FloatingPageComponent({
           <div
             className={cn(
               "modal-footer absolute bottom-0 w-full",
-              pcn<CT>(className, "footer")
+              pcn<CT>(className, "footer"),
             )}
           >
             {show && footer}

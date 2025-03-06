@@ -25,7 +25,7 @@ export function TabbarComponent({
       <div
         className={cn(
           "grid grid-flow-col grid-cols-auto rounded-[6px] border",
-          pcn<CT>(className, "base")
+          pcn<CT>(className, "base"),
         )}
       >
         {items?.map((item, i) => {
@@ -38,7 +38,7 @@ export function TabbarComponent({
                   ? "bg-white/60 text-primary font-semibold"
                   : "hover:bg-white/60 cursor-pointer",
                 pcn<CT>(className, "item"),
-                pcn<CT>(className, "active")
+                pcn<CT>(className, "active"),
               )}
               onClick={() =>
                 onChange?.(typeof item != "string" ? item?.value : item)

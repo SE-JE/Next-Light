@@ -119,7 +119,7 @@ export function ScrollContainerComponent({
         className={cn(
           "w-full overflow-x-auto scroll",
           scrollFloating && "scroll-none",
-          pcn<CT>(className, "base")
+          pcn<CT>(className, "base"),
         )}
       >
         {children}

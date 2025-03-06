@@ -29,7 +29,7 @@ const formReducer = (state: typeof initialState, action: any) => {
         ...state,
         formRegisters: [
           ...state.formRegisters.filter(
-            (reg) => reg.name !== action.payload.name
+            (reg) => reg.name !== action.payload.name,
           ),
           action.payload,
         ],
@@ -39,10 +39,10 @@ const formReducer = (state: typeof initialState, action: any) => {
       return {
         ...state,
         formValues: state.formValues.filter(
-          (val) => val.name !== action.payload.name
+          (val) => val.name !== action.payload.name,
         ),
         formRegisters: state.formRegisters.filter(
-          (reg) => reg.name !== action.payload.name
+          (reg) => reg.name !== action.payload.name,
         ),
       };
 
@@ -64,7 +64,7 @@ export const useForm = (
   submitControl: PostPropsType,
   confirmation?: boolean,
   onSuccess?: (data: any) => void,
-  onFailed?: (code: number) => void
+  onFailed?: (code: number) => void,
 ) => {
   const [state, dispatch] = useReducer(formReducer, initialState);
 

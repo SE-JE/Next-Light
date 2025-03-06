@@ -72,7 +72,7 @@ export function InputCurrencyComponent({
       value: inputValue,
       rules: validations,
     },
-    isFirst
+    isFirst,
   );
 
   useEffect(() => {
@@ -96,7 +96,7 @@ export function InputCurrencyComponent({
           isFocus && "text-primary",
           isFocus && pcn<CT>(className, "label", "focus"),
           isInvalid && "text-danger",
-          isInvalid && pcn<CT>(className, "label", "focus")
+          isInvalid && pcn<CT>(className, "label", "focus"),
         )}
       >
         {label}
@@ -108,7 +108,7 @@ export function InputCurrencyComponent({
             "input-tip",
             pcn<CT>(className, "tip"),
             props.disabled && "opacity-60",
-            props.disabled && pcn<CT>(className, "tip", "disabled")
+            props.disabled && pcn<CT>(className, "tip", "disabled"),
           )}
         >
           {tip}
@@ -125,14 +125,14 @@ export function InputCurrencyComponent({
             rightIcon && "pr-12",
             pcn<CT>(className, "input"),
             isInvalid && "input-error",
-            isInvalid && pcn<CT>(className, "input", "error")
+            isInvalid && pcn<CT>(className, "input", "error"),
           )}
           value={
             inputValue
               ? CurrencyFormatComponent(
                   inputValue,
                   format?.locale,
-                  format?.currency
+                  format?.currency,
                 )
               : ""
           }
@@ -145,8 +145,8 @@ export function InputCurrencyComponent({
               CurrencyFormatComponent(
                 rawValue,
                 format?.locale,
-                format?.currency
-              )
+                format?.currency,
+              ),
             );
           }}
           onFocus={(e) => {
@@ -168,7 +168,7 @@ export function InputCurrencyComponent({
               props.disabled && "opacity-60",
               props.disabled && pcn<CT>(className, "icon", "disabled"),
               isFocus && "text-primary",
-              isFocus && pcn<CT>(className, "icon", "focus")
+              isFocus && pcn<CT>(className, "icon", "focus"),
             )}
             icon={leftIcon}
           />
@@ -181,7 +181,7 @@ export function InputCurrencyComponent({
               props.disabled && "opacity-60",
               props.disabled && pcn<CT>(className, "icon", "disabled"),
               isFocus && "text-primary",
-              isFocus && pcn<CT>(className, "icon", "focus")
+              isFocus && pcn<CT>(className, "icon", "focus"),
             )}
             icon={rightIcon}
           />

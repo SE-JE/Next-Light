@@ -85,7 +85,7 @@ export function InputDateComponent({
       value: inputValue,
       rules: validations,
     },
-    isFirst
+    isFirst,
   );
 
   useEffect(() => {
@@ -113,7 +113,7 @@ export function InputDateComponent({
             isFocus && "text-primary",
             isFocus && pcn<CT>(className, "label", "focus"),
             isInvalid && "text-danger",
-            isInvalid && pcn<CT>(className, "label", "focus")
+            isInvalid && pcn<CT>(className, "label", "focus"),
           )}
         >
           {label}
@@ -125,7 +125,7 @@ export function InputDateComponent({
               "input-tip",
               pcn<CT>(className, "tip"),
               props.disabled && "opacity-60",
-              props.disabled && pcn<CT>(className, "tip", "disabled")
+              props.disabled && pcn<CT>(className, "tip", "disabled"),
             )}
           >
             {tip}
@@ -142,7 +142,7 @@ export function InputDateComponent({
               rightIcon && "pr-12",
               pcn<CT>(className, "input"),
               isInvalid && "input-error",
-              isInvalid && pcn<CT>(className, "input", "error")
+              isInvalid && pcn<CT>(className, "input", "error"),
             )}
             value={inputValue}
             onChange={(e) => {
@@ -170,7 +170,7 @@ export function InputDateComponent({
                 props.disabled && "opacity-60",
                 props.disabled && pcn<CT>(className, "icon", "disabled"),
                 isFocus && "text-primary",
-                isFocus && pcn<CT>(className, "icon", "focus")
+                isFocus && pcn<CT>(className, "icon", "focus"),
               )}
               icon={leftIcon}
             />
@@ -184,7 +184,7 @@ export function InputDateComponent({
                 props.disabled && "opacity-60",
                 props.disabled && pcn<CT>(className, "icon", "disabled"),
                 isFocus && "text-primary",
-                isFocus && pcn<CT>(className, "icon", "focus")
+                isFocus && pcn<CT>(className, "icon", "focus"),
               )}
               icon={rightIcon}
             />
@@ -247,7 +247,7 @@ const CustomDatePicker: React.FC<CustomDatePickerPropsType> = ({
       days.push(
         <div key={i} className="text-center font-bold">
           {startDay.add(i, "days").format("dd")}
-        </div>
+        </div>,
       );
     }
     return days;
@@ -283,14 +283,14 @@ const CustomDatePicker: React.FC<CustomDatePickerPropsType> = ({
             onClick={() => handleDateClick(cloneDay)}
           >
             {day.format("D")}
-          </div>
+          </div>,
         );
         day.add(1, "day");
       }
       rows.push(
         <div key={day.toString()} className="grid grid-cols-7 gap-1">
           {days}
-        </div>
+        </div>,
       );
       days = [];
     }

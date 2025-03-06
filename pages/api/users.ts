@@ -58,7 +58,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       if (query.search) {
         const searchTerm = query.search.toString().toLowerCase();
         filteredUsers = filteredUsers.filter((user) =>
-          user.name.toLowerCase().includes(searchTerm)
+          user.name.toLowerCase().includes(searchTerm),
         );
       }
 
@@ -101,7 +101,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       users = users.map((user) =>
         user.id === updateId
           ? { ...user, name, email, address, position, is_active }
-          : user
+          : user,
       );
       res.status(200).json({
         message: "Success",

@@ -27,7 +27,7 @@ export function HeadbarComponent({
   const styles = {
     base: cn(
       "p-1 flex items-center justify-between bg-white rounded-[6px] relative z-30 select-none border px-4 py-2",
-      className
+      className,
     ),
   };
 

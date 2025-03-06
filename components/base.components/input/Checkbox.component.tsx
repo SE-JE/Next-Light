@@ -66,7 +66,7 @@ export function CheckboxComponent({
             `flex justify-center items-center rounded-md border w-6 h-6 transition-colors border-light-foreground text-light-foreground`,
             checked && "border-light-primary bg-primary text-white",
             checked && pcn<CT>(className, "checked"),
-            pcn<CT>(className, "base")
+            pcn<CT>(className, "base"),
           )}
         >
           {checked && <FontAwesomeIcon icon={faCheck} className="text-sm" />}
@@ -77,7 +77,7 @@ export function CheckboxComponent({
             pcn<CT>(className, "label"),
             checked && "font-semibold",
             checked && pcn<CT>(className, "label", "checked"),
-            disabled && pcn<CT>(className, "label", "disabled")
+            disabled && pcn<CT>(className, "label", "disabled"),
           )}
         >
           {label}

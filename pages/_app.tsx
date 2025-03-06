@@ -24,6 +24,6 @@ export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       <main className={font.className}>
         <Component {...pageProps} />
       </main>
-    </>
+    </>,
   );
 }

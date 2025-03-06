@@ -27,8 +27,8 @@ export function WizardComponent({ items, active }) {
                             key == active + 1
                               ? "bg-gradient-to-r from-primary to-light-primary to-70%"
                               : key <= active + 1
-                              ? "bg-primary"
-                              : ""
+                                ? "bg-primary"
+                                : ""
                           } py-1 rounded w-full`}
                         ></div>
                       </div>

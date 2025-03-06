@@ -26,7 +26,7 @@ export function BottombarComponent({
     base: cn(
       "fixed left-1/2 -translate-x-1/2 w-[96%] max-w-[400px] p-2 px-4 bg-white border rounded-[6px] z-40",
       isKeyboardOpen ? "-bottom-60" : "bottom-3",
-      pcn(className, "base")
+      pcn(className, "base"),
     ),
     item: "flex justify-center items-center flex-col py-3 rounded-[6px]",
   };
@@ -43,7 +43,7 @@ export function BottombarComponent({
                   "border-b bg-background text-primary",
                 pcn(className, "item"),
                 (router.asPath == "/_example/bottombar" || active == "home") &&
-                  pcn(className, "active")
+                  pcn(className, "active"),
               )}
             >
               <FontAwesomeIcon icon={faHome} />
@@ -58,7 +58,7 @@ export function BottombarComponent({
                   "border-b bg-background text-primary",
                 pcn(className, "item"),
                 (router.asPath == "" || active == "home") &&
-                  pcn(className, "active")
+                  pcn(className, "active"),
               )}
             >
               <FontAwesomeIcon icon={faClipboard} />
@@ -73,7 +73,7 @@ export function BottombarComponent({
                   "border-b bg-background text-primary",
                 pcn(className, "item"),
                 (router.asPath == "" || active == "home") &&
-                  pcn(className, "active")
+                  pcn(className, "active"),
               )}
             >
               <FontAwesomeIcon icon={faCrosshairs} />
@@ -88,7 +88,7 @@ export function BottombarComponent({
                   "border-b bg-background text-primary",
                 pcn(className, "item"),
                 (router.asPath == "" || active == "home") &&
-                  pcn(className, "active")
+                  pcn(className, "active"),
               )}
             >
               <FontAwesomeIcon icon={faSackDollar} />
@@ -103,7 +103,7 @@ export function BottombarComponent({
                   "border-b bg-background text-primary",
                 pcn(className, "item"),
                 (router.asPath == "" || active == "home") &&
-                  pcn(className, "active")
+                  pcn(className, "active"),
               )}
             >
               <FontAwesomeIcon icon={faUserCircle} />

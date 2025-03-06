@@ -29,7 +29,7 @@ export function BreadcrumbComponent({
     <nav
       className={cn(
         "w-full overflow-x-auto overflow-y-hidden whitespace-nowrap",
-        pcn<CT>(className, "container")
+        pcn<CT>(className, "container"),
       )}
     >
       <ol className="flex">
@@ -47,7 +47,7 @@ export function BreadcrumbComponent({
                     square && "py-2 px-4 rounded-[6px] bg-light-foreground/10",
                     isActive && "text-primary",
                     isActive && square && "text-primary bg-primary/10",
-                    isActive && pcn<CT>(className, "active")
+                    isActive && pcn<CT>(className, "active"),
                   )}
                 >
                   {item.label}

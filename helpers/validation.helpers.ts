@@ -111,7 +111,7 @@ export const validationHelper = ({
     ) {
       const files = Array.isArray(value) ? value : [value];
       const invalidFile = files.find(
-        (file) => !rules.mimeTypes?.includes(file.type)
+        (file) => !rules.mimeTypes?.includes(file.type),
       );
 
       if (invalidFile) {
@@ -128,13 +128,13 @@ export const validationHelper = ({
     ) {
       const files = Array.isArray(value) ? value : [value];
       const oversizedFile = files.find(
-        (file) => file.size > (rules.maxFileSize || 0)
+        (file) => file.size > (rules.maxFileSize || 0),
       );
 
       if (oversizedFile) {
         errorMessage = validationLangs.max_file_size.replace(
           /@maxFileSize/g,
-          (rules.maxFileSize / (1024 * 1024)).toFixed(2) // Convert to MB
+          (rules.maxFileSize / (1024 * 1024)).toFixed(2), // Convert to MB
         );
         return { valid: false, message: errorMessage };
       }
@@ -149,7 +149,7 @@ export const validationHelper = ({
 // =========================>
 export const useValidationHelper = (
   { value, rules }: ValidationHelperPropsType,
-  sleep = false
+  sleep = false,
 ): [string] => {
   const [message, setMessage] = useState<string>("");
 

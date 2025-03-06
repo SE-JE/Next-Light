@@ -48,24 +48,24 @@ export function IconButtonComponent({
     buttonVariant[variant][paint],
     iconButtonContainer[size],
     rounded ? "rounded-full" : buttonRadius[size],
-    pcn<CT>(className, "base")
+    pcn<CT>(className, "base"),
   );
 
   const loadingClasses = cn(
     "button-loading",
     size === "sm" ? "w-3 h-3" : size === "lg" ? "w-5 h-5" : "w-4 h-4",
-    pcn<CT>(className, "base")
+    pcn<CT>(className, "base"),
   );
 
   const iconClasses = cn(
     size === "xs"
       ? "text-xs"
       : size === "sm"
-      ? "text-sm mb-0.5"
-      : size === "lg"
-      ? "text-xl mb-0.5"
-      : "text-base mb-0.5",
-    pcn<CT>(className, "base")
+        ? "text-sm mb-0.5"
+        : size === "lg"
+          ? "text-xl mb-0.5"
+          : "text-base mb-0.5",
+    pcn<CT>(className, "base"),
   );
 
   return (

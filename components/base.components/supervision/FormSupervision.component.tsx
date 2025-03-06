@@ -50,7 +50,10 @@ type customConstructionType = ({
   setErrors?: (values: { name: string; error?: any }[]) => void;
   registers?: { name: string; validations?: ValidationRulesType | undefined }[];
   setRegisters?: (
-    registers: { name: string; validations?: ValidationRulesType | undefined }[]
+    registers: {
+      name: string;
+      validations?: ValidationRulesType | undefined;
+    }[],
   ) => void;
 }) => ReactNode;
 
@@ -80,7 +83,7 @@ export type FormType<
     | "number"
     | "radio"
     | "select"
-    | "custom"
+    | "custom",
 > = {
   construction?: ConstructionMap[T];
   type?: T;
@@ -153,7 +156,7 @@ export default function FormSupervisionComponent({
       } else {
         setModal("failed");
       }
-    }
+    },
   );
 
   useEffect(() => {
@@ -179,7 +182,7 @@ export default function FormSupervisionComponent({
     return String(col)
       .split(" ")
       .map((c) =>
-        c.includes(":") ? `${c.replace(":", ":col-span-")}` : `col-span-${c}`
+        c.includes(":") ? `${c.replace(":", ":col-span-")}` : `col-span-${c}`,
       )
       .join(" ");
   };
@@ -190,7 +193,7 @@ export default function FormSupervisionComponent({
         <h4
           className={cn(
             "text-lg font-semibold mb-4",
-            pcn<CT>(className, "title")
+            pcn<CT>(className, "title"),
           )}
         >
           {title}
@@ -210,7 +213,7 @@ export default function FormSupervisionComponent({
                 <div
                   className={cn(
                     form?.className,
-                    generateColClass(form?.col || "12")
+                    generateColClass(form?.col || "12"),
                   )}
                 >
                   {inputType == "custom" ? (

@@ -77,7 +77,7 @@ export function ToastComponent({
           "toast border-t-4 !border-primary rounded-[6px]",
           "w-[calc(100vw-2rem)] md:w-[50vw] max-w-[300px]",
           !show && "translate-y-full opacity-0 scale-y-0",
-          pcn<CT>(className, "base")
+          pcn<CT>(className, "base"),
         )}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
@@ -86,7 +86,7 @@ export function ToastComponent({
           <div
             className={cn(
               "pt-2 px-3 flex justify-between items-center text-foreground",
-              pcn<CT>(className, "header")
+              pcn<CT>(className, "header"),
             )}
           >
             <h6 className="font-semibold">{title}</h6>

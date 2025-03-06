@@ -8,7 +8,7 @@ export function cn(...classes: ClassValue[]) {
 export const pcn = <prefixType>(
   className: string,
   prefix: prefixType,
-  pseudoClass?: string
+  pseudoClass?: string,
 ): string => {
   const classes = className.split(" ");
   const matchedClasses = classes

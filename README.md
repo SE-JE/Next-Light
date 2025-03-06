@@ -21,3 +21,4 @@ yarn install && yarn run dev
 
 ```
 npm install && npm run dev
+```

@@ -80,7 +80,7 @@ export function InputNumberComponent({
       value: inputValue,
       rules: validations,
     },
-    isFirst
+    isFirst,
   );
 
   useEffect(() => {
@@ -130,7 +130,7 @@ export function InputNumberComponent({
             isFocus && "text-primary",
             isFocus && pcn<CT>(className, "label", "focus"),
             isInvalid && "text-danger",
-            isInvalid && pcn<CT>(className, "label", "focus")
+            isInvalid && pcn<CT>(className, "label", "focus"),
           )}
         >
           {label}
@@ -142,7 +142,7 @@ export function InputNumberComponent({
               "input-tip",
               pcn<CT>(className, "tip"),
               props.disabled && "opacity-60",
-              props.disabled && pcn<CT>(className, "tip", "disabled")
+              props.disabled && pcn<CT>(className, "tip", "disabled"),
             )}
           >
             {tip}
@@ -159,7 +159,7 @@ export function InputNumberComponent({
               rightIcon && "pr-12",
               pcn<CT>(className, "input"),
               isInvalid && "input-error",
-              isInvalid && pcn<CT>(className, "input", "error")
+              isInvalid && pcn<CT>(className, "input", "error"),
             )}
             value={inputValue}
             onChange={handleInputChange}
@@ -178,7 +178,7 @@ export function InputNumberComponent({
                 props.disabled && "opacity-60",
                 props.disabled && pcn<CT>(className, "icon", "disabled"),
                 isFocus && "text-primary",
-                isFocus && pcn<CT>(className, "icon", "focus")
+                isFocus && pcn<CT>(className, "icon", "focus"),
               )}
               icon={leftIcon}
             />
@@ -192,7 +192,7 @@ export function InputNumberComponent({
               props.disabled && "opacity-60",
               props.disabled && pcn<CT>(className, "icon", "disabled"),
               isFocus && "text-primary",
-              isFocus && pcn<CT>(className, "icon", "focus")
+              isFocus && pcn<CT>(className, "icon", "focus"),
             )}
           >
             <div className="flex flex-col">

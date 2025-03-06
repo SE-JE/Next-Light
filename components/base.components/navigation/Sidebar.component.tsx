@@ -73,7 +73,7 @@ export function SidebarComponent({
     setShows((prevShows) =>
       prevShows?.find((pk) => pk === key)
         ? prevShows.filter((pk) => pk !== key)
-        : [...prevShows, key]
+        : [...prevShows, key],
     );
   };
 
@@ -123,12 +123,12 @@ export function SidebarComponent({
     backdrop: cn(
       "absolute top-0 left-0 w-full h-full bg-background bg-opacity-50 blur-md z-20 md:hidden",
       toggle ? "scale-100 md:scale-0" : "scale-0",
-      pcn<CT>(className, "backdrop")
+      pcn<CT>(className, "backdrop"),
     ),
     base: cn(
       "flex flex-col fixed w-64 h-screen px-2 py-4 overflow-y-auto bg-white z-20 rounded-r-[8px] border-r scroll",
       toggle ? "scale-x-100 md:scale-x-0" : "scale-x-0 md:scale-x-100",
-      pcn<CT>(className, "base")
+      pcn<CT>(className, "base"),
     ),
     headItem:
       "flex justify-between items-center text-light-foreground font-semibold py-2 text-xs uppercase",
@@ -152,7 +152,7 @@ export function SidebarComponent({
                       styles.headItem,
                       menu_head?.collapse && "cursor-pointer",
                       pcn<CT>(className, "head-item"),
-                      menu_head?.className
+                      menu_head?.className,
                     )}
                     onClick={() => setShow(String(menu_head_key))}
                   >
@@ -162,7 +162,7 @@ export function SidebarComponent({
                         icon={faChevronDown}
                         className={cn(
                           "text-xs",
-                          checkShow(String(menu_head_key)) && "rotate-180"
+                          checkShow(String(menu_head_key)) && "rotate-180",
                         )}
                       />
                     )}
@@ -187,7 +187,7 @@ export function SidebarComponent({
                                   cekActive(menu?.path || "") &&
                                   "text-primary border-l-2 border-primary pl-4",
                                 pcn<CT>(className, "item"),
-                                menu?.className
+                                menu?.className,
                               )}
                             >
                               <div className="flex gap-2 items-center">
@@ -204,7 +204,7 @@ export function SidebarComponent({
                                     icon={faChevronUp}
                                     className={`text-sm ${
                                       checkShow(
-                                        `${menu_head_key}.${menu_key}`
+                                        `${menu_head_key}.${menu_key}`,
                                       ) || "rotate-180"
                                     }`}
                                   />
@@ -229,7 +229,7 @@ export function SidebarComponent({
                                         }
                                         onClick={() =>
                                           setShow(
-                                            `${menu_head_key}.${menu_key}.${menu_child_key}`
+                                            `${menu_head_key}.${menu_key}.${menu_child_key}`,
                                           )
                                         }
                                       >
@@ -240,7 +240,7 @@ export function SidebarComponent({
                                               cekActive(child?.path || "") &&
                                               "text-primary border-primary pl-4",
                                             pcn<CT>(className, "child-item"),
-                                            child?.className
+                                            child?.className,
                                           )}
                                         >
                                           <div className="flex gap-2 items-center">
@@ -257,7 +257,7 @@ export function SidebarComponent({
                                                 icon={faChevronUp}
                                                 className={`block text-sm ${
                                                   checkShow(
-                                                    `${menu_head_key}.${menu_key}`
+                                                    `${menu_head_key}.${menu_key}`,
                                                   ) || "rotate-180"
                                                 }`}
                                               />

@@ -1,0 +1,22 @@
+import TableSupervisionComponent from "@/components/base.components/supervision/TableSupervision.component";
+
+export default function {{ name }}Page() {
+  return (
+    <>
+      <div>
+        <TableSupervisionComponent
+          title="{{ title }}"
+          fetchControl={{
+            path: "{{ path }}",
+          }}
+          columnControl={
+            {{ columns }}
+          }
+          formControl={{
+            forms: {{ forms }},
+          }}
+        />
+      </div>
+    </>
+  );
+}

@@ -25,7 +25,7 @@ export function AlertCardComponent({
       <section
         className={cn(
           "rounded-[6px] bg-white p-4 border sm:p-6",
-          pcn<CT>(className, "base")
+          pcn<CT>(className, "base"),
         )}
       >
         <div className="flex items-start sm:gap-8">
@@ -35,7 +35,7 @@ export function AlertCardComponent({
             <strong
               className={cn(
                 "rounded-[4px] border text-primary bg-primary/20 px-3 py-1.5 text-xs font-bold",
-                pcn<CT>(className, "badge")
+                pcn<CT>(className, "badge"),
               )}
             >
               {badge}
@@ -44,7 +44,7 @@ export function AlertCardComponent({
             <h3
               className={cn(
                 "mt-4 text-lg font-medium sm:text-xl",
-                pcn<CT>(className, "title")
+                pcn<CT>(className, "title"),
               )}
             >
               {title}

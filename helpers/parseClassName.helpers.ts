@@ -1,7 +1,7 @@
 export const parseClassName = <prefixType>(
   className: string,
   prefix: prefixType,
-  pseudoClass?: string
+  pseudoClass?: string,
 ): string => {
   const classes = className.split(" ");
   const matchedClasses = classes

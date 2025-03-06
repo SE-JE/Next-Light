@@ -21,7 +21,7 @@ export function DashboardCardComponent({
         <div
           className={cn(
             `bg-white border py-4 px-6 rounded-[6px] flex justify-between gap-4 items-center`,
-            className
+            className,
           )}
         >
           <div>
