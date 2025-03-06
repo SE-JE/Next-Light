@@ -10,7 +10,7 @@ baseBlueprints.forEach(({ schema, controllers }) => {
   const title =
     controllers[controllerKey]?.split("/")?.pop()?.replace("Controller", "") ||
     "Title";
-  const fetchUrl = `http://localhost:8000/api/${controllerKey}`;
+  const fetchUrl = `${controllerKey}`;
   const templatePath = path.join(__dirname, "./table.stub");
   let content = fs.readFileSync(templatePath, "utf-8");
 
