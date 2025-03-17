@@ -3,10 +3,10 @@ import {
   FloatingPageComponent,
   FloatingPagePropsType,
 } from "../modal/FloatingPage.component";
-import { GetPropsType, useGet } from "@/helpers";
+import { GetPropsType, useGet, useResponsive } from "@/helpers";
 import { useRouter } from "next/router";
-import { ButtonComponent } from "../button";
-import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { ButtonComponent, IconButtonComponent } from "../button";
+import { faEdit, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { TableColumnType, TableComponent } from "../table/Table.component";
 import FormSupervisionComponent, {
   FormType,
@@ -19,7 +19,7 @@ export type TableSupervisionColumnType = {
   label?: string;
   width?: string;
   sortable?: boolean;
-  item?: (data: object) => string | ReactNode;
+  item?: (data: any) => string | ReactNode;
   permissionCode?: string;
 };
 
@@ -54,7 +54,7 @@ export type TableSupervisionPropsType = {
         | ((
             row: object,
             setModal: (type: "form" | "delete" | "show") => void,
-            setDataSelected: () => void,
+            setDataSelected: () => void
           ) => ReactNode[])
       )[];
   permissionCode?: number;
@@ -71,6 +71,7 @@ export default function TableSupervisionComponent({
   actionControl,
 }: TableSupervisionPropsType) {
   const router = useRouter();
+  const { isSm } = useResponsive();
   const {
     page: pageParams,
     paginate: paginateParams,
@@ -111,7 +112,7 @@ export default function TableSupervisionComponent({
         // filter: filter,
       },
     },
-    setToLoading,
+    setToLoading
   );
 
   useEffect(() => {
@@ -302,21 +303,34 @@ export default function TableSupervisionComponent({
         onRefresh={() => {}}
         onRowClick={() => {}}
         controlBar={[
-          () => {
-            return (
-              <div className="pl-2 pr-4 mr-2 border-r">
-                <ButtonComponent
-                  label="Tambah Data"
-                  size="sm"
-                  onClick={() => setModal("form")}
-                />
-              </div>
-            );
-          },
+          ...(!isSm
+            ? [
+                () => {
+                  return (
+                    <div className="pl-2 pr-4 mr-2 border-r">
+                      <ButtonComponent
+                        label="Tambah Data"
+                        size="sm"
+                        onClick={() => setModal("form")}
+                      />
+                    </div>
+                  );
+                },
+              ]
+            : []),
           "search",
           "filterColumn",
           "refresh",
         ]}
+      />
+
+      <div></div>
+
+      <IconButtonComponent
+        icon={faPlus}
+        className="fixed bottom-4 right-4 w-12 h-12"
+        size="lg"
+        onClick={() => setModal("form")}
       />
 
       <FloatingPageComponent

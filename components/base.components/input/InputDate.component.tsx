@@ -5,8 +5,15 @@ import React, {
   InputHTMLAttributes,
   ReactNode,
   useEffect,
+  useMemo,
+  useRef,
   useState,
 } from "react";
+import { OutsideClickComponent } from "../formater-wrapper";
+import {
+  faChevronLeft,
+  faChevronRight,
+} from "@fortawesome/free-solid-svg-icons";
 
 type CT =
   | "label"
@@ -85,7 +92,7 @@ export function InputDateComponent({
       value: inputValue,
       rules: validations,
     },
-    isFirst,
+    isFirst
   );
 
   useEffect(() => {
@@ -113,7 +120,7 @@ export function InputDateComponent({
             isFocus && "text-primary",
             isFocus && pcn<CT>(className, "label", "focus"),
             isInvalid && "text-danger",
-            isInvalid && pcn<CT>(className, "label", "focus"),
+            isInvalid && pcn<CT>(className, "label", "focus")
           )}
         >
           {label}
@@ -125,81 +132,84 @@ export function InputDateComponent({
               "input-tip",
               pcn<CT>(className, "tip"),
               props.disabled && "opacity-60",
-              props.disabled && pcn<CT>(className, "tip", "disabled"),
+              props.disabled && pcn<CT>(className, "tip", "disabled")
             )}
           >
             {tip}
           </small>
         )}
 
-        <div className="relative">
-          <input
-            {...props}
-            id={randomId}
-            className={cn(
-              "input",
-              leftIcon && "pl-12",
-              rightIcon && "pr-12",
-              pcn<CT>(className, "input"),
-              isInvalid && "input-error",
-              isInvalid && pcn<CT>(className, "input", "error"),
-            )}
-            value={inputValue}
-            onChange={(e) => {
-              setInputValue(e.target.value);
-              setIsFirst(false);
-              setIsInvalid("");
-              onChange?.(e.target.value);
-            }}
-            onFocus={(e) => {
-              props.onFocus?.(e);
-              setIsFocus(true);
-            }}
-            onBlur={(e) => {
-              props.onBlur?.(e);
-              setTimeout(() => setIsFocus(false), 100);
-            }}
-            autoComplete="off"
-          />
-
-          {leftIcon && (
-            <FontAwesomeIcon
+        <OutsideClickComponent onOutsideClick={() => setIsFocus(false)}>
+          <div className="relative">
+            <input
+              {...props}
+              id={randomId}
               className={cn(
-                "left-4 input-icon ",
-                pcn<CT>(className, "icon"),
-                props.disabled && "opacity-60",
-                props.disabled && pcn<CT>(className, "icon", "disabled"),
-                isFocus && "text-primary",
-                isFocus && pcn<CT>(className, "icon", "focus"),
+                "input",
+                leftIcon && "pl-12",
+                rightIcon && "pr-12",
+                pcn<CT>(className, "input"),
+                isInvalid && "input-error",
+                isInvalid && pcn<CT>(className, "input", "error")
               )}
-              icon={leftIcon}
-            />
-          )}
-
-          {rightIcon && (
-            <FontAwesomeIcon
-              className={cn(
-                "right-4 input-icon",
-                pcn<CT>(className, "icon"),
-                props.disabled && "opacity-60",
-                props.disabled && pcn<CT>(className, "icon", "disabled"),
-                isFocus && "text-primary",
-                isFocus && pcn<CT>(className, "icon", "focus"),
-              )}
-              icon={rightIcon}
-            />
-          )}
-
-          {isFocus && (
-            <CustomDatePicker
-              minDate="2025-01-20"
-              onDateSelect={(e) => {
-                setInputValue(e);
-                onChange?.(e);
+              value={inputValue}
+              onChange={(e) => {
+                setInputValue(e.target.value);
+                setIsFirst(false);
+                setIsInvalid("");
+                onChange?.(e.target.value);
               }}
+              onFocus={(e) => {
+                props.onFocus?.(e);
+                setIsFocus(true);
+              }}
+              onBlur={(e) => {
+                props.onBlur?.(e);
+                // setTimeout(() => setIsFocus(false), 100);
+              }}
+              autoComplete="off"
             />
-          )}
-        </div>
+
+            {leftIcon && (
+              <FontAwesomeIcon
+                className={cn(
+                  "left-4 input-icon ",
+                  pcn<CT>(className, "icon"),
+                  props.disabled && "opacity-60",
+                  props.disabled && pcn<CT>(className, "icon", "disabled"),
+                  isFocus && "text-primary",
+                  isFocus && pcn<CT>(className, "icon", "focus")
+                )}
+                icon={leftIcon}
+              />
+            )}
+
+            {rightIcon && (
+              <FontAwesomeIcon
+                className={cn(
+                  "right-4 input-icon",
+                  pcn<CT>(className, "icon"),
+                  props.disabled && "opacity-60",
+                  props.disabled && pcn<CT>(className, "icon", "disabled"),
+                  isFocus && "text-primary",
+                  isFocus && pcn<CT>(className, "icon", "focus")
+                )}
+                icon={rightIcon}
+              />
+            )}
+
+            {isFocus && (
+              <CustomDatePicker
+                minDate="2025-01-20"
+                maxDate="2025-04-22"
+                onDateSelect={(e) => {
+                  setInputValue(e);
+                  onChange?.(e);
+                }}
+              />
+            )}
+          </div>
+        </OutsideClickComponent>
 
         {isInvalid && (
           <small
@@ -218,6 +228,9 @@ const CustomDatePicker: React.FC<CustomDatePickerPropsType> = ({
   minDate,
   maxDate,
 }) => {
+  const activeYearRef = useRef<HTMLDivElement | null>(null);
+  const containerYearRef = useRef<HTMLDivElement | null>(null);
+
   const [currentDate, setCurrentDate] = useState(moment());
   const [selectedDate, setSelectedDate] = useState(moment());
 
@@ -247,7 +260,7 @@ const CustomDatePicker: React.FC<CustomDatePickerPropsType> = ({
       days.push(
         <div key={i} className="text-center font-bold">
           {startDay.add(i, "days").format("dd")}
-        </div>,
+        </div>
       );
     }
     return days;
@@ -263,16 +276,21 @@ const CustomDatePicker: React.FC<CustomDatePickerPropsType> = ({
         days.push(
           <div
             key={day.toString()}
-            className={`p-2 text-center rounded-lg transition-all 
+            className={`w-8 aspect-square flex items-center justify-center text-center rounded-lg transition-all 
               ${
                 day.isSame(currentDate, "month")
-                  ? "text-black"
-                  : "text-gray-400"
+                  ? "text-foreground"
+                  : "text-light-foreground"
               } 
               ${
                 day.isSame(selectedDate, "day")
-                  ? "bg-blue-500 text-white"
-                  : "hover:bg-blue-100"
+                  ? "bg-primary text-background"
+                  : "hover:bg-light-primary"
+              }
+              ${
+                day.isSame(moment(), "day")
+                  ? "border !border-primary"
+                  : "hover:bg-light-primary"
               } 
               ${
                 (minDate && day.isBefore(moment(minDate))) ||
@@ -283,39 +301,87 @@ const CustomDatePicker: React.FC<CustomDatePickerPropsType> = ({
             onClick={() => handleDateClick(cloneDay)}
           >
             {day.format("D")}
-          </div>,
+          </div>
         );
         day.add(1, "day");
       }
       rows.push(
         <div key={day.toString()} className="grid grid-cols-7 gap-1">
           {days}
-        </div>,
+        </div>
       );
       days = [];
     }
     return rows;
   };
 
+  const years = useMemo(() => {
+    const dumpYears = [];
+
+    for (let i = 1945; i <= moment().year(); i++) {
+      dumpYears.push(i);
+    }
+
+    return dumpYears;
+  }, []);
+
+  useEffect(() => {
+    if (activeYearRef.current && containerYearRef.current) {
+      containerYearRef.current.scrollTo({
+        top:
+          activeYearRef.current.offsetTop - containerYearRef.current.offsetTop,
+      });
+    }
+  }, []);
+
   return (
-    <div className="w-80 bg-white shadow-lg rounded-lg p-4 absolute top-full left-0 mt-1 z-50">
-      <div className="flex justify-between items-center mb-2">
-        <button
-          onClick={handlePrevMonth}
-          className="p-2 bg-gray-200 rounded-full"
+    <div className="w-80 h-72 bg-white border p-2 rounded-[6px] absolute top-full left-0 mt-1 z-50">
+      <div className="flex gap-2">
+        <div
+          className="max-h-[260] overflow-y-auto input-scroll pr-1"
+          ref={containerYearRef}
         >
-          ◀
-        </button>
-        <h2 className="text-lg font-bold">{currentDate.format("MMMM YYYY")}</h2>
-        <button
-          onClick={handleNextMonth}
-          className="p-2 bg-gray-200 rounded-full"
-        >
-          ▶
-        </button>
+          <div className="flex flex-col">
+            {years?.map((item, key) => {
+              const isActive = currentDate?.year() === item;
+
+              return (
+                <>
+                  <div
+                    key={key}
+                    ref={isActive ? activeYearRef : null}
+                    className={`py-1 px-2 font-semibold rounded-[6px] cursor-pointer ${isActive && "bg-light-primary"}`}
+                    onClick={() => {
+                      setCurrentDate(moment().set("year", item));
+                    }}
+                  >
+                    {item}
+                  </div>
+                </>
+              );
+            })}
+          </div>
+        </div>
+        <div>
+          <div className="flex justify-between items-center mb-1">
+            <button
+              onClick={handlePrevMonth}
+              className="w-8 text-sm aspect-square rounded-full cursor-pointer"
+            >
+              <FontAwesomeIcon icon={faChevronLeft} />
+            </button>
+            <h2 className="font-semibold">{currentDate.format("MMMM YYYY")}</h2>
+            <button
+              onClick={handleNextMonth}
+              className="w-8 text-sm aspect-square rounded-full cursor-pointer"
+            >
+              <FontAwesomeIcon icon={faChevronRight} />
+            </button>
+          </div>
+          <div className="grid grid-cols-7 gap-1 mb-2">{renderDays()}</div>
+          <div>{renderCells()}</div>
+        </div>
       </div>
-      <div className="grid grid-cols-7 gap-1 mb-2">{renderDays()}</div>
-      <div>{renderCells()}</div>
     </div>
   );
 };

@@ -159,7 +159,7 @@ export default function ExampleLayout({ children }: { children: ReactNode }) {
             ]}
           />
           <SidebarContentComponent>
-            <div className="p-4">{children}</div>
+            <div className="p-2 lg:p-4">{children}</div>
           </SidebarContentComponent>
         </div>
       </ToggleProvider>

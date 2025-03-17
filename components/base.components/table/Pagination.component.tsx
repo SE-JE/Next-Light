@@ -65,7 +65,7 @@ export default function PaginationComponent({
           onChange={(e) => onChange?.(totalRow, Number(e), 1)}
           className="py-1.5 text-sm bg-white"
         />
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 mt-0.5">
           {page > 1 && (
             <button
               className={styles.overflow}

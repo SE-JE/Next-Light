@@ -7,3 +7,4 @@ export * from "./standIn.helpers";
 export * from "./parseClassName.helpers";
 export * from "./className.helpers";
 export * from "./detectKeyboardOpen.helpers";
+export * from "./responsive.helpers";
