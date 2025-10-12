@@ -87,6 +87,7 @@ export type FormType<
 > = {
   construction?: ConstructionMap[T];
   type?: T;
+  onHide?: (values: any) => boolean,
 
   /** Use responsive class with: "sm::", "md::", "lg::", "xl::". */
   col?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | string;
@@ -98,6 +99,7 @@ export type formSupervisionPropsType = {
   forms: FormType[];
   confirmation?: boolean;
   defaultValue?: object | null;
+  payload?: (values: any) => object;
 
   submitControl: PostPropsType;
   footerControl?: () => ReactNode;
@@ -118,6 +120,7 @@ export default function FormSupervisionComponent({
   onSuccess,
   onError,
   footerControl,
+  payload,
   className = "",
 }: formSupervisionPropsType) {
   const [modal, setModal] = useState<boolean | "success" | "failed">(false);
@@ -139,6 +142,7 @@ export default function FormSupervisionComponent({
     },
   ] = useForm(
     submitControl,
+    payload,
     confirmation,
     () => {
       onSuccess?.();
@@ -207,6 +211,8 @@ export default function FormSupervisionComponent({
         {fresh &&
           forms.map((form, key) => {
             const inputType = form.type || "default";
+
+            if (form?.onHide?.(values)) return <></>;
 
             return (
               <React.Fragment key={key}>

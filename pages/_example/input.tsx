@@ -21,6 +21,7 @@ export default function Input() {
           <div className="col-span-4">
             <InputComponent
               name=""
+              className="label::text-purple-900"
               label="Nama Lengkap"
               placeholder="Contoh: Joko Gunawan..."
             />

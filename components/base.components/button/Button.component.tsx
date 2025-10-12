@@ -57,13 +57,10 @@ export function ButtonComponent({
   );
 
   const iconClasses = cn(
-    size === "xs"
-      ? "text-xs"
-      : size === "sm"
-        ? "text-sm mb-0.5"
-        : size === "lg"
-          ? "text-xl mb-0.5"
-          : "text-base mb-0.5",
+    size === "xs"? "text-xs"
+      : size === "sm" ? "text-sm mb-0.5"
+      : size === "lg" ? "text-xl mb-0.5"
+      : "text-base mb-0.5",
     pcn<CT>(className, "icon"),
   );
 

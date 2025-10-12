@@ -137,14 +137,14 @@ export function TableComponent({
   const styles = {
     controllerBar: cn(
       "py-1 bg-white rounded-[6px] border flex items-center mb-2",
-      pcn<CT>(className, "controller-bar"),
+      pcn<CT>(className, "controller-bar")
     ),
     head: "px-4 py-2.5 font-bold w-full flex justify-between gap-2 items-center text-sm text-foreground capitalize",
     column: cn("px-4 py-2 font-medium", pcn<CT>(className, "column")),
     row: "flex items-center gap-4 rounded-[6px] relative animate-intro-right border-b",
     floatingAction: cn(
       "sticky bg-background -right-5 z-30 cursor-pointer flex items-center shadow rounded-l-lg",
-      pcn<CT>(className, "floating-action"),
+      pcn<CT>(className, "floating-action")
     ),
   };
 
@@ -153,7 +153,7 @@ export function TableComponent({
       (column) =>
         (typeof item[column.selector as keyof object] == "object"
           ? JSON.stringify(item[column.selector as keyof object])
-          : item[column.selector as keyof object]) || "-",
+          : item[column.selector as keyof object]) || "-"
     );
 
     return (
@@ -188,7 +188,7 @@ export function TableComponent({
               className={cn(
                 styles?.head,
                 column.sortable && "cursor-pointer",
-                pcn<CT>(className, "head-column"),
+                pcn<CT>(className, "head-column")
               )}
               style={{
                 width: column.width ? column.width : 200,
@@ -232,7 +232,7 @@ export function TableComponent({
         <div
           className={cn(
             "absolute -bottom-4 bg-white translate-y-full right-0 p-2 w-[240px] z-20 rounded-lg border",
-            !floatingDisplay && "scale-y-0 top-0 opacity-0",
+            !floatingDisplay && "scale-y-0 top-0 opacity-0"
           )}
         >
           <label className="text-sm font-semibold mb-2">
@@ -251,7 +251,7 @@ export function TableComponent({
               setDisplayColumns(
                 Array()
                   .concat(e)
-                  .map((val) => String(val)),
+                  .map((val) => String(val))
               );
             }}
             value={displayColumns}
@@ -353,7 +353,7 @@ export function TableComponent({
               e.scrollLeft &&
               setShowFloatingAction(
                 e.scrollLeft + e.clientWidth <=
-                  e.scrollWidth - actionColumnRef.current?.clientWidth,
+                  e.scrollWidth - actionColumnRef.current?.clientWidth
               );
           }}
         >
@@ -420,7 +420,7 @@ export function TableComponent({
                     className={cn(
                       styles.head,
                       "w-8",
-                      pcn<CT>(className, "head-column"),
+                      pcn<CT>(className, "head-column")
                     )}
                   >
                     #
@@ -445,7 +445,7 @@ export function TableComponent({
                             key % 2 ? "bg-white/40" : "bg-white",
                             onRowClick &&
                               "cursor-pointer hover:bg-light-primary/40",
-                            pcn<CT>(className, "row"),
+                            pcn<CT>(className, "row")
                           )}
                           key={key}
                         >

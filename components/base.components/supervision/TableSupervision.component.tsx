@@ -309,6 +309,7 @@ export default function TableSupervisionComponent({
                   return (
                     <div className="pl-2 pr-4 mr-2 border-r">
                       <ButtonComponent
+                        icon={faPlus}
                         label="Tambah Data"
                         size="sm"
                         onClick={() => setModal("form")}
@@ -328,7 +329,7 @@ export default function TableSupervisionComponent({
 
       <IconButtonComponent
         icon={faPlus}
-        className="fixed bottom-4 right-4 w-12 h-12"
+        className="fixed bottom-4 right-4 w-12 h-12 lg:hidden"
         size="lg"
         onClick={() => setModal("form")}
       />

@@ -32,7 +32,7 @@ export function AccordionComponent({
   const styles = {
     container: cn(
       "bg-white border rounded-lg flex",
-      horizontal ? "flex-row w-min" : "flex-col",
+      horizontal ? "flex-row w-min border-r-0" : "flex-col border-b-0",
       pcn<CT>(className, "container"),
     ),
     head: cn(

@@ -62,6 +62,7 @@ const formReducer = (state: typeof initialState, action: any) => {
 
 export const useForm = (
   submitControl: PostPropsType,
+  payload?: ((values: any) => object) | false,
   confirmation?: boolean,
   onSuccess?: (data: any) => void,
   onFailed?: (code: number) => void,
@@ -98,9 +99,17 @@ export const useForm = (
     dispatch({ type: "SET_LOADING", payload: true });
 
     const formData = new FormData();
-    state.formValues.forEach((val) => {
-      formData.append(val.name, val.value);
-    });
+
+    if(!payload) {
+      state.formValues.forEach((val) => {
+        formData.append(val.name, val.value);
+      });
+    } else {
+      const payloadValues: Record<string, any> = payload(state.formValues);
+      Object.keys(payloadValues).forEach((key) => {
+        formData.append(key, payloadValues[key]);
+      });
+    }
 
     const mutate = await post({
       url: submitControl.url,
