@@ -9,6 +9,10 @@ import {
   InputDatePropsType,
   InputNumberComponent,
   InputNumberPropsType,
+  InputOtpComponent,
+  InputOtpType,
+  InputPasswordComponent,
+  InputPasswordType,
   InputPropsType,
   InputRadioComponent,
   InputRadioPropsType,
@@ -17,6 +21,9 @@ import {
 } from "../input";
 import {
   cn,
+  FormErrorType,
+  FormRegisterType,
+  FormValueType,
   pcn,
   PostPropsType,
   useForm,
@@ -33,8 +40,7 @@ type customConstructionType = ({
   formControl,
   values,
   setValues,
-  registers,
-  setRegisters,
+  setRegister,
   errors,
   setErrors,
 }: {
@@ -45,16 +51,11 @@ type customConstructionType = ({
     error?: string;
   };
   values?: { name: string; value?: any }[];
-  setValues?: (values: { name: string; value?: any }[]) => void;
-  errors?: { name: string; error?: any }[];
-  setErrors?: (values: { name: string; error?: any }[]) => void;
-  registers?: { name: string; validations?: ValidationRulesType | undefined }[];
-  setRegisters?: (
-    registers: {
-      name: string;
-      validations?: ValidationRulesType | undefined;
-    }[],
-  ) => void;
+  setValues?: (values: FormValueType[]) => void;
+  errors?: FormErrorType[];
+  setErrors?: (errors: FormErrorType[]) => void;
+  // registers?: { name: string; validations?: ValidationRulesType | undefined }[];
+  setRegister?: (registers: FormRegisterType) => void;
 }) => ReactNode;
 
 type ConstructionMap = {
@@ -69,6 +70,8 @@ type ConstructionMap = {
   // time: InputTimeProps;
   radio: InputRadioPropsType;
   select: SelectPropsType;
+  "enter-password": InputPasswordType;
+  "otp": InputOtpType;
   custom: customConstructionType;
 };
 
@@ -83,6 +86,8 @@ export type FormType<
     | "number"
     | "radio"
     | "select"
+    | "enter-password"
+    | "otp"
     | "custom",
 > = {
   construction?: ConstructionMap[T];
@@ -129,13 +134,12 @@ export default function FormSupervisionComponent({
   const [
     {
       formControl,
+      setRegister,
       values,
       setValues,
       errors,
       setErrors,
       setDefaultValues,
-      registers,
-      setRegisters,
       submit,
       loading,
       confirm,
@@ -174,7 +178,7 @@ export default function FormSupervisionComponent({
     if (defaultValue) {
       setDefaultValues(defaultValue);
     } else {
-      setDefaultValues({});
+      setDefaultValues(null);
       setFresh(false);
       setTimeout(() => {
         setFresh(true);
@@ -228,10 +232,9 @@ export default function FormSupervisionComponent({
                         formControl,
                         values,
                         setValues,
-                        registers,
-                        setRegisters,
                         errors,
                         setErrors,
+                        setRegister,
                       })}
                     </>
                   ) : inputType == "check" ? (
@@ -267,6 +270,17 @@ export default function FormSupervisionComponent({
                       {...(form.construction as SelectPropsType)}
                       {...formControl(form.construction?.name || "input_name")}
                       autoFocus={key == 0}
+                    />
+                  ) : inputType == "enter-password" ? (
+                    <InputPasswordComponent
+                      {...(form.construction as InputPasswordType)}
+                      {...formControl(form.construction?.name || "input_name")}
+                      autoFocus={key == 0}
+                    />
+                  ) : inputType == "otp" ? (
+                    <InputOtpComponent
+                      {...(form.construction as InputOtpType)}
+                      {...formControl(form.construction?.name || "input_name")}
                     />
                   ) : (
                     <InputComponent

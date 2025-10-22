@@ -8,6 +8,8 @@ export * from "./InputDate.component";
 export * from "./InputNumber.component";
 export * from "./InputRadio.component";
 // export * from "./InputTime.component";
+export * from "./InputOtp.component";
+export * from "./InputPassword.component";
 export * from "./Checkbox.component";
 export * from "./Radio.component";
 export * from "./Select.component";

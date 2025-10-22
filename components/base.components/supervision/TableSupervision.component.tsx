@@ -26,6 +26,7 @@ export type TableSupervisionColumnType = {
 export type TableSupervisionFormType = {
   forms: string[] | (FormType & { visibility?: "*" | "create" | "update" })[];
   customDefaultValue?: object;
+  payload?: (values: any) => object;
   modalControl?: FloatingPagePropsType;
   contentType?: "application/json" | "multipart/form-data";
 };
@@ -351,6 +352,7 @@ export default function TableSupervisionComponent({
                 (dataSelected as { id: number })?.id || ""
               }`,
             }}
+            payload={formControl?.payload}
             onSuccess={() => {
               reset();
               setModal(null);
