@@ -1,18 +1,14 @@
 import React, { ReactNode, useEffect, useMemo, useState } from "react";
-import {
-  FloatingPageComponent,
-  FloatingPagePropsType,
-} from "../modal/FloatingPage.component";
-import { GetPropsType, useGet, useResponsive } from "@/helpers";
 import { useRouter } from "next/router";
-import { ButtonComponent, IconButtonComponent } from "../button";
-import { faEdit, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { TableColumnType, TableComponent } from "../table/Table.component";
-import FormSupervisionComponent, {
-  FormType,
-} from "./FormSupervision.component";
-import { ModalConfirmComponent } from "../modal";
 import { faQuestionCircle } from "@fortawesome/free-regular-svg-icons";
+import { faEdit, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { ApiType, useGetApi, useResponsive } from "@/helpers";
+import { FloatingPageComponent, FloatingPagePropsType } from "@components/modal/FloatingPage.component";
+import { ButtonComponent, IconButtonComponent } from "@components/button";
+import { TableColumnType, TableComponent } from "@components/table/Table.component";
+import FormSupervisionComponent, { FormType } from "@components/supervision/FormSupervision.component";
+import { ModalConfirmComponent } from "@components/modal";
+
 
 export type TableSupervisionColumnType = {
   selector: string;
@@ -33,7 +29,7 @@ export type TableSupervisionFormType = {
 
 export type TableSupervisionPropsType = {
   title?: string;
-  fetchControl: GetPropsType;
+  fetchControl: ApiType;
   setToRefresh?: boolean;
   refreshOnClose?: boolean;
   setToLoading?: boolean;
@@ -48,7 +44,7 @@ export type TableSupervisionPropsType = {
   // includeFilters?: getFilterParams[];
   // unUrlPage?: boolean;
   // noControlBar?: boolean;
-  actionControl?:
+  actionControl  ?:  
     | boolean
     | (
         | string
@@ -101,15 +97,16 @@ export default function TableSupervisionComponent({
   // ## fetching
   // ============================
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [{ loading, code, data, reset }] = useGet(
+  const [{ loading, code, data, reset }] = useGetApi(
     {
       ...fetchControl,
-      params: {
+      method  :  "GET",
+      params  :  {
         page,
         paginate,
-        sortBy: sort.column,
-        sortDirection: sort.direction,
-        search: search,
+        sortBy         :  sort.column,
+        sortDirection  :  sort.direction,
+        search         :  search,
         // filter: filter,
       },
     },
@@ -364,7 +361,7 @@ export default function TableSupervisionComponent({
         title={`Menghapus Data?`}
         submitControl={{
           onSubmit: {
-            method: "destroy",
+            method: "DELETE",
             ...(fetchControl.path ? 
               {path: `${fetchControl.path}/${(dataSelected as { id: number })?.id || ""}`} 
             : 

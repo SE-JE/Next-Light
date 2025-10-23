@@ -3,11 +3,14 @@ const storeName = "cache";
 const version = 1;
 
 type CavityType = {
-  key     : string;
-  data    : any;
-  expired : number;
+  key      :  string;
+  data     :  any;
+  expired  :  number;
 };
 
+// ==============================>
+// ## Init indexDb
+// ==============================>
 async function idb(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(name, version);
@@ -19,20 +22,23 @@ async function idb(): Promise<IDBDatabase> {
       }
     };
 
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
+    request.onsuccess  =  () => resolve(request.result);
+    request.onerror    =  () => reject(request.error);
   });
 }
 
 export const cavity = {
+  // ==============================>
+  // ## Set cache to indexDb
+  // ==============================>
   set: async ({ key, data, expired }: CavityType) => {
-    const db = await idb();
-    const tx = db.transaction(storeName, "readwrite");
-    const store = tx.objectStore(storeName);
+    const db     =  await idb();
+    const tx     =  db.transaction(storeName, "readwrite");
+    const store  =  tx.objectStore(storeName);
 
     const item = {
       key,
-      expired: new Date().getTime() + expired * 60 * 1000, // dalam ms
+      expired: new Date().getTime() + expired * 60 * 1000,
       data,
     };
 
@@ -41,10 +47,13 @@ export const cavity = {
     return tx.commit;
   },
 
+  // ==============================>
+  // ## Get cache from indexDb
+  // ==============================>
   get: async (key: string) => {
-    const db = await idb();
-    const tx = db.transaction(storeName, "readonly");
-    const store = tx.objectStore(storeName);
+    const db     =  await idb();
+    const tx     =  db.transaction(storeName, "readonly");
+    const store  =  tx.objectStore(storeName);
 
     return new Promise((resolve) => {
       const request = store.get(key);
@@ -56,7 +65,6 @@ export const cavity = {
         if (item.expired > Date.now()) {
           resolve(item.data);
         } else {
-          // auto delete jika expired
           const deleteTx = db.transaction(storeName, "readwrite");
           deleteTx.objectStore(storeName).delete(key);
           resolve(null);
@@ -67,10 +75,14 @@ export const cavity = {
     });
   },
 
+  // ==============================>
+  // ## Remove cache from indexDb
+  // ==============================>
   delete: async (key: string) => {
-    const db = await idb();
-    const tx = db.transaction(storeName, "readwrite");
-    const store = tx.objectStore(storeName);
+    const db     =  await idb();
+    const tx     =  db.transaction(storeName, "readwrite");
+    const store  =  tx.objectStore(storeName);
+
     store.delete(key);
     return tx.commit;
   },

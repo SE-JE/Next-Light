@@ -1,9 +1,14 @@
 import { ButtonComponent, CardComponent } from "@/components/base.components";
 import FormSupervisionComponent from "@/components/base.components/supervision/FormSupervision.component";
+import { useAuthContext } from "@/contexts/Auth.context";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import React from "react";
 
 export default function Verify() {
+  const router = useRouter();
+  const {registerToken} = useAuthContext();  
+
   return (
     <>
       <div className="h-screen flex flex-col justify-center items-center">
@@ -21,15 +26,20 @@ export default function Verify() {
               },
             ]}
             submitControl={{
-              path: "/verify"
+              path: "verify",
+              bearer: registerToken || "",
             }}
-            footerControl={() => (
+            onSuccess={() => {
+              router.push("/auth/login")
+            }}
+            footerControl={({loading}) => (
               <>
                 <ButtonComponent
                   type="submit"
                   label="Submit"
                   block
                   className="mt-4"
+                  loading={loading}
                 />
 
                 <p className="mt-4 text-center">Already have an account? <Link href="/auth/login" className="text-primary underline">Login</Link></p>

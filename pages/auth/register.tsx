@@ -1,11 +1,13 @@
 import { ButtonComponent, CardComponent } from "@/components/base.components";
 import FormSupervisionComponent from "@/components/base.components/supervision/FormSupervision.component";
+import { useAuthContext } from "@/contexts/Auth.context";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
 
 export default function Register() {
   const router = useRouter();
+  const {setRegisterToken} = useAuthContext();
 
   return (
     <>
@@ -22,7 +24,6 @@ export default function Register() {
                   label: "Nama",
                   placeholder: "Ex: Joko Gunawan",
                   validations: { required: true },
-                  className: "label::!text-green-700"
                 }
               },
               {
@@ -44,16 +45,20 @@ export default function Register() {
               },
             ]}
             submitControl={{
-              path: "/register"
+              path: "register"
             }}
-            onSuccess={() => router.push("/auth/verify")}
-            footerControl={() => (
+            onSuccess={(res) => {
+              setRegisterToken(res?.data?.token)
+              router.push("/auth/verify")
+            }}
+            footerControl={({loading}) => (
               <>
                 <ButtonComponent
                   type="submit"
                   label="Create Account"
                   block
                   className="mt-4"
+                  loading={loading}
                 />
 
                 <p className="mt-4 text-center">Already have an account? <Link href="/auth/login" className="text-primary underline">Login</Link></p>

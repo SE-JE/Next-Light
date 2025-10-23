@@ -1,13 +1,13 @@
 import {
+  api,
+  ApiType,
   cn,
-  get,
-  GetPropsType,
   pcn,
   standIn,
   useLazySearch,
   useValidationHelper,
   ValidationRulesType,
-} from "@/helpers";
+} from "@helpers/.";
 import {
   faCheckCircle,
   faChevronDown,
@@ -33,37 +33,37 @@ export type SelectOptionPropsType = {
 };
 
 export interface SelectPropsType {
-  name: string;
-  label?: string;
-  placeholder?: string;
-  tip?: string | ReactNode;
-  leftIcon?: any;
-  rightIcon?: any;
+  name          :  string;
+  label        ?:  string;
+  placeholder  ?:  string;
+  tip          ?:  string | ReactNode;
+  leftIcon     ?:  any;
+  rightIcon    ?:  any;
 
   /** Use custom class with: "label::", "tip::", "error::", "icon::", "suggest::", "suggest-item::". */
-  className?: string;
+  className    ?:  string;
 
-  value?: string | number | (string | number)[];
-  error?: string;
-  disabled?: boolean;
-  validations?: ValidationRulesType;
-  multiple?: boolean;
-  autoFocus?: boolean;
+  value        ?:  string | number | (string | number)[];
+  error        ?:  string;
+  disabled     ?:  boolean;
+  validations  ?:  ValidationRulesType;
+  multiple     ?:  boolean;
+  autoFocus    ?:  boolean;
 
-  options?: SelectOptionPropsType[];
-  searchable?: boolean;
-  serverOptionControl?: GetPropsType & { cacheName?: string };
-  serverSearchable?: boolean;
-  includedOptions?: SelectOptionPropsType[];
-  exceptOptions?: (string | number)[];
-  tempOptions?: SelectOptionPropsType[];
-  newOption?: SelectOptionPropsType;
-  maxShowOption?: number;
+  options              ?:  SelectOptionPropsType[];
+  searchable           ?:  boolean;
+  serverOptionControl  ?:  ApiType & { cacheName?: string };
+  serverSearchable     ?:  boolean;
+  includedOptions      ?:  SelectOptionPropsType[];
+  exceptOptions        ?:  (string | number)[];
+  tempOptions          ?:  SelectOptionPropsType[];
+  newOption            ?:  SelectOptionPropsType;
+  maxShowOption        ?:  number;
 
-  onChange?: (value: string | number | (string | number)[], data?: any) => any;
-  register?: (name: string, validations?: ValidationRulesType) => void;
-  onFocus?: () => void;
-  onBlur?: () => void;
+  onChange  ?:  (value: string | number | (string | number)[], data?: any) => any;
+  register  ?:  (name: string, validations?: ValidationRulesType) => void;
+  onFocus   ?:  () => void;
+  onBlur    ?:  () => void;
 }
 
 export function SelectComponent({
@@ -270,7 +270,7 @@ export function SelectComponent({
       );
       setLoadingOption(false);
     } else {
-      const mutateOptions = await get(serverControl || {});
+      const mutateOptions = await api(serverControl || {});
       setDataOptions(
         [...mutateOptions?.data, ...includedOptions].filter(
           (op: SelectOptionPropsType) => !exceptOptions?.includes(op.value)

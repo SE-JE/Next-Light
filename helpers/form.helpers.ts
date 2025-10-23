@@ -1,6 +1,6 @@
 import { useReducer, useEffect } from "react";
-import { post, PostPropsType } from "./api.helpers";
-import { validationHelper, ValidationRulesType } from "./validation.helpers";
+import { api, ApiType } from "./api.helpers";
+import { validationHelper, ValidationRulesType } from "@helpers/.";
 
 export interface FormRegisterType { 
   name         : string; 
@@ -131,7 +131,7 @@ const formReducer = (state: FormStateType, action: ActionType) => {
 // ## Hook form
 // ==============================>
 export const useForm = (
-  submitControl   : PostPropsType,
+  submitControl   : ApiType,
   payload        ?: ((values: any)  => object) | false,
   confirmation   ?: boolean,
   onSuccess      ?: (data: any)     => void,
@@ -207,13 +207,13 @@ export const useForm = (
     // ==============================>
     // ## Execute api handler
     // ==============================>
-    const execute = await post({
+    const execute = await api({
       url               : submitControl.url,
       path              : submitControl.path,
+      method            : submitControl.method || "POST",
       bearer            : submitControl.bearer,
-      includeHeaders    : submitControl.includeHeaders,
-      contentType       : submitControl.contentType,
-      body              : formData,
+      headers           : submitControl.headers,
+      payload           : formData,
     });
 
     if (execute?.status === 200 || execute?.status === 201) {

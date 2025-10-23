@@ -18,20 +18,20 @@ import {
   InputRadioPropsType,
   SelectComponent,
   SelectPropsType,
-} from "../input";
+} from "@components/input";
+import { ButtonComponent } from "@components/button";
+import { ModalConfirmComponent, ToastComponent } from "@components/modal";
 import {
+  ApiType,
   cn,
   FormErrorType,
   FormRegisterType,
   FormValueType,
   pcn,
-  PostPropsType,
   useForm,
   ValidationRulesType,
-} from "@/helpers";
-import { ButtonComponent } from "../button";
+} from "@helpers/.";
 import { faSave } from "@fortawesome/free-solid-svg-icons";
-import { ModalConfirmComponent, ToastComponent } from "../modal";
 import { faQuestionCircle } from "@fortawesome/free-regular-svg-icons";
 
 type CT = "base" | "title" | "submit";
@@ -44,18 +44,18 @@ type customConstructionType = ({
   errors,
   setErrors,
 }: {
-  formControl: (name: string) => {
-    onChange?: (value: any) => void;
-    register?: (regName: string, reqValidation: ValidationRulesType) => void;
-    value?: any;
-    error?: string;
+  formControl  ?: (name: string) => {
+    onChange   ?:  (value: any) => void;
+    register   ?:  (regName: string, reqValidation: ValidationRulesType) => void;
+    value      ?:  any;
+    error      ?:  string;
   };
-  values?: { name: string; value?: any }[];
-  setValues?: (values: FormValueType[]) => void;
-  errors?: FormErrorType[];
-  setErrors?: (errors: FormErrorType[]) => void;
+  values       ?:  { name: string; value?: any }[];
+  setValues    ?:  (values: FormValueType[]) => void;
+  errors       ?:  FormErrorType[];
+  setErrors    ?:  (errors: FormErrorType[]) => void;
+  setRegister  ?:  (registers: FormRegisterType) => void;
   // registers?: { name: string; validations?: ValidationRulesType | undefined }[];
-  setRegister?: (registers: FormRegisterType) => void;
 }) => ReactNode;
 
 type ConstructionMap = {
@@ -90,30 +90,30 @@ export type FormType<
     | "otp"
     | "custom",
 > = {
-  construction?: ConstructionMap[T];
-  type?: T;
-  onHide?: (values: any) => boolean,
-
   /** Use responsive class with: "sm::", "md::", "lg::", "xl::". */
-  col?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | string;
-  className?: string;
+  col           ?:  1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | string;
+  className     ?:  string;
+  
+  construction  ?:  ConstructionMap[T];
+  type          ?:  T;
+  onHide        ?:  (values: any) => boolean,
 };
 
 export type formSupervisionPropsType = {
-  title?: string;
-  forms: FormType[];
-  confirmation?: boolean;
-  defaultValue?: object | null;
-  payload?: (values: any) => object;
+  title          ?:  string;
+  forms           :  FormType[];
+  confirmation   ?:  boolean;
+  defaultValue   ?:  object | null;
+  payload        ?:  (values: any) => object;
+  
+  submitControl   :  ApiType;
+  footerControl  ?:  ({ loading }: {loading: boolean}) => ReactNode;
 
-  submitControl: PostPropsType;
-  footerControl?: () => ReactNode;
-
-  onSuccess?: () => void;
-  onError?: (code: number) => void;
+  onSuccess      ?:  (data: any) => void;
+  onError        ?:  (code: number) => void;
 
   /** Use custom class with: "title::", "submit::". */
-  className?: string;
+  className      ?: string;
 };
 
 export default function FormSupervisionComponent({
@@ -126,7 +126,7 @@ export default function FormSupervisionComponent({
   onError,
   footerControl,
   payload,
-  className = "",
+  className="",
 }: formSupervisionPropsType) {
   const [modal, setModal] = useState<boolean | "success" | "failed">(false);
   const [fresh, setFresh] = useState<boolean>(true);
@@ -148,13 +148,11 @@ export default function FormSupervisionComponent({
     submitControl,
     payload,
     confirmation,
-    () => {
-      onSuccess?.();
+    (data: any) => {
+      onSuccess?.(data);
       setModal("success");
       setFresh(false);
-      setTimeout(() => {
-        setFresh(true);
-      }, 500);
+      setTimeout(() => setFresh(true), 500);
     },
     (code: number) => {
       onError?.(code);
@@ -169,9 +167,7 @@ export default function FormSupervisionComponent({
 
   useEffect(() => {
     setFresh(false);
-    setTimeout(() => {
-      setFresh(true);
-    }, 500);
+    setTimeout(() => setFresh(true), 500);
   }, [forms]);
 
   useEffect(() => {
@@ -180,20 +176,11 @@ export default function FormSupervisionComponent({
     } else {
       setDefaultValues(null);
       setFresh(false);
-      setTimeout(() => {
-        setFresh(true);
-      }, 500);
+      setTimeout(() => setFresh(true), 500);
     }
   }, [defaultValue]);
 
-  const generateColClass = (col: string | number) => {
-    return String(col)
-      .split(" ")
-      .map((c) =>
-        c.includes(":") ? `${c.replace(":", ":col-span-")}` : `col-span-${c}`,
-      )
-      .join(" ");
-  };
+  const generateColClass = (col: string | number) => String(col).split(" ").map((c) => c.includes(":") ? `${c.replace(":", ":col-span-")}` : `col-span-${c}`).join(" ");
 
   return (
     <>
@@ -294,7 +281,7 @@ export default function FormSupervisionComponent({
             );
           })}
         <div className="col-span-12">
-          {footerControl?.() || (
+          {footerControl?.({loading}) || (
             <>
               <div className="flex justify-end mt-4">
                 <ButtonComponent

@@ -127,14 +127,6 @@ export function InputPasswordComponent({
   // =========================>
   const isConfirmMismatch = confirmPassword && password !== confirmPassword;
 
-  useEffect(() => {
-    if (isConfirmMismatch) {
-      setIsInvalid("Konfirmasi password tidak cocok");
-    } else if (!errorMessage) {
-      setIsInvalid("");
-    }
-  }, [confirmPassword, password]);
-
   return (
     <div className="relative flex flex-col gap-y-1">
       {label && (

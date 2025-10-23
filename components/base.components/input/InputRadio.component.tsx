@@ -1,8 +1,8 @@
 import React, { ReactNode, useEffect, useState } from "react";
 import {
+  api,
+  ApiType,
   cn,
-  get,
-  GetPropsType,
   pcn,
   useValidationHelper,
   ValidationRulesType,
@@ -17,24 +17,25 @@ export type InputRadioOptionPropsType = {
 };
 
 export type InputRadioPropsType = {
-  name: string;
-  label?: string;
-  tip?: string | ReactNode;
-  vertical?: boolean;
+  name                  :  string;
+  label                ?:  string;
+  tip                  ?:  string | ReactNode;
+  vertical             ?:  boolean;
 
   /** Use custom class with: "label::", "tip::", "error::", "icon::", "suggest::", "suggest-item::". */
-  className?: string;
+  className            ?: string;
   /** Use custom class with: "label::", "checked::", "error::". */
-  classNameCheckbox?: string;
+  classNameCheckbox    ?: string;
 
-  value?: string | number;
-  disabled?: boolean;
-  error?: string;
-
-  options?: InputRadioOptionPropsType[];
-  serverOptionControl?: GetPropsType;
-  customOptions?: any;
-  validations?: ValidationRulesType;
+  value                ?:  string | number;
+  disabled             ?:  boolean;
+  error                ?:  string;
+  
+  options              ?:  InputRadioOptionPropsType[];
+  serverOptionControl  ?:  ApiType;
+  customOptions        ?:  any;
+  validations          ?:  ValidationRulesType;
+  
 
   onChange?: (value: string | number) => any;
   register?: (name: string, validations?: ValidationRulesType) => void;
@@ -60,10 +61,10 @@ export function InputRadioComponent({
   register,
   onChange,
 }: InputRadioPropsType) {
-  const [isInvalid, setIsInvalid] = useState("");
-  const [inputValue, setInputValue] = useState<string | number>("");
-  const [dataOptions, setDataOptions] = useState<InputRadioPropsType[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [isInvalid, setIsInvalid]      =  useState("");
+  const [inputValue, setInputValue]    =  useState<string | number>("");
+  const [dataOptions, setDataOptions]  =  useState<InputRadioPropsType[]>([]);
+  const [loading, setLoading]          =  useState(false);
 
   // =========================>
   // ## initial
@@ -86,7 +87,7 @@ export function InputRadioComponent({
   useEffect(() => {
     const fetchOptions = async () => {
       setLoading(true);
-      const mutateOptions = await get(serverOptionControl || {});
+      const mutateOptions = await api(serverOptionControl || {});
       if (mutateOptions?.status == 200) {
         customOptions
           ? setDataOptions([customOptions, ...mutateOptions.data])

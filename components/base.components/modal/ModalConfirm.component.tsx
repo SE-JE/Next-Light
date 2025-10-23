@@ -3,32 +3,25 @@ import { faQuestion } from "@fortawesome/free-solid-svg-icons";
 import { ButtonComponent, ButtonPropsType } from "../button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  api,
+  ApiType,
   cn,
-  destroy,
-  DestroyPropsType,
   pcn,
-  post,
-  PostPropsType,
 } from "@/helpers";
 import { ToastComponent } from "./Toast.component";
 
 type CT = "base" | "backdrop" | "header" | "footer";
 
 export type ModalConfirmPropsType = {
-  show: boolean;
-  title?: string | ReactNode;
-  children?: any;
-  icon?: any;
-  footer?: string | ReactNode;
-
-  submitControl?: ButtonPropsType & {
-    onSubmit?:
-      | ((PostPropsType | DestroyPropsType) & {
-          method?: "post" | "destroy";
-        })
-      | (() => void);
-    onSuccess?: () => void;
-    onError?: () => void;
+  show            :  boolean;
+  title          ?:  string | ReactNode;
+  children       ?:  any;
+  icon           ?:  any;
+  footer         ?:  string | ReactNode;
+  submitControl  ?: ButtonPropsType & {
+    onSubmit     ?:  ApiType | (() => void);
+    onSuccess    ?:  () => void;
+    onError      ?:  () => void;
   };
   onClose: () => void;
 
@@ -121,14 +114,7 @@ export function ModalConfirmComponent({
               if (typeof submitControl?.onSubmit == "function") {
                 submitControl?.onSubmit?.();
               } else {
-                const actions = {
-                  post,
-                  destroy,
-                };
-
-                const response = await actions[
-                  submitControl?.onSubmit?.method || "post"
-                ]?.(submitControl?.onSubmit || {});
+                const response = await api(submitControl?.onSubmit as ApiType);
 
                 if (response?.status == 200 || response?.status == 201) {
                   setToast("success");

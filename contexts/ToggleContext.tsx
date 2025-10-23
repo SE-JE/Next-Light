@@ -9,7 +9,7 @@ const ToggleContext = createContext<ToggleContextInterface | undefined>(
   undefined,
 );
 
-export const ToggleProvider: React.FC<{ children: React.ReactNode }> = ({
+export const ToggleContextProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [actives, setActives] = useState<
@@ -32,7 +32,7 @@ export const ToggleProvider: React.FC<{ children: React.ReactNode }> = ({
 export const useToggleContext = (): ToggleContextInterface => {
   const context = useContext(ToggleContext);
   if (!context) {
-    throw new Error("useToggleContext must be used within a ToggleProvider");
+    throw new Error("useToggleContext must be used within a ToggleContextProvider");
   }
   return context;
 };

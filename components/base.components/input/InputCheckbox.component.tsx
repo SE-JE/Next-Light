@@ -1,12 +1,12 @@
 import React, { ReactNode, useEffect, useState } from "react";
 import {
+  api,
+  ApiType,
   cn,
-  get,
-  GetPropsType,
   pcn,
   useValidationHelper,
   ValidationRulesType,
-} from "../../../helpers";
+} from "@helpers/.";
 import { CheckboxComponent } from "./Checkbox.component";
 
 type CT = "label" | "tip" | "error" | "input" | "icon";
@@ -26,19 +26,20 @@ export type InputCheckboxPropsType = {
   disabled?: boolean;
   error?: string;
 
-  options?: InputCheckboxOptionPropsType[];
-  serverOptionControl?: GetPropsType;
-  customOptions?: any;
-  validations?: ValidationRulesType;
-
-  onChange?: (value: string[] | number[]) => any;
-  register?: (name: string, validations?: ValidationRulesType) => void;
+  options              ?:  InputCheckboxOptionPropsType[];
+  serverOptionControl  ?:  ApiType;
+  customOptions        ?:  any;
+  validations          ?:  ValidationRulesType;
+  
+  onChange             ?:  (value: string[] | number[]) => any;
+  register             ?:  (name: string, validations?: ValidationRulesType) => void;
+  
 
   /** Use custom class with: "label::", "tip::", "error::", "icon::", "suggest::", "suggest-item::". */
-  className?: string;
+  className            ?: string;
 
   /** Use custom class with: "label::", "checked::", "error::". */
-  classNameCheckbox?: string;
+  classNameCheckbox    ?: string;
 };
 
 export function InputCheckboxComponent({
@@ -46,8 +47,8 @@ export function InputCheckboxComponent({
   label,
   tip,
   vertical,
-  className = "",
-  classNameCheckbox = "",
+  className="",
+  classNameCheckbox="",
 
   value,
   disabled,
@@ -61,10 +62,10 @@ export function InputCheckboxComponent({
   register,
   onChange,
 }: InputCheckboxPropsType) {
-  const [isInvalid, setIsInvalid] = useState("");
-  const [inputValue, setInputValue] = useState<string[] | number[]>([]);
-  const [dataOptions, setDataOptions] = useState<InputCheckboxPropsType[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [isInvalid, setIsInvalid]      =  useState("");
+  const [inputValue, setInputValue]    =  useState<string[] | number[]>([]);
+  const [dataOptions, setDataOptions]  =  useState<InputCheckboxPropsType[]>([]);
+  const [loading, setLoading]          =  useState(false);
 
   // =========================>
   // ## initial
@@ -87,7 +88,7 @@ export function InputCheckboxComponent({
   useEffect(() => {
     const fetchOptions = async () => {
       setLoading(true);
-      const mutateOptions = await get(serverOptionControl || {});
+      const mutateOptions = await api(serverOptionControl || {});
       if (mutateOptions?.status == 200) {
         customOptions
           ? setDataOptions([customOptions, ...mutateOptions.data])

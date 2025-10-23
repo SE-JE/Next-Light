@@ -1,9 +1,12 @@
 import { ButtonComponent, CardComponent } from "@/components/base.components";
 import FormSupervisionComponent from "@/components/base.components/supervision/FormSupervision.component";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import React from "react";
 
 export default function Login() {
+  const router = useRouter();
+
   return (
     <>
       <div className="h-screen flex flex-col justify-center items-center">
@@ -31,6 +34,9 @@ export default function Login() {
             ]}
             submitControl={{
               path: "/login"
+            }}
+            onSuccess={() => {
+              router.push("/auth/login")
             }}
             footerControl={() => (
               <>

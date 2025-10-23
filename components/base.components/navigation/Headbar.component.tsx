@@ -7,10 +7,9 @@ import {
   faUserCog,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Cookies from "js-cookie";
 import { useRouter } from "next/router";
-import { OutsideClickComponent } from "../formater-wrapper/OutsideClick.component";
-import { cn, token_cookie_name } from "@/helpers";
+import { OutsideClickComponent } from "@components/formater-wrapper/OutsideClick.component";
+import { cn, middleware } from "@helpers/.";
 
 export type HeadbarPropsType = {
   children?: ReactNode;
@@ -93,7 +92,7 @@ export function HeadbarComponent({
             <div
               className="px-6 py-2 flex gap-4 hover:bg-background/40 hover:border-y items-center cursor-pointer text-danger"
               onClick={() => {
-                Cookies.remove(token_cookie_name);
+                middleware.deleteAccessToken();
                 router.push("/");
               }}
             >

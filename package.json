@@ -16,11 +16,9 @@
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@tailwindcss/postcss": "^4.0.0",
-    "@types/js-cookie": "^3.0.6",
     "axios": "^1.7.9",
     "clsx": "^2.1.1",
     "crypto-js": "^4.2.0",
-    "fs": "^0.0.1-security",
     "js-cookie": "^3.0.5",
     "moment": "^2.30.1",
     "next": "15.1.4",
@@ -32,7 +30,8 @@
     "tailwindcss": "^4.0.0"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
+    "@eslint/eslintrc"  :  "^3",
+    "@types/js-cookie": "^3.0.6",
     "@types/crypto-js": "^4.2.2",
     "@types/node": "^20",
     "@types/react": "^19",

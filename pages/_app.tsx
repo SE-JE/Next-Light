@@ -1,11 +1,16 @@
+import '@fortawesome/fontawesome-svg-core/styles.css';
 import "../styles/globals.css";
 import { ReactElement, ReactNode } from "react";
 import { AppProps } from "next/app";
 import { Inter } from "next/font/google";
+import { config } from '@fortawesome/fontawesome-svg-core';
+import ContextProvider from "@/contexts";
 
 type NextPageWithLayout = AppProps["Component"] & {
-  getLayout?: (page: ReactElement) => ReactNode;
+  getLayout  ?:  (page: ReactElement) => ReactNode;
 };
+
+config.autoAddCss  =  false;
 
 const font = Inter({
   subsets: ["latin"],
@@ -21,9 +26,11 @@ export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
 
   return getLayout(
     <>
-      <main className={font.className}>
-        <Component {...pageProps} />
-      </main>
+      <ContextProvider>
+        <main className={font.className}>
+          <Component {...pageProps} />
+        </main>
+      </ContextProvider>
     </>,
   );
 }

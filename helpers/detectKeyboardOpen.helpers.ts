@@ -14,9 +14,8 @@ export function useDetectKeyboardOpen() {
     };
 
     window.visualViewport?.addEventListener("resize", handleResize);
-    return () => {
-      window.visualViewport?.removeEventListener("resize", handleResize);
-    };
+    
+    return () => window.visualViewport?.removeEventListener("resize", handleResize);
   }, []);
 
   return isKeyboardOpen;
