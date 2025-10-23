@@ -326,8 +326,6 @@ export default function TableSupervisionComponent({
         ]}
       />
 
-      <div></div>
-
       <IconButtonComponent
         icon={faPlus}
         className="fixed bottom-4 right-4 w-12 h-12 lg:hidden"
@@ -345,14 +343,11 @@ export default function TableSupervisionComponent({
           <FormSupervisionComponent
             defaultValue={formControl?.customDefaultValue}
             forms={forms as FormType[]}
-            submitControl={{
-              path: `${fetchControl.path}/${
-                (dataSelected as { id: number })?.id || ""
-              }`,
-              url: `${fetchControl.url}/${
-                (dataSelected as { id: number })?.id || ""
-              }`,
-            }}
+            submitControl={fetchControl.path ? 
+              { path: `${fetchControl.path}/${(dataSelected as { id: number })?.id || "" }`} 
+            : 
+              { url: `${fetchControl.url}/${(dataSelected as { id: number })?.id || ""}`}
+            }
             payload={formControl?.payload}
             onSuccess={() => {
               reset();
@@ -370,12 +365,11 @@ export default function TableSupervisionComponent({
         submitControl={{
           onSubmit: {
             method: "destroy",
-            path: `${fetchControl.path}/${
-              (dataSelected as { id: number })?.id || ""
-            }`,
-            url: `${fetchControl.url}/${
-              (dataSelected as { id: number })?.id || ""
-            }`,
+            ...(fetchControl.path ? 
+              {path: `${fetchControl.path}/${(dataSelected as { id: number })?.id || ""}`} 
+            : 
+              {url: `${fetchControl.url}/${(dataSelected as { id: number })?.id || ""}`}
+            ),
           },
           onSuccess: () => {
             reset();
