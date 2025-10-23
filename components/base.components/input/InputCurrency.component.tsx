@@ -100,6 +100,7 @@ export function InputCurrencyComponent({
         )}
       >
         {label}
+        {validations?.required && <span className="text-danger">*</span>}
       </label>
 
       {tip && (

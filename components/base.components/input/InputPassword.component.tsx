@@ -149,6 +149,7 @@ export function InputPasswordComponent({
           )}
         >
           {label}
+          {validations?.required && <span className="text-danger">*</span>}
         </label>
       )}
 
@@ -207,6 +208,12 @@ export function InputPasswordComponent({
           />
         )}
       </div>
+
+      {isInvalid && (
+        <small className={cn("input-error-message", "text-danger mt-1")}>
+          {isInvalid}
+        </small>
+      )}
 
       {strength && (
         <div className="flex items-center gap-2 mt-1">
@@ -280,7 +287,7 @@ export function InputPasswordComponent({
         </div>
       </div>
 
-      {(isInvalid || isConfirmMismatch) && (
+      {isConfirmMismatch && (
         <small className={cn("input-error-message", "text-danger mt-1")}>
           {isInvalid || "Password confirmation not match"}
         </small>

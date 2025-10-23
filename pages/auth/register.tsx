@@ -1,9 +1,12 @@
 import { ButtonComponent, CardComponent } from "@/components/base.components";
 import FormSupervisionComponent from "@/components/base.components/supervision/FormSupervision.component";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import React from "react";
 
 export default function Register() {
+  const router = useRouter();
+
   return (
     <>
       <div className="h-screen flex flex-col justify-center items-center">
@@ -26,6 +29,7 @@ export default function Register() {
                   name: "email",
                   label: "E-mail",
                   placeholder: "Ex: example@mail.com",
+                  validations: { required: true }
                 }
               },
               {
@@ -34,12 +38,14 @@ export default function Register() {
                   name: "password",
                   label: "Password",
                   placeholder: "Ex: secret123",
+                  validations: { required: true }
                 }
               },
             ]}
             submitControl={{
               path: "/register"
             }}
+            onSuccess={() => router.push("/auth/verify")}
             footerControl={() => (
               <>
                 <ButtonComponent

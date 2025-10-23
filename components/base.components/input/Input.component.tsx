@@ -207,6 +207,7 @@ export function InputComponent({
           )}
         >
           {label}
+          {validations?.required && <span className="text-danger">*</span>}
         </label>
 
         {tip && (

@@ -325,6 +325,7 @@ export function SelectComponent({
           )}
         >
           {label}
+          {validations?.required && <span className="text-danger">*</span>}
         </label>
 
         {tip && (

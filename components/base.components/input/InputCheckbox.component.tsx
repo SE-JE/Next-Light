@@ -131,6 +131,7 @@ export function InputCheckboxComponent({
           )}
         >
           {label}
+          {validations?.required && <span className="text-danger">*</span>}
         </label>
 
         {tip && (

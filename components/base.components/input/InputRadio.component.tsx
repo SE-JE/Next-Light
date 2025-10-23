@@ -130,6 +130,7 @@ export function InputRadioComponent({
           )}
         >
           {label}
+          {validations?.required && <span className="text-danger">*</span>}
         </label>
 
         {tip && (

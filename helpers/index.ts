@@ -4,6 +4,7 @@ export * from "./middleware.helpers";
 export * from "./search.helpers";
 export * from "./form.helpers";
 export * from "./standIn.helpers";
+export * from "./cavity.helpers";
 export * from "./parseClassName.helpers";
 export * from "./className.helpers";
 export * from "./detectKeyboardOpen.helpers";

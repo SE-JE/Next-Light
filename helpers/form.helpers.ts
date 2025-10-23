@@ -86,7 +86,7 @@ const formReducer = (state: FormStateType, action: ActionType) => {
       ...state,
       formValues: action.payload as { name: string; value?: any }[],
     };
-    
+
     // ==============================>
     // ## Single value handler
     // ==============================>
@@ -97,7 +97,7 @@ const formReducer = (state: FormStateType, action: ActionType) => {
         { name: action.payload.name, value: action.payload.value },
       ],
     };
-    
+
     // ==============================>
     // ## Errors handler
     // ==============================>
@@ -192,7 +192,12 @@ export const useForm = (
       // ==============================>
       // ## Custom from payload
       // ==============================>
-      const payloadValues: Record<string, any> = payload(state.formValues);
+      const objValues = state.formValues.reduce<Record<string, any>>((acc, val) => {
+        acc[val.name] = val.value;
+        return acc;
+      }, {});
+      
+      const payloadValues: Record<string, any> = payload(objValues);
       Object.keys(payloadValues).forEach((key) => {
         formData.append(key, payloadValues[key]);
       });

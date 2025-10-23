@@ -124,6 +124,7 @@ export function InputDateComponent({
           )}
         >
           {label}
+          {validations?.required && <span className="text-danger">*</span>}
         </label>
 
         {tip && (
