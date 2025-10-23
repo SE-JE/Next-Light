@@ -21,7 +21,8 @@ export default function Register() {
                   name: "name",
                   label: "Nama",
                   placeholder: "Ex: Joko Gunawan",
-                  validations: { required: true }
+                  validations: { required: true },
+                  className: "label::!text-green-700"
                 }
               },
               {

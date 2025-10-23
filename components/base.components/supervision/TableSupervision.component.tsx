@@ -343,6 +343,7 @@ export default function TableSupervisionComponent({
       >
         <div className="p-4">
           <FormSupervisionComponent
+            defaultValue={formControl?.customDefaultValue}
             forms={forms as FormType[]}
             submitControl={{
               path: `${fetchControl.path}/${

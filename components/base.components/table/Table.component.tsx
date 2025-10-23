@@ -32,6 +32,7 @@ export type TableColumnType = {
   selector: string;
   label: string;
   width?: string;
+  item?: (data: any) => string | ReactNode;
   sortable?: boolean;
   className?: string;
 };
@@ -149,8 +150,8 @@ export function TableComponent({
   };
 
   function renderItem(item: object) {
-    const itemMapping = columnMapping.map(
-      (column) =>
+    const itemMapping = columnMapping.map((column) =>
+        column?.item ? column?.item(item) : 
         (typeof item[column.selector as keyof object] == "object"
           ? JSON.stringify(item[column.selector as keyof object])
           : item[column.selector as keyof object]) || "-"

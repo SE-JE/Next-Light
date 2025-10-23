@@ -27,8 +27,6 @@ export const parseClassName = <prefixType>(
           return classNameWithoutPrefix.split(":").slice(1).join(":");
         } else {
           if (/^(?!.*\b\w+:).*$/.test(classNameWithoutPrefix)) {
-            console.log(classNameWithoutPrefix);
-
             return classNameWithoutPrefix;
           } else {
             return "";
