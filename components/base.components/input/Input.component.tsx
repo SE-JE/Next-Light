@@ -23,7 +23,7 @@ export interface InputPropsType
   leftIcon?: any;
   rightIcon?: any;
 
-  value?: string;
+  value?: any;
   error?: string;
   suggestions?: string[];
 
@@ -31,7 +31,7 @@ export interface InputPropsType
   onlyAlphabet?: boolean;
   autoUppercase?: boolean;
 
-  onChange?: (value: string) => any;
+  onChange?: (value: any) => any;
   register?: (name: string, validations?: ValidationRulesType) => void;
 
   /** Use custom class with: "label::", "tip::", "error::", "icon::", "suggest::", "suggest-item::". */
@@ -58,7 +58,7 @@ export function InputComponent({
 
   ...props
 }: InputPropsType) {
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState<any>("");
   const [isFocus, setIsFocus] = useState(false);
   const [isInvalid, setIsInvalid] = useState("");
   const [isFirst, setIsFirst] = useState(true);
@@ -104,7 +104,7 @@ export function InputComponent({
   // ## change value handler
   // =========================>
   useEffect(() => {
-    setInputValue(value || "");
+    setInputValue(value && (props.type != "file" || value instanceof File) ? value : "");
     value && setIsFirst(false);
   }, [value]);
 
@@ -229,6 +229,7 @@ export function InputComponent({
             id={randomId}
             className={cn(
               "input",
+              props.type == "file" && "input-file",
               leftIcon && "pl-12",
               rightIcon && "pr-12",
               pcn<CT>(className, "base"),
@@ -240,7 +241,8 @@ export function InputComponent({
               setInputValue(e.target.value);
               setIsFirst(false);
               setIsInvalid("");
-              onChange?.(e.target.value);
+              // onChange?.(e.target.value);
+              onChange?.(props.type == "file" ? e.target?.files && e.target?.files[0] : e.target.value);
               dataSuggestions?.length && filterSuggestion(e);
             }}
             onFocus={(e) => {

@@ -80,11 +80,11 @@ body {
   }
 
   .input {
-    @apply px-4 py-2 rounded-[6px] text-foreground bg-background w-full transition duration-150 ease-in-out focus:outline-none border border-slate-300 shadow-inner placeholder:font-normal placeholder:text-light-foreground focus:!border-primary disabled:opacity-60;
+    @apply px-4 py-2 rounded-[6px] text-foreground bg-background w-full transition duration-150 ease-in-out focus:outline-none border border-slate-300 placeholder:font-normal placeholder:text-light-foreground focus:!border-primary disabled:opacity-60;
   }
 
   .input-file {
-    @apply file:-mx-3 file:-my-1 file:cursor-pointer file:overflow-hidden file:rounded-md file:border-0 file:border-solid file:border-inherit file:[margin-inline-end:0.75rem] file:[border-inline-end-width:1px] file:bg-light-primary file:px-3 file:py-1 file:text-slate-500;
+    @apply file:-mx-3 file:-my-1 file:cursor-pointer file:overflow-hidden file:rounded-md file:border-0 file:border-solid file:border-inherit file:[margin-inline-end:0.75rem] file:bg-slate-200 file:px-3 file:py-1 file:text-slate-500;
   }
 
   .input-label {

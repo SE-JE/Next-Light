@@ -6,6 +6,7 @@ import {
 } from "./button.decorate";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ReactNode } from "react";
+import Link from "next/link";
 
 type CT = "icon" | "loading" | "base";
 
@@ -19,6 +20,7 @@ export type ButtonPropsType = {
   disabled?: boolean;
   size?: "xs" | "sm" | "md" | "lg";
   onClick?: any;
+  href?: string;
   icon?: any;
   loading?: boolean;
   hover?: boolean;
@@ -37,6 +39,7 @@ export function ButtonComponent({
   disabled,
   size = "md",
   onClick,
+  href,
   icon,
   loading,
   className = "",
@@ -65,11 +68,12 @@ export function ButtonComponent({
   );
 
   return (
-    <button
+    <ButtonComponentWrapper
       type={type}
       className={buttonClasses}
       disabled={disabled || loading}
       onClick={onClick}
+      href={href}
     >
       {loading ? (
         <div className={loadingClasses}></div>
@@ -77,6 +81,11 @@ export function ButtonComponent({
         icon && <FontAwesomeIcon icon={icon} className={iconClasses} />
       )}
       {label}
-    </button>
+    </ButtonComponentWrapper>
   );
+}
+
+
+const ButtonComponentWrapper = (props: ButtonPropsType & {children?: ReactNode}) => {
+  return !props.href ? <button {...props} >{props.children}</button> : <Link href={props.href || ""} {...props}></Link> 
 }

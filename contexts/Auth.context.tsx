@@ -1,4 +1,4 @@
-import { middleware } from "@helpers/.";
+import { api, middleware } from "@helpers/.";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 interface AuthContextInterface {
@@ -27,8 +27,18 @@ export const AuthContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
   }
 
+  const fetchUser = async () => {
+    const fetch = await api({path: "me"});
+    
+    setUser(fetch?.data?.data)
+  }
+
   useEffect(() => {
-    setAccessToken(middleware.getAccessToken() || null)
+    const token = middleware.getAccessToken() || null;
+    
+    setAccessToken(token)
+
+    fetchUser()
   }, []);
 
   return (

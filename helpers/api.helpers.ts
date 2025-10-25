@@ -86,7 +86,7 @@ export const api = async ({
   
   const buildHeaders: Record<string, string>  =  {Authorization: authBearer(bearer) || "", ...headers};
 
-  buildHeaders["Content-Type"]                =  buildHeaders["Content-Type"] || "application/json";
+  buildHeaders["Content-Type"]                =  buildHeaders["Content-Type"] || "multipart/form-data";
   
   const filter: Record<string, any>           =  {};
   
@@ -103,7 +103,7 @@ export const api = async ({
       params   : {
         ...params,
         ...includeParams,
-        filter: params?.filter ? JSON.stringify(filter) : "",
+        ...(params?.filter ? { filter: JSON.stringify(filter)} : {})
       },
     })
     .then((res) => res)

@@ -1,58 +1,62 @@
-import { ButtonComponent, CardComponent } from "@/components/base.components";
-import FormSupervisionComponent from "@/components/base.components/supervision/FormSupervision.component";
 import { useAuthContext } from "@/contexts/Auth.context";
-import Link from "next/link";
+import { ButtonComponent, CardComponent } from "@components/.";
+import FormSupervisionComponent from "@components/supervision/FormSupervision.component";
 import { useRouter } from "next/router";
 import React from "react";
 
-export default function Login() {
+export default function EditProfile() {
+  const { user } = useAuthContext();
   const router = useRouter();
-  const {setAccessToken,setUser} = useAuthContext();
 
   return (
     <>
       <div className="h-screen flex flex-col justify-center items-center">
         <h1 className="text-2xl font-extrabold italic">WELCOME TO NEXT-LIGHT v.3</h1>
-        <p className="text-sm font-semibold mt-6">Sign in with your account!</p>
+        <p className="text-sm font-semibold mt-6">Edit account!</p>
 
         <CardComponent className="mt-4 p-6 w-[400px] rounded-2xl">
           <FormSupervisionComponent 
             forms={[
               {
                 construction: {
-                  name: "email",
-                  label: "E-mail",
-                  placeholder: "Ex: example@mail.com",
-                  validations: {required: true, email: true}
+                  name: "name",
+                  label: "Nama",
+                  placeholder: "Ex: Joko Gunawan",
+                  validations: { required: true },
                 }
               },
               {
                 construction: {
-                  type: "password",
-                  name: "password",
-                  label: "Password",
-                  placeholder: "Ex: secret123",
+                  name: "email",
+                  label: "E-mail",
+                  placeholder: "Ex: example@mail.com",
+                  validations: { required: true }
                 }
-              }
+              },
+              {
+                construction: {
+                  type: "file",
+                  name: "image",
+                  label: "Picture",
+                }
+              },
             ]}
+            defaultValue={user}
             submitControl={{
-              path: "login"
+              path: "me/update"
             }}
-            onSuccess={(res) => {
-              setAccessToken(res?.data?.token)
-              setUser(res?.data?.user)
+            onSuccess={() => {
               router.push("/auth/me")
             }}
-            footerControl={() => (
+            footerControl={({loading}) => (
               <>
                 <ButtonComponent
                   type="submit"
-                  label="Login Now"
+                  label="Save Changes"
                   block
                   className="mt-4"
+                  loading={loading}
                 />
-
-                <p className="mt-4 text-center">Don&apos;t have an account yet? <Link href="/auth/register" className="text-primary underline">Create Account</Link></p>
               </>
             )}
           />
