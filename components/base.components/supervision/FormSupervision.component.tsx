@@ -51,7 +51,7 @@ type formCustomConstructionProps = ({
   setRegister  ?:  (registers: FormRegisterType) => void;
 }) => ReactNode;
 
-type MapConstruction = {
+type ClusterConstruction = {
   name       :  string;
   label      :  string;
   tip        :  string;
@@ -68,7 +68,7 @@ type ConstructionMap = {
   datetime          :  InputDateTimeProps;
   time              :  InputTimeProps;
   image             :  InputImageProps;
-  map               :  MapConstruction;
+  cluster           :  ClusterConstruction;
   number            :  InputNumberProps;
   radio             :  InputRadioProps;
   select            :  SelectProps;
@@ -179,7 +179,7 @@ export function FormSupervisionComponent({
     "enter-password"  :  InputPasswordComponent,
     otp               :  InputOtpComponent,
     image             :  InputComponent,
-    map               :  () => null,
+    cluster           :  () => null,
     custom            :  () => null,
   };
 
@@ -189,8 +189,8 @@ export function FormSupervisionComponent({
 
     if (form?.onHide?.(values)) return null;
 
-    if (inputType === "map") {
-      const { name: mapName, forms: innerForms, label, tip, wrap, className } = form.construction as MapConstruction;
+    if (inputType === "cluster") {
+      const { name: mapName, forms: innerForms, label, tip, wrap, className } = form.construction as ClusterConstruction;
 
       const groupKey = prefix ? `${prefix}.${mapName}` : mapName;
       const group = mapGroups[groupKey] || [0];
