@@ -1,46 +1,56 @@
-import { cn, pcn } from "@/helpers";
+import { cn, pcn, useInputRandomId } from "@/utils";
 import { useEffect, useState } from "react";
+
+
 
 type CT = "label" | "checked" | "error" | "input";
 
-export type RadioPropsType = {
-  name: string;
-  label?: string;
-  disabled?: boolean;
-  value?: string;
-  onChange?: () => void;
-  checked?: boolean;
-  error?: string;
+export interface RadioProps {
+  name    :  string;
+  label  ?:  string;
+
+  value     ?:  string;
+  disabled  ?:  boolean;
+  checked   ?:  boolean;
+  invalid   ?:  string;
+
+  onChange  ?:  () => void;
+
   /** Use custom class with: "label::", "checked::", "error::". */
-  className?: string;
+  className  ?:  string;
 };
+
+
+
 
 export function RadioComponent({
   name,
   label,
-  disabled,
+
   value,
-  onChange,
+  disabled,
   checked,
-  error,
+  invalid,
+
+  onChange,
+
   className = "",
-}: RadioPropsType) {
+}: RadioProps) {
+
   // =========================>
   // ## initial
   // =========================>
-  const [randomId, setRandomId] = useState("");
-  const [isInvalid, setIsInvalid] = useState("");
+  const randomId                             =  useInputRandomId()
+  const [invalidMessage, setInvalidMessage]  =  useState("");
 
-  useEffect(() => {
-    setRandomId(Math.random().toString(36).substring(7));
-  }, []);
 
   // =========================>
   // ## invalid handler
   // =========================>
   useEffect(() => {
-    setIsInvalid(error || "");
-  }, [error]);
+    setInvalidMessage(invalid || "");
+  }, [invalid]);
+
 
   return (
     <>
@@ -78,16 +88,11 @@ export function RadioComponent({
               checked && pcn<CT>(className, "label", "checked"),
               disabled && pcn<CT>(className, "label", "disabled"),
             )}
-          >
-            {label}
-          </div>
+          >{label}</div>
         </label>
-        {isInvalid && (
-          <small
-            className={cn("input-error-message", pcn<CT>(className, "error"))}
-          >
-            {isInvalid}
-          </small>
+
+        {invalidMessage && (
+          <small className={cn("input-error-message", pcn<CT>(className, "error"))}>{invalidMessage}</small>
         )}
       </div>
     </>

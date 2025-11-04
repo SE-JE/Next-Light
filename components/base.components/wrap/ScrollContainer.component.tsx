@@ -1,23 +1,29 @@
-import { cn, pcn } from "@/helpers";
+import { cn, pcn } from "@/utils";
 import { useRef, useState, useEffect, ReactNode } from "react";
+
+
 
 type CT = "base" | "container" | "floating-scroll";
 
-interface ScrollContainerPropsType {
-  children: ReactNode;
-  scrollFloating?: boolean;
-  onScroll?: (e: any) => void;
+export interface ScrollContainerProps {
+  children         :  ReactNode;
+  footer          ?:  ReactNode;
+  scrollFloating  ?:  boolean;
+  onScroll        ?:  (e: any) => void;
 
   /** Use custom class with: "container::", "floating-scroll::"". */
   className?: string;
 }
 
+
+
 export function ScrollContainerComponent({
   children,
+  footer,
   className = "",
   scrollFloating = false,
   onScroll,
-}: ScrollContainerPropsType) {
+}: ScrollContainerProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const floatingScrollbarRef = useRef<HTMLDivElement | null>(null);
   const floatingScrollbarContainerRef = useRef<HTMLDivElement | null>(null);
@@ -89,9 +95,8 @@ export function ScrollContainerComponent({
   useEffect(() => {
     handleResize();
     window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
+    
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   useEffect(() => {
@@ -137,6 +142,8 @@ export function ScrollContainerComponent({
           </div>
         </div>
       )}
+
+      {footer}
     </div>
   );
 }

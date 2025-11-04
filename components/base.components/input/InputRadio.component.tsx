@@ -1,88 +1,80 @@
 import React, { ReactNode, useEffect, useState } from "react";
-import {
-  api,
-  ApiType,
-  cn,
-  pcn,
-  useValidationHelper,
-  ValidationRulesType,
-} from "../../../helpers";
-import { RadioComponent } from "./Radio.component";
+import { api, ApiType, cn, pcn, useInputHandler, useValidation, validation } from "@utils/.";
+import { RadioComponent } from "@components/.";
+
+
 
 type CT = "label" | "tip" | "error" | "input" | "icon";
 
-export type InputRadioOptionPropsType = {
+export type InputRadioOptionProps = {
   value: string | number;
   label: string;
 };
 
-export type InputRadioPropsType = {
+export type InputRadioProps = {
   name                  :  string;
   label                ?:  string;
   tip                  ?:  string | ReactNode;
   vertical             ?:  boolean;
 
+  value                ?:  string | number;
+  disabled             ?:  boolean;
+  invalid              ?:  string;
+  options              ?:  InputRadioOptionProps[];
+  serverOptionControl  ?:  ApiType;
+  customOptions        ?:  any;
+  validations          ?:  string;
+
+  onChange  ?:  (value: string | number) => any;
+  register  ?:  (name: string, validations?: string) => void;
+
   /** Use custom class with: "label::", "tip::", "error::", "icon::", "suggest::", "suggest-item::". */
   className            ?: string;
   /** Use custom class with: "label::", "checked::", "error::". */
   classNameCheckbox    ?: string;
-
-  value                ?:  string | number;
-  disabled             ?:  boolean;
-  error                ?:  string;
-  
-  options              ?:  InputRadioOptionPropsType[];
-  serverOptionControl  ?:  ApiType;
-  customOptions        ?:  any;
-  validations          ?:  ValidationRulesType;
-  
-
-  onChange?: (value: string | number) => any;
-  register?: (name: string, validations?: ValidationRulesType) => void;
 };
+
+
 
 export function InputRadioComponent({
   name,
   label,
   tip,
   vertical,
-  className = "",
-  classNameCheckbox = "",
 
   value,
   disabled,
-  error,
+  invalid,
 
   options,
   serverOptionControl,
   customOptions,
   validations,
 
-  register,
   onChange,
-}: InputRadioPropsType) {
-  const [isInvalid, setIsInvalid]      =  useState("");
-  const [inputValue, setInputValue]    =  useState<string | number>("");
-  const [dataOptions, setDataOptions]  =  useState<InputRadioPropsType[]>([]);
+  register,
+
+  className = "",
+  classNameCheckbox = "",
+}: InputRadioProps) {
+  const [dataOptions, setDataOptions]  =  useState<InputRadioOptionProps[]>([]);
   const [loading, setLoading]          =  useState(false);
 
-  // =========================>
-  // ## initial
-  // =========================>
-  useEffect(() => {
-    register?.(name || "", validations);
-  }, [name, validations]);
-
-  useEffect(() => {
-    if (value) {
-      setInputValue(value);
-    } else {
-      setInputValue("");
-    }
-  }, [value]);
 
   // =========================>
-  // ## fetch option
+  // ## Initial
+  // =========================>
+  const inputHandler  =  useInputHandler(name, value, validations, register, false)
+
+
+  // =========================>
+  // ## Invalid handler
+  // =========================>
+  const [invalidMessage]  =  useValidation(inputHandler.value, validations, invalid, inputHandler.idle);
+
+
+  // =========================>
+  // ## Fetch option
   // =========================>
   useEffect(() => {
     const fetchOptions = async () => {
@@ -103,19 +95,6 @@ export function InputRadioComponent({
     }
   }, [serverOptionControl?.path, serverOptionControl?.url]);
 
-  // =========================>
-  // ## invalid handler
-  // =========================>
-  const [errorMessage] = useValidationHelper({
-    value: inputValue,
-    rules: validations,
-  });
-
-  useEffect(() => {
-    setIsInvalid(errorMessage || error || "");
-  }, [error, errorMessage]);
-
-  const dummy = vertical ? [1, 2, 3, 4, 5, 6, 7, 8, 9] : [1, 2, 3];
 
   return (
     <>
@@ -126,12 +105,12 @@ export function InputRadioComponent({
             pcn<CT>(className, "label"),
             disabled && "opacity-50",
             disabled && pcn<CT>(className, "label", "disabled"),
-            isInvalid && "text-danger",
-            isInvalid && pcn<CT>(className, "label", "focus"),
+            !!invalidMessage && "text-danger",
+            !!invalidMessage && pcn<CT>(className, "label", "focus"),
           )}
         >
           {label}
-          {validations?.required && <span className="text-danger">*</span>}
+          {validations && validation.hasRules(validations, "required") && <span className="text-danger">*</span>}
         </label>
 
         {tip && (
@@ -142,9 +121,7 @@ export function InputRadioComponent({
               disabled && "opacity-60",
               disabled && pcn<CT>(className, "tip", "disabled"),
             )}
-          >
-            {tip}
-          </small>
+          >{tip}</small>
         )}
 
         <div
@@ -153,21 +130,14 @@ export function InputRadioComponent({
               vertical && `flex-col flex-wrap ${vertical}`
             }`,
             pcn<CT>(className, "input"),
-            isInvalid && "input-error",
-            isInvalid && pcn<CT>(className, "input", "error"),
+            !!invalidMessage && "input-error",
+            !!invalidMessage && pcn<CT>(className, "input", "error"),
           )}
         >
-          {loading &&
-            dummy.map((_, key) => {
-              return (
-                <>
-                  <div
-                    key={key}
-                    className="w-1/3 h-6 skeleton-loading rounded-lg"
-                  ></div>
-                </>
-              );
-            })}
+          {loading && (vertical ? [1, 2, 3, 4, 5, 6, 7, 8, 9] : [1, 2, 3]).map((_, key) => {
+            return <div key={key} className="w-1/3 h-6 skeleton-loading rounded-lg"></div>;
+          })}
+
           {(options || dataOptions) &&
             (options || dataOptions)?.map((option, key) => {
               return (
@@ -175,15 +145,15 @@ export function InputRadioComponent({
                   key={key}
                   label={option.label}
                   name={`option[${option.value}]#${name}`}
-                  checked={inputValue == option.value}
+                  checked={inputHandler.value == option.value}
                   disabled={disabled}
                   className={classNameCheckbox}
                   onChange={() => {
-                    if (inputValue == option.value) {
-                      setInputValue("");
+                    if (inputHandler.value == option.value) {
+                      inputHandler.setValue("");
                       onChange?.("");
                     } else {
-                      setInputValue(option.value || "");
+                      inputHandler.setValue(option.value || "");
                       onChange?.(option.value || "");
                     }
                   }}
@@ -191,6 +161,10 @@ export function InputRadioComponent({
               );
             })}
         </div>
+
+        {invalidMessage && (
+          <small className={cn("input-error-message", pcn<CT>(className, "error"))}>{invalidMessage}</small>
+        )}
       </div>
     </>
   );

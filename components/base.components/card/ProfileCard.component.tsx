@@ -1,26 +1,32 @@
-import { cn, pcn } from "@/helpers";
-import Image from "next/image";
 import React from "react";
+import Image from "next/image";
+import { cn, pcn } from "@utils/.";
+
+
 
 type CT = "image" | "base" | "content";
 
+export interface ProfileCardProps {
+  name          :  string;
+  short        ?:  string;
+  image        ?:  string;
+  description  ?:  string | React.ReactNode;
+  footer       ?:  string | React.ReactNode;
+
+  /** Use custom class with: "image::", "content::". */
+  className  ?:  string;
+}
+
+
+
 export function ProfileCardComponent({
-  image = "",
+  image  =  "",
   name,
   short,
   description,
   footer,
-  className = "",
-}: {
-  name: string;
-  short?: string;
-  image?: string;
-  description?: string | React.ReactNode;
-  footer?: string | React.ReactNode;
-
-  /** Use custom class with: "image::", "content::". */
-  className?: string;
-}) {
+  className  =  "",
+} : ProfileCardProps) {
   return (
     <>
       <div

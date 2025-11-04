@@ -2,29 +2,34 @@ import React, { ReactNode } from "react";
 import Link from "next/link";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { cn, pcn } from "@/helpers";
+import { cn, pcn } from "@utils/.";
+
+
 
 type CT = "container" | "active" | "base";
 
-export type BreadcrumbItemPropsType = {
-  path: string;
-  label: string;
-  className?: string;
+export interface BreadcrumbItemProps {
+  path        :  string;
+  label       :  string;
+  className  ?:  string;
 };
+
+export interface BreadcrumbProps {
+  items              :  BreadcrumbItemProps[];
+  square            ?:  boolean;
+  separatorContent  ?:  string | ReactNode;
+
+  /** Use custom class with: "container::", "active::". */
+  className  ?:  string;
+};
+
 
 export function BreadcrumbComponent({
   items,
-  className = "",
-  square = false,
+  className  =  "",
+  square     =  false,
   separatorContent,
-}: {
-  items: BreadcrumbItemPropsType[];
-  square?: boolean;
-  separatorContent?: string | ReactNode;
-
-  /** Use custom class with: "container::", "active::". */
-  className?: string;
-}) {
+}: BreadcrumbProps) {
   return (
     <nav
       className={cn(
@@ -53,6 +58,7 @@ export function BreadcrumbComponent({
                   {item.label}
                 </Link>
               </li>
+              
               {!isActive && (
                 <li className="mx-2">
                   {separatorContent || (

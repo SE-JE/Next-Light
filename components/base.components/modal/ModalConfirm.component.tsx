@@ -1,33 +1,31 @@
 import { ReactNode, useEffect, useState } from "react";
 import { faQuestion } from "@fortawesome/free-solid-svg-icons";
-import { ButtonComponent, ButtonPropsType } from "../button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  api,
-  ApiType,
-  cn,
-  pcn,
-} from "@/helpers";
-import { ToastComponent } from "./Toast.component";
+import { api, ApiType, cn, pcn } from "@utils/.";
+import { ToastComponent, ButtonComponent, ButtonProps } from "@components/.";
+
+
 
 type CT = "base" | "backdrop" | "header" | "footer";
 
-export type ModalConfirmPropsType = {
+export interface ModalConfirmProps {
   show            :  boolean;
+  onClose         :  () => void;
   title          ?:  string | ReactNode;
   children       ?:  any;
   icon           ?:  any;
   footer         ?:  string | ReactNode;
-  submitControl  ?: ButtonPropsType & {
+  submitControl  ?:  ButtonProps & {
     onSubmit     ?:  ApiType | (() => void);
     onSuccess    ?:  () => void;
     onError      ?:  () => void;
   };
-  onClose: () => void;
 
   /** Use custom class with: "backdrop::", "header::", "footer::". */
-  className?: string;
+  className  ?:  string;
 };
+
+
 
 export function ModalConfirmComponent({
   show,
@@ -40,7 +38,7 @@ export function ModalConfirmComponent({
   onClose,
 
   className = "",
-}: ModalConfirmPropsType) {
+}: ModalConfirmProps) {
   const [toast, setToast] = useState<boolean | "success" | "failed">(false);
   const [loading, setLoading] = useState(false);
 

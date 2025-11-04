@@ -1,11 +1,13 @@
 import { ReactNode, useEffect, useState } from "react";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
-import { IconButtonComponent } from "../button";
-import { cn, pcn } from "@/helpers";
+import { cn, pcn } from "@utils/.";
+import { IconButtonComponent } from "@components/.";
+
+
 
 type CT = "base" | "backdrop" | "header" | "footer";
 
-export type ToastPropsType = {
+export interface ToastProps {
   show: boolean;
   onClose: () => void;
   title?: string | ReactNode;
@@ -16,6 +18,8 @@ export type ToastPropsType = {
   className?: string;
 };
 
+
+
 export function ToastComponent({
   show,
   onClose,
@@ -23,7 +27,7 @@ export function ToastComponent({
   children,
   footer,
   className = "",
-}: ToastPropsType) {
+}: ToastProps) {
   const [countdown, setCountdown] = useState(5);
   const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null);
 

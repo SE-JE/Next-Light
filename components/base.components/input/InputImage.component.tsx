@@ -1,298 +1,206 @@
-// import { useEffect, useRef, useState } from 'react';
-// import { faCamera, faHandHolding } from '@fortawesome/free-solid-svg-icons';
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-// // import AvatarEditor from 'react-avatar-editor';
-// import { inputImageProps } from './props/input-image.props';
-// import styles from './input.module.css';
-// import { validationLangs } from '../../../langs';
-// import { inputLabel } from './input.decorate';
-// import { useValidationHelper } from '../../../helpers';
+import React, { useEffect, useRef, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCamera, faHandHolding, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { cn, pcn, useInputHandler, useInputRandomId, useValidation, validation } from "@utils/.";
+import { IconButtonComponent } from "@components/.";
 
-// export default function InputImageComponent({
-//   name,
-//   label,
-//   onChange,
-//   value,
-//   disabled,
-//   // placeholder,
-//   aspect,
-//   error,
-//   uploadUrl,
-//   validations,
-//   register,
-// }: // uploadFolder,
-// // crop,
-// // cropSize,
-// inputImageProps) {
-//   const [inputValue, setInputValue] = useState<string | File>('');
-//   const [isInvalid, setIsInvalid] = useState('');
-//   const [dragActive, setDragActive] = useState(false);
-//   // const [imageCrop, setImageCrop] = useState(false);
 
-//   useEffect(() => {
-//     register?.(name, validations);
-//   }, [register, name, validations]);
 
-//   const inputRef = useRef<HTMLInputElement>(null);
+type CT = "label" | "error" | "input" | "tip";
 
-//   const [errorMessage] = useValidationHelper({
-//     value: inputValue,
-//     rules: validations,
-//   });
+export interface InputImageProps {
+  name    :  string;
+  label  ?:  string;
+  tip    ?:  string;
 
-//   useEffect(() => {
-//     if (value) {
-//       // if (onChange && !uploadUrl) {
-//       setInputValue(
-//         (typeof value == 'object' ? URL.createObjectURL(value) : value) || ''
-//       );
-//       // } else {
-//       //   setInputValue(STORAGE_URL + '/' + value);
-//       // }
-//     } else {
-//       setInputValue('');
-//     }
-//   }, [value]);
+  value        ?:  string | File;
+  aspect       ?:  string;
+  invalid      ?:  string;
+  disabled     ?:  boolean;
+  validations  ?:  string;
 
-//   // =========================>
-//   // ## invalid handler
-//   // =========================>
-//   useEffect(() => {
-//     setIsInvalid(errorMessage || error || '');
-//   }, [error, errorMessage]);
+  onChange  ?:  (file?: File | null) => void;
+  register  ?:  (name: string, rules?: string) => void;
 
-//   const upload = async (e: any) => {
-//     var image = e.target.files[0];
+  /** Use custom class with: "label::", "error::". */
+  className  ?:  string;
+};
 
-//     const allowedExtension = [
-//       'image/jpeg',
-//       'image/jpg',
-//       'image/png',
-//       'image/svg',
-//     ];
 
-//     if (image && !allowedExtension.includes(image.type)) {
-//       setIsInvalid(
-//         validationLangs.extensionNotAllowed.replace(
-//           '@extension',
-//           'png/jpg/jpeg/svg'
-//         )
-//       );
-//     } else {
-//       !uploadUrl && setInputValue(image ? URL.createObjectURL(image) : '');
 
-//       if (onChange && !uploadUrl) {
-//         onChange(e.target.files[0]);
-//       }
-//     }
 
-//     // if (crop) {
-//     //   setImageCrop(image);
-//     // } else {
+export const InputImageComponent: React.FC<InputImageProps> = ({
+  name,
+  label,
+  tip,
 
-//     // if (onChange && uploadUrl) {
-//     //   const formData = new FormData();
+  value,
+  disabled,
+  aspect = "1/1",
+  invalid,
+  validations,
 
-//     //   formData.append('file_image', e.target.files[0]);
+  onChange,
+  register,
 
-//     //   if (uploadFolder) {
-//     //     formData.append('folder_name', uploadFolder);
-//     //   }
+  className = "",
+}) => {
 
-//     //   const upload = await post('admin/hotel/upload-image', formData);
+  const inputRef                     =  useRef<HTMLInputElement>(null);
+  const [preview, setPreview]        =  useState<string>("");
+  const [dragActive, setDragActive]  =  useState(false);
 
-//     //   if (upload?.status == 200) {
-//     //     onChange(upload.data.file_name);
-//     //     setImage(STORAGE_URL + '/' + upload.data.file_name);
-//     //   }
-//     // }
-//     // }
-//   };
 
-//   // handle drag events
-//   const handleDrag = function (e: any) {
-//     e.preventDefault();
-//     e.stopPropagation();
-//     if (e.type === 'dragenter' || e.type === 'dragover') {
-//       setDragActive(true);
-//     } else if (e.type === 'dragleave') {
-//       setDragActive(false);
-//     }
-//   };
+  // =========================>
+  // ## Invalid handler
+  // =========================>
+  const inputHandler  =  useInputHandler(name, value, validations, register, true)
+  const randomId      =  useInputRandomId()
 
-//   // triggers when file is dropped
-//   const handleDrop = function (e: any) {
-//     e.preventDefault();
-//     e.stopPropagation();
-//     setDragActive(false);
-//     if (e.dataTransfer.files && e.dataTransfer.files[0] && inputRef.current) {
-//       inputRef.current.files = e.dataTransfer.files;
 
-//       let image = e.dataTransfer.files[0];
+  // =========================>
+  // ## Invalid handler
+  // =========================>
+  const [invalidMessage, setInvalidMessage]  =  useValidation(inputHandler.value, validations, invalid, inputHandler.idle);
 
-//       if (!uploadUrl) {
-//         setInputValue(image ? URL.createObjectURL(image) : '');
-//       }
-//     }
-//   };
 
-//   // const [zoom, setZoom] = useState('1');
-//   // const imageRef = useRef();
+  useEffect(() => {
+    if (value) {
+      const url = typeof value === "object" ? URL.createObjectURL(value) : value;
+      
+      setPreview(url);
+      
+      return () => { (typeof value === "object") && URL.revokeObjectURL(url) };
+    } else {
+      setPreview("");
+    }
+  }, [value]);
 
-//   // const onCropDown = () => {
-//   //   if (imageRef.current) {
-//   //     // This returns a HTMLCanvasElement, it can be made into a data URL or a blob,
-//   //     // drawn on another canvas, or added to the DOM.
-//   //     const canvas = imageRef.current.getImage().toDataURL();
-//   //     setImage(canvas);
-//   //     setImageCrop(false);
 
-//   //     onChange && onChange(dataURLtoFile(canvas, name));
+  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-//   //     // If you want the image resized to the canvas size (also a HTMLCanvasElement)
-//   //     const canvasScaled = imageRef.current.getImageScaledToCanvas();
-//   //   }
-//   // };
+    const allowed = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
-//   // useEffect(() => {
-//   //   setZoom(1);
-//   //   if (!imageCrop) {
-//   //     inputRef.current.value = null;
-//   //   }
-//   // }, [imageCrop]);
+    if (!allowed.includes(file.type)) {
+      setInvalidMessage("Format gambar tidak diperbolehkan (hanya JPG/PNG/WebP).");
+      return;
+    }
 
-//   // function dataURLtoFile(dataurl, filename) {
-//   //   var arr = dataurl.split(','),
-//   //     mime = arr[0].match(/:(.*?);/)[1],
-//   //     bstr = atob(arr[1]),
-//   //     n = bstr.length,
-//   //     u8arr = new Uint8Array(n);
+    setInvalidMessage("");
 
-//   //   while (n--) {
-//   //     u8arr[n] = bstr.charCodeAt(n);
-//   //   }
+    const url = URL.createObjectURL(file);
+    setPreview(url);
+    onChange?.(file);
+  };
 
-//   //   return new File([u8arr], filename, { type: mime });
-//   // }
 
-//   return (
-//     <>
-//       <div className="relative">
-//         <label htmlFor={name} className="cursor-pointer">
-//           <label
-//             htmlFor={`input_${name}`}
-//             className={`
-//             select-none
-//             ${inputLabel['md']}
-//             ${disabled && 'opacity-60'}
-//           `}
-//           >
-//             {label}
-//           </label>
-//           <div
-//             // htmlFor={name}
-//             style={{
-//               backgroundImage: 'url(' + inputValue + ')',
-//               filter: inputValue ? 'brightness(0.9)' : '',
-//               aspectRatio: aspect || '1/1',
-//             }}
-//             className={`
-//               bg-background text-slate-400 w-full border-[1px] shadow-inner relative flex flex-col gap-y-5 justify-center items-center m-auto rounded-lg bg-cover bg-no-repeat
-//               ${dragActive ? 'border-primary' : 'border-emerald-100'}
-//               ${!disabled && 'cursor-pointer '}
-//               ${isInvalid && 'outline__danger'}
-//             `}
-//             onDragEnter={handleDrag}
-//           >
-//             {!disabled &&
-//               (inputValue ? (
-//                 <FontAwesomeIcon className="text-3xl" icon={faCamera} />
-//               ) : (
-//                 <>
-//                   <FontAwesomeIcon
-//                     className="text-2xl"
-//                     icon={dragActive ? faHandHolding : faCamera}
-//                   />
-//                   <p className="text-sm">
-//                     {dragActive ? 'Letakkan disini' : 'Pilih gambar'}
-//                   </p>
-//                 </>
-//               ))}
-//           </div>
-//           {/* {!ImageValid && (
-//               <div className='text__danger mt-3'>
-//                 Image Extension Only (.jpg, .jpeg, .png, .svg)
-//               </div>
-//             )} */}
-//           <input
-//             ref={inputRef}
-//             type="file"
-//             id={name}
-//             name={name}
-//             onChange={upload}
-//             className="hidden"
-//             disabled={disabled}
-//             accept="image/*"
-//           />
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
 
-//           {dragActive && (
-//             <div
-//               className="absolute w-full h-full top-0 left-0"
-//               onDragEnter={handleDrag}
-//               onDragLeave={handleDrag}
-//               onDragOver={handleDrag}
-//               onDrop={handleDrop}
-//             ></div>
-//           )}
-//         </label>
+    setDragActive(false);
+    const file = e.dataTransfer.files?.[0];
 
-//         {isInvalid && (
-//           <small
-//             className={`
-//               overflow-x-hidden
-//               ${styles.input__error__message}
-//               text-sm
-//             `}
-//           >
-//             {isInvalid}
-//           </small>
-//         )}
-//       </div>
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setPreview(url);
+      onChange?.(file);
+    }
+  };
 
-//       {/* <ModalComponent
-//         onClose={() => setImageCrop(false)}
-//         show={imageCrop}
-//         title={'Sesuaikan ukuran gambar'}
-//         footer={(
-//           <div className='flex justify-end'>
-//             <ButtonComponent
-//               icon={faSave}
-//               label={"Simpan"}
-//               bg="primary"
-//               color={"background"}
-//               size="sm"
-//               onClick={() => onCropDown()}
-//             />
-//           </div>
-//         )}
-//       >
-//         <div className='flex justify-center'>
-//           <div onWheel={(e) => e.deltaY < 0 ? setZoom(zoom + 0.01) : (zoom > 1) && setZoom(zoom - 0.01)}>
-//             <AvatarEditor
-//               ref={imageRef}
-//               image={imageCrop}
-//               width={cropSize?.at(0) ? cropSize[0] : 200}
-//               height={cropSize?.at(1) ? cropSize[1] : 200}
-//               // border={20}
-//               border={[20, 20]}
-//               color={[34, 40, 49, 0.5]} // RGBA
-//               scale={+zoom}
-//               rotate={0}
-//               borderRadius={0}
-//             />
-//           </div>
-//         </div>
-//       </ModalComponent> */}
-//     </>
-//   );
-// }
+
+  const handleRemove = () => {
+    setPreview("");
+    onChange?.(null);
+    if (inputRef.current) inputRef.current.value = "";
+  };
+
+
+  return (
+    <div className="w-full relative">
+      {label && (
+        <label
+          htmlFor={randomId}
+          className={cn(
+            "mb-1 block text-sm font-medium select-none",
+            pcn<CT>(className, "label"),
+            disabled ? "opacity-60" : ""
+          )}
+        >
+          {label}
+          {validations && validation.hasRules(validations, "required") && <span className="text-danger">*</span>}
+        </label>
+      )}
+
+      {tip && (
+        <small
+          className={cn(
+            "input-tip",
+            pcn<CT>(className, "tip"),
+            disabled && "opacity-60"
+          )}
+        >{tip}</small>
+      )}
+
+      <label htmlFor={randomId}>
+        <div
+          className={cn(
+            "border rounded-xl w-full flex flex-col items-center justify-center overflow-hidden cursor-pointer bg-background transition-all duration-200 relative",
+            "border-dashed border-2 p-2",
+            pcn<CT>(className, "input"),
+            dragActive ? "border-primary" : "border-gray-200",
+            !!invalidMessage && "border-red-500"
+          )}
+          style={{
+            aspectRatio: aspect,
+            backgroundImage: preview ? `url(${preview})` : undefined,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+          onDragEnter={(e) => {
+            e.preventDefault();
+            setDragActive(true);
+          }}
+          onDragLeave={(e) => {
+            e.preventDefault();
+            setDragActive(false);
+          }}
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={handleDrop}
+        >
+          {!preview && (
+            <div className="flex flex-col items-center text-gray-400">
+              <FontAwesomeIcon
+                icon={dragActive ? faHandHolding : faCamera}
+                className="text-3xl mb-1"
+              />
+              <p className="text-xs">
+                {dragActive ? "Letakkan di sini" : "Klik atau seret gambar"}
+              </p>
+            </div>
+          )}
+
+          <input
+            ref={inputRef}
+            id={randomId}
+            name={name}
+            type="file"
+            accept="image/*"
+            disabled={disabled}
+            onChange={handleUpload}
+            className="hidden"
+          />
+        </div>
+      </label>
+
+      {preview && !disabled && (
+        <IconButtonComponent icon={faTrash} onClick={handleRemove} variant="light" paint="danger" size="xs" className="absolute top-10 right-4" />
+      )}
+
+      {invalidMessage && (
+        <small className={cn("input-error-message", pcn<CT>(className, "error"))}>{invalidMessage}</small>
+      )}
+    </div>
+  );
+};

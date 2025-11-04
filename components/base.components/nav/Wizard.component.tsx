@@ -1,6 +1,14 @@
-import React from "react";
+import React, { ReactNode } from "react";
 
-export function WizardComponent({ items, active }) {
+export interface WizardProps {
+  items   :  {label: string, circle_content: ReactNode}[];
+  active  :  number;
+};
+
+export function WizardComponent({ 
+  items, 
+  active 
+}: WizardProps) {
   return (
     <div>
       <div className="w-full py-4">

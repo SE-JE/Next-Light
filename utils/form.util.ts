@@ -1,11 +1,11 @@
-import { useReducer, useEffect } from "react";
-import { api, ApiType } from "./api.helpers";
-import { validationHelper, ValidationRulesType } from "@helpers/.";
+import { useReducer, useEffect, useState } from "react";
+import { api, ApiType } from "./api.util";
+import { validation } from "@/utils";
 
 export interface FormRegisterType { 
   name         : string; 
-  status       : boolean; 
-  validations ?: ValidationRulesType;
+  status      ?: boolean; 
+  validations ?: string;
 }
 
 export interface FormValueType { 
@@ -156,13 +156,13 @@ export const useForm = (
   // ## FormControl handler
   // ==============================>
   const formControl  =  (name: string)  =>  ({
-    register  : (regName: string, regValidations?: ValidationRulesType) => dispatch({
+    register  : (regName: string, regValidations?: string) => dispatch({
       type    : "SET_REGISTER",
       payload : { name: regName, validations: regValidations },
     }),
     onChange  :  (e: any)                                        =>  onChange(name, e),
     value     :  state.formValues.find((val)                     =>  val.name === name)?.value || undefined,
-    error     :  state.formErrors.find((err: { name: string })   =>  err.name === name)?.error || undefined,
+    invalid   :  state.formErrors.find((err: { name: string })   =>  err.name === name)?.error || undefined,
   });
 
 
@@ -231,8 +231,8 @@ export const useForm = (
         name: key,
         error: execute.data.errors[key][0],
       }));
-      dispatch({ type: "SET_ERRORS", payload: errors });
       onFailed?.(execute?.status || 500);
+      dispatch({ type: "SET_ERRORS", payload: errors });
       dispatch({ type: "SET_LOADING", payload: false });
       dispatch({ type: "SET_CONFIRM", payload: false });
     } else {
@@ -259,7 +259,7 @@ export const useForm = (
     // ## Check register validation
     // ==============================>
     state.formRegisters.forEach((form) => {
-      const { valid, message } = validationHelper({
+      const { valid, message } = validation.check({
         value: state.formValues.find((val) => val.name === form.name)?.value,
         rules: form.validations,
       });
@@ -325,4 +325,54 @@ export const useForm = (
       },
     },
   ];
+};
+
+
+
+// ==============================>
+// ## Generate random id
+// ==============================>
+export const useInputRandomId = () => {
+  const [randomId, setRandomId]  =  useState("");
+
+  useEffect(() => {
+      setRandomId(Math.random().toString(36).substring(7));
+    }, []);
+
+  return randomId;
+};
+
+
+// ==============================>
+// ## Input handle
+// ==============================>
+export const useInputHandler = (
+  name?: string, 
+  value?: any, 
+  validations?: string,
+  register?: (name: string, validations?: string) => void,
+  isFile: boolean = false,
+) => {
+  const [inputValue, setInputValue]                    =  useState<any>("");
+  const [focus, setFocus]                              =  useState<boolean>(false);
+  // const [invalid, setInvalid]                          =  useState("");
+  const [idle, setIdle]                                =  useState(true);
+
+  useEffect(() => {
+    name && register?.(name || "", validations);
+  }, [name, validations]);
+
+  useEffect(() => {
+    setInputValue(value && (!isFile || value instanceof File) ? value : "");
+    value && setIdle(false);
+  }, [value]);
+
+  return {
+    value: inputValue, 
+    setValue: setInputValue,
+    idle,
+    setIdle,
+    focus,
+    setFocus
+  };
 };

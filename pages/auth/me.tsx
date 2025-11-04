@@ -1,6 +1,6 @@
 import { ButtonComponent, CardComponent } from "@/components/base.components";
 import { useAuthContext } from "@/contexts/Auth.context";
-import { middleware } from "@/helpers";
+import { middleware } from "@/utils";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import React from "react";

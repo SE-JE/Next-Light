@@ -1,21 +1,25 @@
 import { ReactNode, useEffect } from "react";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
-import { IconButtonComponent } from "../button";
-import { cn, pcn } from "@/helpers";
+import { cn, pcn } from "@utils/.";
+import { IconButtonComponent } from "@components/.";
+
+
 
 type CT = "base" | "backdrop" | "header" | "footer";
 
-export type ModalPropsType = {
-  show: boolean;
-  onClose: () => void;
-  title?: string | ReactNode;
-  children?: any;
-  tip?: string | ReactNode;
-  footer?: string | ReactNode;
+export interface ModalProps {
+  show       :  boolean;
+  onClose    :  () => void;
+  title     ?:  string | ReactNode;
+  children  ?:  any;
+  tip       ?:  string | ReactNode;
+  footer    ?:  string | ReactNode;
 
   /** Use custom class with: "backdrop::", "header::", "footer::". */
-  className?: string;
+  className  ?:  string;
 };
+
+
 
 export function ModalComponent({
   show,
@@ -25,7 +29,7 @@ export function ModalComponent({
   tip,
   footer,
   className = "",
-}: ModalPropsType) {
+}: ModalProps) {
   useEffect(() => {
     if (show) {
       document.getElementsByTagName("body")[0].style.overflow = "hidden";
@@ -57,9 +61,7 @@ export function ModalComponent({
           <div className={cn("modal-header", pcn<CT>(className, "header"))}>
             <div>
               <h6 className="text-lg font-semibold text-foreground">{title}</h6>
-              <p className="text-sm text-light-foreground leading-4 mt-1">
-                {tip}
-              </p>
+              <p className="text-sm text-light-foreground leading-4 mt-1">{tip}</p>
             </div>
 
             <IconButtonComponent

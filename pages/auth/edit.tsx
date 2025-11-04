@@ -1,6 +1,5 @@
 import { useAuthContext } from "@/contexts/Auth.context";
-import { ButtonComponent, CardComponent } from "@components/.";
-import FormSupervisionComponent from "@components/supervision/FormSupervision.component";
+import { ButtonComponent, CardComponent, FormSupervisionComponent } from "@components/.";
 import { useRouter } from "next/router";
 import React from "react";
 
@@ -22,7 +21,6 @@ export default function EditProfile() {
                   name: "name",
                   label: "Nama",
                   placeholder: "Ex: Joko Gunawan",
-                  validations: { required: true },
                 }
               },
               {
@@ -30,7 +28,6 @@ export default function EditProfile() {
                   name: "email",
                   label: "E-mail",
                   placeholder: "Ex: example@mail.com",
-                  validations: { required: true }
                 }
               },
               {

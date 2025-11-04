@@ -1,46 +1,58 @@
+import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
-import { cn, pcn } from "@/helpers";
-import { useEffect, useState } from "react";
-type CT = "label" | "checked" | "error" | "base";
+import { cn, pcn, useInputRandomId } from "@utils/.";
 
-export type CheckboxPropsType = {
-  name: string;
-  label?: string;
-  disabled?: boolean;
-  value?: string;
-  onChange?: () => void;
-  checked?: boolean;
-  error?: string;
+
+
+type CT  =  "label" | "checked" | "error" | "base";
+
+export type CheckboxProps = {
+  name    :  string;
+  label  ?:  string;
+  
+  value     ?:  string;
+  disabled  ?:  boolean;
+  checked   ?:  boolean;
+  invalid   ?:  string;
+  
+  onChange  ?:  () => void;
 
   /** Use custom class with: "label::", "checked::", "error::". */
-  className?: string;
+  className  ?:  string;
 };
 
+
+
 export function CheckboxComponent({
+  name,
   label,
-  name = "",
-  onChange,
-  checked = false,
+
   value,
   disabled = false,
-  error = "",
+  checked = false,
+  invalid,
+
+  onChange,
+
   className = "",
-}: CheckboxPropsType) {
-  const [randomId, setRandomId] = useState("");
+}: CheckboxProps) {
 
-  useEffect(() => {
-    setRandomId(Math.random().toString(36).substring(7));
-  }, []);
-
-  const [isInvalid, setIsInvalid] = useState("");
 
   // =========================>
-  // ## invalid handler
+  // ## Initial
+  // =========================>
+  const randomId                             =  useInputRandomId()
+  const [invalidMessage, setInvalidMessage]  =  useState("");
+
+
+  // =========================>
+  // ## Invalid handler
   // =========================>
   useEffect(() => {
-    setIsInvalid(error || "");
-  }, [error]);
+    setInvalidMessage(invalid || "");
+  }, [invalid]);
+
 
   return (
     <div className={`flex flex-col gap-1 `}>
@@ -57,9 +69,10 @@ export function CheckboxComponent({
 
       <label
         htmlFor={randomId}
-        className={`flex gap-2 items-center cursor-pointer ${
-          disabled ? "pointer-events-none opacity-60" : ""
-        }`}
+        className={cn(
+        "flex gap-2 items-center cursor-pointer",
+        disabled && "pointer-events-none opacity-60"
+        )}
       >
         <div
           className={cn(
@@ -84,12 +97,8 @@ export function CheckboxComponent({
         </span>
       </label>
 
-      {isInvalid && (
-        <small
-          className={cn("input-error-message", pcn<CT>(className, "error"))}
-        >
-          {isInvalid}
-        </small>
+      {invalidMessage && (
+        <small className={cn("input-error-message", pcn<CT>(className, "error"))}>{invalidMessage}</small>
       )}
     </div>
   );

@@ -1,111 +1,62 @@
-import { cn, pcn, useValidationHelper, ValidationRulesType } from "@/helpers";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React, { InputHTMLAttributes, ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import moment from "moment";
-import React, {
-  InputHTMLAttributes,
-  ReactNode,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import { OutsideClickComponent } from "../formater-wrapper";
-import {
-  faChevronLeft,
-  faChevronRight,
-} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import { cn, pcn, useInputHandler, useInputRandomId, useValidation, validation } from "@utils/.";
+import { OutsideClickComponent } from "@components/.";
 
-type CT =
-  | "label"
-  | "tip"
-  | "error"
-  | "input"
-  | "icon"
-  | "suggest"
-  | "suggest-item";
 
-type CustomDatePickerPropsType = {
-  onDateSelect?: (date: string) => void;
-  minDate?: string;
-  maxDate?: string;
-};
 
-export interface InputDatePropsType
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange"> {
-  label?: string;
-  tip?: string | ReactNode;
-  leftIcon?: any;
-  rightIcon?: any;
+type CT = "label" | "tip" | "error" | "input" | "icon";
 
-  /** Use custom class with: "label::", "tip::", "error::", "icon::", "suggest::", "suggest-item::". */
-  className?: string;
+export interface InputDateProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange"> {
+  label      ?:  string;
+  tip        ?:  string | ReactNode;
+  leftIcon   ?:  any;
+  rightIcon  ?:  any;
 
-  value?: string;
-  error?: string;
+  value        ?:  string;
+  invalid      ?:  string;
+  validations  ?:  string;
+  
+  onChange  ?:  (value: string) => any;
+  register  ?:  (name: string, validations?: string) => void;
 
-  validations?: ValidationRulesType;
-
-  onChange?: (value: string) => any;
-  register?: (name: string, validations?: ValidationRulesType) => void;
+  /** Use custom class with: "label::", "tip::", "error::", "icon::". */
+  className  ?:  string;
 }
+
+
 
 export function InputDateComponent({
   label,
   tip,
   leftIcon,
   rightIcon,
-  className = "",
-
+  
   value,
-  error,
-
+  invalid,
   validations,
 
   register,
   onChange,
-
+  
+  className = "",
   ...props
-}: InputDatePropsType) {
-  const [inputValue, setInputValue] = useState("");
-  const [isFocus, setIsFocus] = useState(false);
-  const [isInvalid, setIsInvalid] = useState("");
-  const [isFirst, setIsFirst] = useState(true);
+}: InputDateProps) {
 
   // =========================>
-  // ## initial
+  // ## Initial
   // =========================>
-  useEffect(() => {
-    register?.(props.name || "", validations);
-  }, [props.name, validations]);
+  const inputHandler = useInputHandler(props.name, value, validations, register, false)
+  const randomId = useInputRandomId()
 
-  const [randomId, setRandomId] = useState("");
-
-  useEffect(() => {
-    setRandomId(Math.random().toString(36).substring(7));
-  }, []);
 
   // =========================>
-  // ## invalid handler
+  // ## Invalid handler
   // =========================>
-  const [errorMessage] = useValidationHelper(
-    {
-      value: inputValue,
-      rules: validations,
-    },
-    isFirst
-  );
+  const [invalidMessage] = useValidation(inputHandler.value, validations, invalid, inputHandler.idle);
 
-  useEffect(() => {
-    setIsInvalid(errorMessage || error || "");
-  }, [error, errorMessage]);
-
-  // =========================>
-  // ## change value handler
-  // =========================>
-  useEffect(() => {
-    setInputValue(value || "");
-    value && setIsFirst(false);
-  }, [value]);
 
   return (
     <>
@@ -117,14 +68,14 @@ export function InputDateComponent({
             pcn<CT>(className, "label"),
             props.disabled && "opacity-50",
             props.disabled && pcn<CT>(className, "label", "disabled"),
-            isFocus && "text-primary",
-            isFocus && pcn<CT>(className, "label", "focus"),
-            isInvalid && "text-danger",
-            isInvalid && pcn<CT>(className, "label", "focus")
+            inputHandler.focus && "text-primary",
+            inputHandler.focus && pcn<CT>(className, "label", "focus"),
+            !!invalidMessage && "text-danger",
+            !!invalidMessage && pcn<CT>(className, "label", "focus")
           )}
         >
           {label}
-          {validations?.required && <span className="text-danger">*</span>}
+          {validations && validation.hasRules(validations, "required") && <span className="text-danger">*</span>}
         </label>
 
         {tip && (
@@ -135,12 +86,10 @@ export function InputDateComponent({
               props.disabled && "opacity-60",
               props.disabled && pcn<CT>(className, "tip", "disabled")
             )}
-          >
-            {tip}
-          </small>
+          >{tip}</small>
         )}
 
-        <OutsideClickComponent onOutsideClick={() => setIsFocus(false)}>
+        <OutsideClickComponent onOutsideClick={() => inputHandler.setFocus(false)}>
           <div className="relative">
             <input
               {...props}
@@ -150,23 +99,21 @@ export function InputDateComponent({
                 leftIcon && "pl-12",
                 rightIcon && "pr-12",
                 pcn<CT>(className, "input"),
-                isInvalid && "input-error",
-                isInvalid && pcn<CT>(className, "input", "error")
+                !!invalidMessage && "input-error",
+                !!invalidMessage && pcn<CT>(className, "input", "error")
               )}
-              value={inputValue}
+              value={inputHandler.value}
               onChange={(e) => {
-                setInputValue(e.target.value);
-                setIsFirst(false);
-                setIsInvalid("");
+                inputHandler.setValue(e.target.value);
+                inputHandler.setValue(false);
                 onChange?.(e.target.value);
               }}
               onFocus={(e) => {
                 props.onFocus?.(e);
-                setIsFocus(true);
+                inputHandler.setFocus(true);
               }}
               onBlur={(e) => {
                 props.onBlur?.(e);
-                // setTimeout(() => setIsFocus(false), 100);
               }}
               autoComplete="off"
             />
@@ -178,8 +125,8 @@ export function InputDateComponent({
                   pcn<CT>(className, "icon"),
                   props.disabled && "opacity-60",
                   props.disabled && pcn<CT>(className, "icon", "disabled"),
-                  isFocus && "text-primary",
-                  isFocus && pcn<CT>(className, "icon", "focus")
+                  inputHandler.focus && "text-primary",
+                  inputHandler.focus && pcn<CT>(className, "icon", "focus")
                 )}
                 icon={leftIcon}
               />
@@ -192,19 +139,17 @@ export function InputDateComponent({
                   pcn<CT>(className, "icon"),
                   props.disabled && "opacity-60",
                   props.disabled && pcn<CT>(className, "icon", "disabled"),
-                  isFocus && "text-primary",
-                  isFocus && pcn<CT>(className, "icon", "focus")
+                  inputHandler.focus && "text-primary",
+                  inputHandler.focus && pcn<CT>(className, "icon", "focus")
                 )}
                 icon={rightIcon}
               />
             )}
 
-            {isFocus && (
-              <CustomDatePicker
-                minDate="2025-01-20"
-                maxDate="2025-04-22"
-                onDateSelect={(e) => {
-                  setInputValue(e);
+            {inputHandler.focus && (
+              <InputDatePickerComponent
+                onChange={(e) => {
+                  inputHandler.setValue(e);
                   onChange?.(e);
                 }}
               />
@@ -212,51 +157,54 @@ export function InputDateComponent({
           </div>
         </OutsideClickComponent>
 
-        {isInvalid && (
-          <small
-            className={cn("input-error-message", pcn<CT>(className, "error"))}
-          >
-            {isInvalid}
-          </small>
+        {invalidMessage && (
+          <small className={cn("input-error-message", pcn<CT>(className, "error"))}>{invalidMessage}</small>
         )}
       </div>
     </>
   );
 }
 
-const CustomDatePicker: React.FC<CustomDatePickerPropsType> = ({
-  onDateSelect,
+
+
+export interface InputDatePickerProps {
+  onChange      ?:  (date: string) => void;
+  minDate       ?:  string;
+  maxDate       ?:  string;
+  rightElement  ?:  ReactNode;
+};
+
+
+
+export const InputDatePickerComponent: React.FC<InputDatePickerProps> = ({
+  onChange,
   minDate,
   maxDate,
+  rightElement,
 }) => {
-  const activeYearRef = useRef<HTMLDivElement | null>(null);
-  const containerYearRef = useRef<HTMLDivElement | null>(null);
+  const activeYearRef     =  useRef<HTMLDivElement | null>(null);
+  const containerYearRef  =  useRef<HTMLDivElement | null>(null);
 
-  const [currentDate, setCurrentDate] = useState(moment());
-  const [selectedDate, setSelectedDate] = useState(moment());
+  const [currentDate, setCurrentDate]    =  useState(moment());
+  const [selectedDate, setSelectedDate]  =  useState(moment());
 
-  const startDate = moment(currentDate).startOf("month").startOf("week");
-  const endDate = moment(currentDate).endOf("month").endOf("week");
+  const startDate  =  moment(currentDate).startOf("month").startOf("week");
+  const endDate    =  moment(currentDate).endOf("month").endOf("week");
 
-  const handlePrevMonth = () =>
-    setCurrentDate(moment(currentDate).subtract(1, "month"));
-  const handleNextMonth = () =>
-    setCurrentDate(moment(currentDate).add(1, "month"));
+  const handlePrevMonth = () => setCurrentDate(moment(currentDate).subtract(1, "month"));
+  const handleNextMonth = () => setCurrentDate(moment(currentDate).add(1, "month"));
 
   const handleDateClick = (date: moment.Moment) => {
-    if (
-      (minDate && date.isBefore(moment(minDate))) ||
-      (maxDate && date.isAfter(moment(maxDate)))
-    ) {
-      return;
-    }
+    if ((minDate && date.isBefore(moment(minDate))) || (maxDate && date.isAfter(moment(maxDate)))) { return; }
+
     setSelectedDate(date);
-    onDateSelect?.(date.format("YYYY-MM-DD"));
+    onChange?.(date.format("YYYY-MM-DD"));
   };
 
   const renderDays = () => {
     const days = [];
     const startDay = moment(startDate);
+
     for (let i = 0; i < 7; i++) {
       days.push(
         <div key={i} className="text-center font-bold">
@@ -264,55 +212,39 @@ const CustomDatePicker: React.FC<CustomDatePickerPropsType> = ({
         </div>
       );
     }
+
     return days;
   };
 
   const renderCells = () => {
-    const rows = [];
-    let days = [];
-    const day = moment(startDate);
+    const rows  =  [];
+    let   days  =  [];
+    const day   =  moment(startDate);
+
     while (day.isBefore(endDate) || day.isSame(endDate, "day")) {
       for (let i = 0; i < 7; i++) {
         const cloneDay = moment(day);
+
         days.push(
           <div
             key={day.toString()}
             className={`w-8 aspect-square flex items-center justify-center text-center rounded-lg transition-all 
-              ${
-                day.isSame(currentDate, "month")
-                  ? "text-foreground"
-                  : "text-light-foreground"
-              } 
-              ${
-                day.isSame(selectedDate, "day")
-                  ? "bg-primary text-background"
-                  : "hover:bg-light-primary"
-              }
-              ${
-                day.isSame(moment(), "day")
-                  ? "border !border-primary"
-                  : "hover:bg-light-primary"
-              } 
-              ${
-                (minDate && day.isBefore(moment(minDate))) ||
-                (maxDate && day.isAfter(moment(maxDate)))
-                  ? "opacity-10 cursor-not-allowed"
-                  : "cursor-pointer"
-              }`}
+              ${day.isSame(currentDate, "month") ? "text-foreground" : "text-light-foreground"} 
+              ${day.isSame(selectedDate, "day") ? "bg-primary text-background" : "hover:bg-light-primary"}
+              ${day.isSame(moment(), "day") ? "border !border-primary" : "hover:bg-light-primary"} 
+              ${(minDate && day.isBefore(moment(minDate))) || (maxDate && day.isAfter(moment(maxDate))) ? "opacity-10 cursor-not-allowed" : "cursor-pointer"}`}
             onClick={() => handleDateClick(cloneDay)}
-          >
-            {day.format("D")}
-          </div>
+          >{day.format("D")}</div>
         );
+
         day.add(1, "day");
       }
-      rows.push(
-        <div key={day.toString()} className="grid grid-cols-7 gap-1">
-          {days}
-        </div>
-      );
+
+      rows.push(<div key={day.toString()} className="grid grid-cols-7 gap-1">{days}</div>);
+
       days = [];
     }
+
     return rows;
   };
 
@@ -329,14 +261,13 @@ const CustomDatePicker: React.FC<CustomDatePickerPropsType> = ({
   useEffect(() => {
     if (activeYearRef.current && containerYearRef.current) {
       containerYearRef.current.scrollTo({
-        top:
-          activeYearRef.current.offsetTop - containerYearRef.current.offsetTop,
+        top: activeYearRef.current.offsetTop - containerYearRef.current.offsetTop,
       });
     }
   }, []);
 
   return (
-    <div className="w-80 h-72 bg-white border p-2 rounded-[6px] absolute top-full left-0 mt-1 z-50">
+    <div className="w-max h-72 bg-white border p-2 rounded-[6px] absolute top-full left-0 mt-1 z-50">
       <div className="flex gap-2">
         <div
           className="max-h-[260] overflow-y-auto input-scroll pr-1"
@@ -352,9 +283,7 @@ const CustomDatePicker: React.FC<CustomDatePickerPropsType> = ({
                     key={key}
                     ref={isActive ? activeYearRef : null}
                     className={`py-1 px-2 font-semibold rounded-[6px] cursor-pointer ${isActive && "bg-light-primary"}`}
-                    onClick={() => {
-                      setCurrentDate(moment().set("year", item));
-                    }}
+                    onClick={() => setCurrentDate(moment().set("year", item))}
                   >
                     {item}
                   </div>
@@ -364,14 +293,14 @@ const CustomDatePicker: React.FC<CustomDatePickerPropsType> = ({
           </div>
         </div>
         <div>
-          <div className="flex justify-between items-center mb-1">
+          <div className="flex justify-between items-center mb-2">
             <button
               onClick={handlePrevMonth}
               className="w-8 text-sm aspect-square rounded-full cursor-pointer"
             >
               <FontAwesomeIcon icon={faChevronLeft} />
             </button>
-            <h2 className="font-semibold">{currentDate.format("MMMM YYYY")}</h2>
+            <h2 className="font-semibold">{currentDate.format("MMMM")}</h2>
             <button
               onClick={handleNextMonth}
               className="w-8 text-sm aspect-square rounded-full cursor-pointer"
@@ -382,6 +311,8 @@ const CustomDatePicker: React.FC<CustomDatePickerPropsType> = ({
           <div className="grid grid-cols-7 gap-1 mb-2">{renderDays()}</div>
           <div>{renderCells()}</div>
         </div>
+
+        {rightElement && <div>{rightElement}</div>}
       </div>
     </div>
   );

@@ -1,7 +1,22 @@
-import { cn, pcn } from "@/helpers";
 import React, { ReactNode } from "react";
+import { cn, pcn } from "@utils/.";
+
+
 
 type CT = "badge" | "title" | "base";
+
+export interface AlertCardProps {
+  title        ?:  string | ReactNode;
+  leftContent  ?:  string | ReactNode;
+  badge        ?:  string | ReactNode;
+  content      ?:  string | ReactNode;
+  footer       ?:  string | ReactNode;
+
+  /** Use custom class with: "badge::", "title::". */
+  className  ?:  string;
+}
+
+
 
 export function AlertCardComponent({
   title,
@@ -10,16 +25,7 @@ export function AlertCardComponent({
   content,
   footer,
   className = "",
-}: {
-  title?: string | ReactNode;
-  leftContent?: string | ReactNode;
-  badge?: string | ReactNode;
-  content?: string | ReactNode;
-  footer?: string | ReactNode;
-
-  /** Use custom class with: "badge::", "title::". */
-  className?: string;
-}) {
+}: AlertCardProps) {
   return (
     <>
       <section

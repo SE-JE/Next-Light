@@ -1,26 +1,27 @@
-import { cn, pcn } from "@/helpers";
-import {
-  faChevronLeft,
-  faChevronRight,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState, useRef, useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import { cn, pcn } from "@utils/.";
+
+
 
 type CT = "item" | "prev-button" | "next-button" | "navigation" | "base";
 
 interface CarouselItem {
-  background: string;
-  content?: string;
+  background   :  string;
+  content     ?:  string;
 }
 
 interface CarouselProps {
-  items: CarouselItem[];
-  noButton?: boolean;
-  noNavigation?: boolean;
+  items          :  CarouselItem[];
+  noButton      ?:  boolean;
+  noNavigation  ?:  boolean;
 
   /** Use custom class with: "item::", "prev-button::", "next-button::", "navigation::". */
-  className?: string;
+  className  ?:  string;
 }
+
+
 
 export function CarouselComponent({
   items,

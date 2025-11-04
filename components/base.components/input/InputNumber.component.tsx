@@ -1,121 +1,91 @@
-import { cn, pcn, useValidationHelper, ValidationRulesType } from "@/helpers";
-import { faSortDown, faSortUp } from "@fortawesome/free-solid-svg-icons";
+import React, { InputHTMLAttributes, ReactNode } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, {
-  InputHTMLAttributes,
-  ReactNode,
-  useEffect,
-  useState,
-} from "react";
+import { faSortDown, faSortUp } from "@fortawesome/free-solid-svg-icons";
+import { cn, pcn, useInputHandler, useInputRandomId, useValidation, validation } from "@utils/.";
 
-type CT =
-  | "label"
-  | "tip"
-  | "error"
-  | "input"
-  | "icon"
-  | "suggest"
-  | "suggest-item";
 
-export interface InputNumberPropsType
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange"> {
-  label?: string;
-  tip?: string | ReactNode;
-  leftIcon?: any;
-  rightIcon?: any;
 
+type CT = "label" | "tip" | "error" | "input" | "icon";
+
+export interface InputNumberProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange"> {
+  label      ?:  string;
+  tip        ?:  string | ReactNode;
+  leftIcon   ?:  any;
+  rightIcon  ?:  any;
+
+  value        ?:  number;
+  invalid      ?:  string;
+  validations  ?:  string;
+  min          ?:  number;
+  max          ?:  number;
+  
+  onChange  ?:  (value: number) => any;
+  register  ?:  (name: string, validations?: string) => void;
+  
   /** Use custom class with: "label::", "tip::", "error::", "icon::", "suggest::", "suggest-item::". */
-  className?: string;
-
-  value?: number;
-  error?: string;
-
-  validations?: ValidationRulesType;
-
-  onChange?: (value: number) => any;
-  register?: (name: string, validations?: ValidationRulesType) => void;
-
-  min?: number;
-  max?: number;
+  className  ?:  string;
 }
+
+
 
 export function InputNumberComponent({
   label,
   tip,
   leftIcon,
   rightIcon,
-  className = "",
+
   value,
-  error,
+  invalid,
   validations,
-  register,
-  onChange,
   min,
   max,
+
+  onChange,
+  register,
+
+  className = "",
   ...props
-}: InputNumberPropsType) {
-  const [inputValue, setInputValue] = useState("");
-  const [isFocus, setIsFocus] = useState(false);
-  const [isInvalid, setIsInvalid] = useState("");
-  const [isFirst, setIsFirst] = useState(true);
+}: InputNumberProps) {
 
   // =========================>
-  // ## initial
+  // ## Initial
   // =========================>
-  useEffect(() => {
-    register?.(props.name || "", validations);
-  }, [props.name, validations]);
+  const inputHandler  =  useInputHandler(props.name, value, validations, register, false)
+  const randomId      =  useInputRandomId()
 
-  const [randomId, setRandomId] = useState("");
-
-  useEffect(() => {
-    setRandomId(Math.random().toString(36).substring(7));
-  }, []);
 
   // =========================>
-  // ## invalid handler
+  // ## Invalid handler
   // =========================>
-  const [errorMessage] = useValidationHelper(
-    {
-      value: inputValue,
-      rules: validations,
-    },
-    isFirst,
-  );
+  const [invalidMessage]  =  useValidation(inputHandler.value, validations, invalid, inputHandler.idle);
 
-  useEffect(() => {
-    setIsInvalid(errorMessage || error || "");
-  }, [error, errorMessage]);
 
   // =========================>
-  // ## change value handler
+  // ## Change value handler
   // =========================>
-  useEffect(() => {
-    setInputValue(String(value || ""));
-    value && setIsFirst(false);
-  }, [value]);
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
 
     const regex = /^-?\d*\.?\d*$/;
     if (regex.test(newValue)) {
-      setInputValue(newValue);
-      setIsFirst(false);
-      setIsInvalid("");
+      inputHandler.setValue(newValue);
+      inputHandler.setIdle(false);
       onChange?.(Number(newValue));
     }
   };
 
+
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     props.onBlur?.(e);
-    setTimeout(() => setIsFocus(false), 100);
+    setTimeout(() => inputHandler.setFocus(false), 100);
   };
+
 
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
     props.onFocus?.(e);
-    setIsFocus(true);
+    inputHandler.setFocus(true);
   };
+
 
   return (
     <>
@@ -127,14 +97,14 @@ export function InputNumberComponent({
             pcn<CT>(className, "label"),
             props.disabled && "opacity-50",
             props.disabled && pcn<CT>(className, "label", "disabled"),
-            isFocus && "text-primary",
-            isFocus && pcn<CT>(className, "label", "focus"),
-            isInvalid && "text-danger",
-            isInvalid && pcn<CT>(className, "label", "focus"),
+            inputHandler.focus && "text-primary",
+            inputHandler.focus && pcn<CT>(className, "label", "focus"),
+            !!invalidMessage && "text-danger",
+            !!invalidMessage && pcn<CT>(className, "label", "focus"),
           )}
         >
           {label}
-          {validations?.required && <span className="text-danger">*</span>}
+          {validations && validation.hasRules(validations, "required") && <span className="text-danger">*</span>}
         </label>
 
         {tip && (
@@ -145,9 +115,7 @@ export function InputNumberComponent({
               props.disabled && "opacity-60",
               props.disabled && pcn<CT>(className, "tip", "disabled"),
             )}
-          >
-            {tip}
-          </small>
+          >{tip}</small>
         )}
 
         <div className="relative">
@@ -159,10 +127,10 @@ export function InputNumberComponent({
               leftIcon && "pl-12",
               rightIcon && "pr-12",
               pcn<CT>(className, "input"),
-              isInvalid && "input-error",
-              isInvalid && pcn<CT>(className, "input", "error"),
+              !!invalidMessage && "input-error",
+              !!invalidMessage && pcn<CT>(className, "input", "error"),
             )}
-            value={inputValue}
+            value={inputHandler.value}
             onChange={handleInputChange}
             onFocus={handleFocus}
             onBlur={handleBlur}
@@ -178,8 +146,8 @@ export function InputNumberComponent({
                 pcn<CT>(className, "icon"),
                 props.disabled && "opacity-60",
                 props.disabled && pcn<CT>(className, "icon", "disabled"),
-                isFocus && "text-primary",
-                isFocus && pcn<CT>(className, "icon", "focus"),
+                inputHandler.focus && "text-primary",
+                inputHandler.focus && pcn<CT>(className, "icon", "focus"),
               )}
               icon={leftIcon}
             />
@@ -192,35 +160,27 @@ export function InputNumberComponent({
               pcn<CT>(className, "icon"),
               props.disabled && "opacity-60",
               props.disabled && pcn<CT>(className, "icon", "disabled"),
-              isFocus && "text-primary",
-              isFocus && pcn<CT>(className, "icon", "focus"),
+              inputHandler.focus && "text-primary",
+              inputHandler.focus && pcn<CT>(className, "icon", "focus"),
             )}
           >
             <div className="flex flex-col">
               <FontAwesomeIcon
-                className={`
-                  text-light-foreground hover:text-primary -mb-1
-                `}
+                className={`text-light-foreground hover:text-primary -mb-1`}
                 icon={faSortUp}
-                onClick={() => setInputValue(String(Number(inputValue) + 1))}
+                onClick={() => inputHandler.setValue(String(Number(inputHandler.value) + 1))}
               />
               <FontAwesomeIcon
-                className={`
-                  text-light-foreground hover:text-primary -mt-1
-              `}
+                className={`text-light-foreground hover:text-primary -mt-1`}
                 icon={faSortDown}
-                onClick={() => setInputValue(String(Number(inputValue) - 1))}
+                onClick={() => inputHandler.setValue(String(Number(inputHandler.value) - 1))}
               />
             </div>
           </label>
         </div>
 
-        {isInvalid && (
-          <small
-            className={cn("input-error-message", pcn<CT>(className, "error"))}
-          >
-            {isInvalid}
-          </small>
+        {invalidMessage && (
+          <small className={cn("input-error-message", pcn<CT>(className, "error"))}>{invalidMessage}</small>
         )}
       </div>
     </>

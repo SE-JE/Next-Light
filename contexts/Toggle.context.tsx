@@ -1,0 +1,24 @@
+import React, { createContext, useContext, useState } from "react";
+
+interface ToggleContextInterface {
+  toggle: Record<string, string | number | object | boolean>;
+  setToggle: (key: string, value?: string | number | object | boolean) => void;
+}
+
+const ToggleContext = createContext<ToggleContextInterface | undefined>(undefined);
+
+export const ToggleContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [actives, setActives] = useState<Record<string, string | number | object | boolean>>({});
+
+  const setActive = (key: string, value: (string | number | object | boolean) = true) => setActives((prev) => ({ ...prev, [key]: value }));
+
+  return <ToggleContext.Provider value={{toggle: actives, setToggle: setActive}}>{children}</ToggleContext.Provider>;
+};
+
+export const useToggleContext = (): ToggleContextInterface => {
+  const context = useContext(ToggleContext);
+  if (!context) {
+    throw new Error("useToggleContext must be used within a ToggleContextProvider");
+  }
+  return context;
+};

@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import axios, { AxiosResponse } from "axios";
 import Router from "next/router";
-import { middleware, cavity } from "@helpers/.";
+import { auth, cavity } from "@/utils";
 
 // =========================>
 // ## Build auth bearer
 // =========================>
 export const authBearer = (bearer?: string): string | null => {
-  const token  =  bearer || middleware.getAccessToken() || null;
+  const token  =  bearer || auth.getAccessToken() || null;
   return token ? `Bearer ${token}` : null;
 };
 
@@ -15,8 +15,8 @@ export const authBearer = (bearer?: string): string | null => {
 // ## Api error handler
 // =========================>
 const handleErrors = (fetch: AxiosResponse) => {
-  if (fetch?.status === 401) Router.push(middleware.PATH_LOGIN);
-  if (fetch?.status === 403) Router.push(middleware.PATH_BASE);
+  if (fetch?.status === 401) Router.push(auth.PATH_LOGIN);
+  if (fetch?.status === 403) Router.push(auth.PATH_BASE);
   return fetch;
 };
 
@@ -172,7 +172,7 @@ export const useGetApi = (props: ApiType & { method?: "GET" | "OPTIONS", cacheNa
 
   const reset = () => fetch(true);
 
-  return [{ loading, code, data, reset }];
+  return { loading, code, data, reset };
 };
 
 

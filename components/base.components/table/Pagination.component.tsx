@@ -1,29 +1,30 @@
-import {
-  faChevronLeft,
-  faChevronRight,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
-import { InputRadioComponent } from "../input/InputRadio.component";
-import { cn, pcn } from "@/helpers";
+import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { cn, pcn } from "@utils/.";
+import { InputRadioComponent } from "@components/.";
+
+
 
 type CT = "item" | "active" | "base";
 
-export type PaginationPropsType = {
-  totalRow: number;
-  paginate: number;
-  page: number;
-  onChange?: (totalRow: number, paginate: number, page: number) => void;
-  className?: string;
+export interface PaginationProps {
+  totalRow    :  number;
+  paginate    :  number;
+  page        :  number;
+  onChange   ?:  (totalRow: number, paginate: number, page: number) => void;
+  className  ?:  string;
 };
 
-export default function PaginationComponent({
+
+
+export function PaginationComponent({
+  paginate   =  10,
+  page       =  1,
   totalRow,
-  paginate = 10,
-  page = 1,
   onChange,
-  className = "",
-}: PaginationPropsType) {
+  className  =  "",
+}: PaginationProps) {
   const [pages, setPages] = useState<number[]>([]);
   const lastPage = Math.ceil(totalRow / paginate);
 

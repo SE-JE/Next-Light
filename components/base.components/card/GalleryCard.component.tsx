@@ -1,20 +1,26 @@
-import { cn, pcn } from "@/helpers";
 import Image from "next/image";
 import React from "react";
+import { cn, pcn } from "@utils/.";
+
+
 
 type CT = "label" | "image" | "base";
+
+export interface GalleryCardProps {
+  src   :  string;
+  alt  ?:  string;
+
+  /** Use custom class with: "label::", "image::". */
+  className?: string;
+}
+
+
 
 export function GalleryCardComponent({
   src,
   alt = "",
   className = "",
-}: {
-  src: string;
-  alt?: string;
-
-  /** Use custom class with: "label::", "image::". */
-  className?: string;
-}) {
+} : GalleryCardProps) {
   return (
     <>
       <div className={pcn<CT>(className, "base")}>

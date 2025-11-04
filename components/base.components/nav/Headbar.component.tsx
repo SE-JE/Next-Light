@@ -1,27 +1,21 @@
 import React, { ReactNode, useState } from "react";
-import {
-  faBell,
-  faHistory,
-  faPowerOff,
-  faUser,
-  faUserCog,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useRouter } from "next/router";
-import { OutsideClickComponent } from "@components/formater-wrapper/OutsideClick.component";
-import { cn, middleware } from "@helpers/.";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBell, faHistory, faPowerOff, faUser, faUserCog } from "@fortawesome/free-solid-svg-icons";
+import { OutsideClickComponent } from "@components/.";
+import { cn, auth } from "@utils/.";
 
-export type HeadbarPropsType = {
+export interface HeadbarProps {
   children?: ReactNode;
   className?: string;
 };
 
-export function HeadbarComponent({
+export function HeadBarComponent({
   children,
   className = "",
-}: HeadbarPropsType) {
-  const router = useRouter();
-  const [profile, setProfile] = useState(false);
+}: HeadbarProps) {
+  const router                 =  useRouter();
+  const [profile, setProfile]  =  useState(false);
 
   const styles = {
     base: cn(
@@ -57,11 +51,7 @@ export function HeadbarComponent({
         </div>
       </div>
 
-      <OutsideClickComponent
-        onOutsideClick={() => {
-          setProfile(false);
-        }}
-      >
+      <OutsideClickComponent onOutsideClick={() => setProfile(false)}>
         <div
           className={`absolute right-0 top-[70px] rounded-[6px] border overflow-hidden bg-white z-30 ${
             profile ? "scale-y-100" : "scale-y-0"
@@ -92,7 +82,7 @@ export function HeadbarComponent({
             <div
               className="px-6 py-2 flex gap-4 hover:bg-background/40 hover:border-y items-center cursor-pointer text-danger"
               onClick={() => {
-                middleware.deleteAccessToken();
+                auth.deleteAccessToken();
                 router.push("/");
               }}
             >

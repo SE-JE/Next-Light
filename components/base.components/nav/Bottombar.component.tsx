@@ -1,26 +1,25 @@
-import { cn, pcn, useDetectKeyboardOpen } from "@/helpers";
-import {
-  faClipboard,
-  faCrosshairs,
-  faHome,
-  faSackDollar,
-  faUserCircle,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faClipboard, faCrosshairs, faHome, faSackDollar, faUserCircle } from "@fortawesome/free-solid-svg-icons";
+import { cn, pcn, useKeyboardOpen } from "@utils/.";
 
-export function BottombarComponent({
+
+
+export interface BottombarProps {
+  active     ?:  string;
+  className  ?:  string;
+}
+
+
+
+export function BottomBarComponent({
   className = "",
   active,
-}: {
-  active?: string;
-  className?: string;
-}) {
-  const router = useRouter();
-
-  const isKeyboardOpen = useDetectKeyboardOpen();
+}: BottombarProps) {
+  const router          =  useRouter();
+  const isKeyboardOpen  =  useKeyboardOpen();
 
   const styles = {
     base: cn(

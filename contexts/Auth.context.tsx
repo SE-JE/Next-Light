@@ -1,4 +1,4 @@
-import { api, middleware } from "@helpers/.";
+import { api, auth } from "@/utils";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 interface AuthContextInterface {
@@ -21,9 +21,9 @@ export const AuthContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
     setAccessToken(token);
 
     if(token) {
-      middleware.setAccessToken(token)
+      auth.setAccessToken(token)
     } else {
-      middleware.deleteAccessToken()
+      auth.deleteAccessToken()
     }
   }
 
@@ -34,7 +34,7 @@ export const AuthContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
   }
 
   useEffect(() => {
-    const token = middleware.getAccessToken() || null;
+    const token = auth.getAccessToken() || null;
     
     setAccessToken(token)
 

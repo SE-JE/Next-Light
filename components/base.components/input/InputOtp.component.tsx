@@ -1,53 +1,50 @@
-import { cn, pcn } from "@/helpers";
 import React, { ReactNode, useEffect, useRef, useState } from "react";
-type CT =
-  | "label"
-  | "tip"
-  | "error"
-  | "base"
-  | "icon"
-  | "suggest"
-  | "suggest-item";
+import { cn, pcn } from "@utils/.";
 
-export interface InputOtpType {
-  label?: string;
-  tip?: string | ReactNode;
-  name: string;
-  disabled?: boolean;
-  
-  value?: string;
-  error?: string;
 
-  length?: number;
-  
-  onChange?: (value: string) => any;
+
+type CT = "label" | "tip" | "error" | "base" | "icon";
+
+export interface InputOtpProps {
+  label     ?:  string;
+  tip       ?:  string | ReactNode;
+  name       :  string;
+  disabled  ?:  boolean;
+
+  value    ?:  string;
+  invalid  ?:  string;
+  length   ?:  number;
+
+  onChange  ?:  (value: string) => any;
 
   /** Use custom class with: "label::", "tip::", "error::". */
-  className?: string;
+  className  ?:  string;
 }
 
-export const InputOtpComponent: React.FC<InputOtpType> = ({
+
+
+export const InputOtpComponent: React.FC<InputOtpProps> = ({
   label,
   tip,
   name,
   disabled,
-  className = "",
 
   value,
-  error,
-
+  invalid,  
   length = 6,
-  
+
   onChange,
+
+  className = "",
 }) => {
-  const [isFocus, setIsFocus] = useState(false);
-  const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
+  const [isFocus, setIsFocus]  =  useState(false);
+  const inputsRef              =  useRef<(HTMLInputElement | null)[]>([]);
+  const [otp, setOtp]          =  useState<string[]>((value || "").split("").concat(Array(length).fill("")).slice(0, length));
+
 
   useEffect(() => {
     const handleFocusChange = () => {
-      const anyFocused = inputsRef.current.some(
-        (input) => input === document.activeElement
-      );
+      const anyFocused = inputsRef.current.some((input) => input === document.activeElement);
       setIsFocus(anyFocused);
     };
 
@@ -60,24 +57,24 @@ export const InputOtpComponent: React.FC<InputOtpType> = ({
     };
   }, []);
 
-  const [otp, setOtp] = useState<string[]>((value || "").split("").concat(Array(length).fill("")).slice(0, length));
 
   const emitChange = (newOtp: string[]) => {
     const val = newOtp.join("");
     onChange?.(val);
   };
 
+
   const handleChange = (val: string, index: number) => {
     if (!/^[0-9]?$/.test(val)) return;
-    const newOtp = [...otp];
-    newOtp[index] = val;
+    const newOtp   =  [...otp];
+    newOtp[index]  =  val;
+
     setOtp(newOtp);
     emitChange(newOtp);
 
-    if (val && index < length - 1) {
-      inputsRef.current[index + 1]?.focus();
-    }
+    (val && index < length - 1) && inputsRef.current[index + 1]?.focus();
   };
+
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
     if (e.key === "Backspace") {
@@ -92,6 +89,7 @@ export const InputOtpComponent: React.FC<InputOtpType> = ({
     }
   };
 
+
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
     const paste = e.clipboardData.getData("text").trim();
@@ -104,6 +102,7 @@ export const InputOtpComponent: React.FC<InputOtpType> = ({
     inputsRef.current[Math.min(pasted.length, length - 1)]?.focus();
   };
 
+
   return (
     <>
       <div className="relative flex flex-col gap-y-0.5">
@@ -115,8 +114,8 @@ export const InputOtpComponent: React.FC<InputOtpType> = ({
             disabled && pcn<CT>(className, "label", "disabled"),
             isFocus && "text-primary",
             isFocus && pcn<CT>(className, "label", "focus"),
-            !!error && "text-danger",
-            !!error && pcn<CT>(className, "label", "focus"),
+            !!invalid && "text-danger",
+            !!invalid && pcn<CT>(className, "label", "focus"),
           )}
         >
           {label}
@@ -130,14 +129,12 @@ export const InputOtpComponent: React.FC<InputOtpType> = ({
               disabled && "opacity-60",
               disabled && pcn<CT>(className, "tip", "disabled"),
             )}
-          >
-            {tip}
-          </small>
+          >{tip}</small>
         )}
         <div className={cn(
           "input pb-1", 
           isFocus && "!border-primary",
-          !!error && "input-error"
+          !!invalid && "input-error"
           )}
         >
           <div className="flex gap-2 justify-between">
@@ -161,8 +158,8 @@ export const InputOtpComponent: React.FC<InputOtpType> = ({
           <input type="hidden" name={name} value={otp.join("")} />
         </div>
 
-        {error && (
-          <small className={cn("input-error-message", pcn<CT>(className, "error"))}>{error}</small>
+        {invalid && (
+          <small className={cn("input-error-message", pcn<CT>(className, "error"))}>{invalid}</small>
         )}
       </div>
     </>

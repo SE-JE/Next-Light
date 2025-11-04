@@ -1,113 +1,67 @@
-import { cn, pcn, useValidationHelper, ValidationRulesType } from "@/helpers";
+import React, { InputHTMLAttributes, ReactNode, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, {
-  InputHTMLAttributes,
-  ReactNode,
-  useEffect,
-  useState,
-} from "react";
+import { cn, pcn, useInputHandler, useInputRandomId, useValidation, validation } from "@utils/.";
+
+
 
 type CT = "label" | "tip" | "error" | "base" | "icon";
 
-export interface InputPasswordType
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange"> {
-  label?: string;
-  tip?: string | ReactNode;
-  leftIcon?: any;
-  rightIcon?: any;
+export interface InputPasswordProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange"> {
+  label      ?:  string;
+  tip        ?:  string | ReactNode;
+  leftIcon   ?:  any;
+  rightIcon  ?:  any;
 
-  value?: string;
-  error?: string;
-  validations?: ValidationRulesType;
-  onlyAlphabet?: boolean;
-  autoUppercase?: boolean;
+  value        ?:  string;
+  invalid      ?:  string;
+  validations  ?:  string;
 
-  onChange?: (value: string, confirm?: string) => any;
-  register?: (name: string, validations?: ValidationRulesType) => void;
+  onChange  ?:  (value: string, confirm?: string) => any;
+  register  ?:  (name: string, validations?: string) => void;
 
   /** Use custom class with: "label::", "tip::", "error::", "icon::". */
-  className?: string;
+  className  ?:  string;
 }
+
+
 
 export function InputPasswordComponent({
   label,
   tip,
   leftIcon,
   rightIcon,
-  className = "",
 
   value,
-  error,
-
+  invalid,
   validations,
-  onlyAlphabet,
-  autoUppercase,
 
   register,
   onChange,
 
+  className = "",
   ...props
-}: InputPasswordType) {
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [isFocus, setIsFocus] = useState(false);
-  const [isInvalid, setIsInvalid] = useState("");
-  const [isFirst, setIsFirst] = useState(true);
-  const [strength, setStrength] = useState<"weak" | "strong" | "excellent" | "">(
-    "",
-  );
+}: InputPasswordProps) {
+  const [password, setPassword]                =  useState("");
+  const [confirmPassword, setConfirmPassword]  =  useState("");
+  const [strength, setStrength]                =  useState<"weak" | "strong" | "excellent" | "">("");
 
-  const [randomId, setRandomId] = useState("");
-  const [randomConfirmId, setRandomConfirmId] = useState("");
-
-  useEffect(() => {
-    register?.(props.name || "", validations);
-  }, [props.name, validations]);
-
-  useEffect(() => {
-    setRandomId(Math.random().toString(36).substring(7));
-    setRandomConfirmId(Math.random().toString(36).substring(7));
-  }, []);
 
   // =========================>
-  // ## VALIDATION HANDLER
+  // ## Initial
   // =========================>
-  const [errorMessage] = useValidationHelper(
-    { value: password, rules: validations },
-    isFirst,
-  );
+  const inputHandler     =  useInputHandler(props.name, value, validations, register, false)
+  const randomId         =  useInputRandomId()
+  const randomConfirmId  =  useInputRandomId()
 
-  useEffect(() => {
-    setIsInvalid(errorMessage || error || "");
-  }, [error, errorMessage]);
 
   // =========================>
-  // ## VALUE CHANGES
+  // ## Invalid handler
   // =========================>
-  useEffect(() => {
-    setPassword(value || "");
-    value && setIsFirst(false);
-  }, [value]);
+  const [invalidMessage]  =  useValidation(inputHandler.value, validations, invalid, inputHandler.idle);
 
-  useEffect(() => {
-    if (password && typeof password === "string") {
-      let newVal = password;
-
-      if (onlyAlphabet) {
-        newVal = password
-          .split("")
-          .filter((ch) => ch === " " || /[A-Za-z]/.test(ch))
-          .join("");
-      }
-
-      if (autoUppercase) newVal = newVal.toUpperCase();
-      if (validations?.max) newVal = newVal.slice(0, validations?.max);
-      setPassword(newVal);
-    }
-  }, [password, onlyAlphabet, autoUppercase, validations]);
 
   // =========================>
-  // ## PASSWORD STRENGTH
+  // ## Password strength handler
   // =========================>
   useEffect(() => {
     if (!password) return setStrength("");
@@ -122,10 +76,12 @@ export function InputPasswordComponent({
     else setStrength("weak");
   }, [password]);
 
+
   // =========================>
-  // ## CONFIRM PASSWORD
+  // ## Check match confirm password
   // =========================>
   const isConfirmMismatch = confirmPassword && password !== confirmPassword;
+
 
   return (
     <div className="relative flex flex-col gap-y-1">
@@ -136,12 +92,12 @@ export function InputPasswordComponent({
             "input-label",
             pcn<CT>(className, "label"),
             props.disabled && "opacity-50",
-            isFocus && "text-primary",
-            isInvalid && "text-danger",
+            inputHandler.focus && "text-primary",
+            !!invalidMessage && "text-danger",
           )}
         >
           {label}
-          {validations?.required && <span className="text-danger">*</span>}
+          {validations && validation.hasRules(validations, "required") && <span className="text-danger">*</span>}
         </label>
       )}
 
@@ -152,9 +108,7 @@ export function InputPasswordComponent({
             pcn<CT>(className, "tip"),
             props.disabled && "opacity-60",
           )}
-        >
-          {tip}
-        </small>
+        >{tip}</small>
       )}
 
       <div className="relative">
@@ -167,22 +121,21 @@ export function InputPasswordComponent({
             leftIcon && "pl-12",
             rightIcon && "pr-12",
             pcn<CT>(className, "base"),
-            isInvalid && "input-error",
+            !!invalidMessage && "input-error",
           )}
           value={password}
           onChange={(e) => {
             setPassword(e.target.value);
-            setIsFirst(false);
-            setIsInvalid("");
+            inputHandler.setIdle(false);
             onChange?.(e.target.value, confirmPassword);
           }}
           onFocus={(e) => {
             props.onFocus?.(e);
-            setIsFocus(true);
+            inputHandler.setFocus(true);
           }}
           onBlur={(e) => {
             props.onBlur?.(e);
-            setTimeout(() => setIsFocus(false), 100);
+            setTimeout(() => inputHandler.setFocus(false), 100);
           }}
           autoComplete="off"
         />
@@ -201,9 +154,9 @@ export function InputPasswordComponent({
         )}
       </div>
 
-      {isInvalid && (
+      {invalidMessage && (
         <small className={cn("input-error-message", "text-danger mt-1")}>
-          {isInvalid}
+          {invalidMessage}
         </small>
       )}
 
@@ -240,13 +193,7 @@ export function InputPasswordComponent({
               strength === "strong" && "text-warning",
               strength === "excellent" && "text-success",
             )}
-          >
-            {strength === "weak"
-              ? "Weak"
-              : strength === "strong"
-              ? "Strong"
-              : "Excellent"}
-          </span>
+          >{strength === "weak" ? "Weak" : strength === "strong" ? "Strong" : "Excellent"}</span>
         </div>
       )}
 
@@ -254,9 +201,7 @@ export function InputPasswordComponent({
         <label
           htmlFor={randomConfirmId}
           className={cn("input-label text-sm", pcn<CT>(className, "label"))}
-        >
-          Password Confirm
-        </label>
+        >Password Confirm</label>
         <div className="relative">
           <input
             {...props}
@@ -280,9 +225,7 @@ export function InputPasswordComponent({
       </div>
 
       {isConfirmMismatch && (
-        <small className={cn("input-error-message", "text-danger mt-1")}>
-          {isInvalid || "Password confirmation not match"}
-        </small>
+        <small className={cn("input-error-message", "text-danger mt-1")}>Password confirmation not match</small>
       )}
     </div>
   );

@@ -1,48 +1,48 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  buttonVariant,
-  buttonRadius,
-  iconButtonContainer,
-} from "./button.decorate";
-import { cn, pcn } from "@/helpers";
+import { cn, pcn } from "@utils/.";
+import { buttonVariant, buttonRadius, iconButtonContainer } from "./button.decorate";
+
+
 
 type CT = "icon" | "loading" | "base";
 
-export type IconButtonPropsType = {
-  icon?: any;
-  type?: "submit" | "button";
-  variant?: "solid" | "outline" | "light" | "simple";
-  paint?: "primary" | "secondary" | "success" | "danger" | "warning";
-  customPaint?: {
-    bg?: string;
-    color?: string;
-    border?: string;
+export interface IconButtonProps {
+  icon         ?:  any;
+  type         ?:  "submit" | "button";
+  variant      ?:  "solid" | "outline" | "light" | "simple";
+  rounded      ?:  boolean | string;
+  disabled     ?:  boolean;
+  size         ?:  "xs" | "sm" | "md" | "lg";
+  onClick      ?:  any;
+  loading      ?:  boolean;
+  hover        ?:  boolean;
+  tips         ?:  string | undefined;
+  paint        ?:  "primary" | "secondary" | "success" | "danger" | "warning";
+  customPaint  ?:  {
+    bg         ?:  string;
+    color      ?:  string;
+    border     ?:  string;
   };
-  rounded?: boolean | string;
-  disabled?: boolean;
-  size?: "xs" | "sm" | "md" | "lg";
-  onClick?: any;
-  loading?: boolean;
-  hover?: boolean;
-  tips?: string | undefined;
 
   /** Use custom class with: "icon::", "loading::". */
   className?: string;
 };
 
+
+
 export function IconButtonComponent({
-  type = "button",
-  variant = "solid",
-  paint = "primary",
+  type     =  "button",
+  variant  =  "solid",
+  paint    =  "primary",
+  size     =  "md",
   rounded,
   disabled,
-  size = "md",
   onClick,
   icon,
   loading,
   tips,
-  className = "",
-}: IconButtonPropsType) {
+  className  =  "",
+}: IconButtonProps) {
   const buttonClasses = cn(
     "button",
     buttonVariant[variant][paint],

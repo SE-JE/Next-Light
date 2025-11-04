@@ -1,18 +1,22 @@
-import { cn } from "@/helpers";
 import React from "react";
+import { cn } from "@utils/.";
+
+
+
+export interface CardProps {
+  children    :  React.ReactNode;
+  className  ?:  string;
+}
+
+
 
 export function CardComponent({
   children,
   className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
+}: CardProps) {
   return (
     <>
-      <div
-        className={cn("px-4 py-2.5 rounded-[6px] border bg-white", className)}
-      >
+      <div className={cn("px-4 py-2.5 rounded-[6px] border bg-white", className)}>
         {children}
       </div>
     </>

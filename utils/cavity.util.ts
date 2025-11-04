@@ -1,6 +1,13 @@
-const name = String(process.env.NEXT_PUBLIC_APP_NAME || "").toLowerCase().trim().replace(/[^\w\s-]/g, "").replace(/[\s_-]+/g, "-").replace(/^-+|-+$/g, "") + ".cavity";
-const storeName = "cache";
-const version = 1;
+/* eslint-disable no-console */
+import { socket as s } from "@utils/socket.util";
+
+const name           =  String(process.env.NEXT_PUBLIC_APP_NAME || "").toLowerCase().trim().replace(/[^\w\s-]/g, "").replace(/[\s_-]+/g, "-").replace(/^-+|-+$/g, "") + ".cavity";
+const storeName      =  "cache";
+const version        =  1;
+
+const subscriptions  =  new Set<string>();
+const socket         =  s.connect();
+let   registered     =  false;
 
 type CavityType = {
   key      :  string;
@@ -86,4 +93,45 @@ export const cavity = {
     store.delete(key);
     return tx.commit;
   },
+
+  socket: {
+    register: () => {
+      if (registered || !s) return;
+      registered = true;
+
+      socket?.on("cache:invalidate", async ({ key }: { key: string }) => {
+        await cavity.delete(key);
+      });
+
+      socket?.on("connect", () => {
+        console.log("[Cavity] Socket connected:", socket.id);
+        subscriptions.forEach((key) => cavity.socket.subscribe(key));
+      });
+
+      socket?.on("disconnect", (reason) => {
+        console.warn("[Cavity] Socket disconnected:", reason);
+      });
+    },
+
+    subscribe(key: string) {
+      if (!socket?.connected) return;
+      if (subscriptions.has(key)) return;
+
+      subscriptions.add(key);
+      socket.emit("cache:subscribe", { key });
+    },
+
+    unsubscribe(key: string) {
+      if (!socket?.connected) return;
+      if (!subscriptions.has(key)) return;
+
+      subscriptions.delete(key);
+      socket.emit("cache:unsubscribe", { key });
+    },
+
+    invalidate(key: string) {
+      if (!socket?.connected) return;
+      socket.emit("cache:invalidate", { key });
+    },
+  }
 };

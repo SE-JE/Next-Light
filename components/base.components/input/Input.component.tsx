@@ -1,42 +1,34 @@
-import { cn, pcn, useValidationHelper, ValidationRulesType } from "@/helpers";
+import React, { InputHTMLAttributes, ReactNode, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, {
-  InputHTMLAttributes,
-  ReactNode,
-  useEffect,
-  useState,
-} from "react";
+import { cn, pcn, useInputHandler, useInputRandomId, useValidation, validation } from "@utils/.";
 
-type CT =
-  | "label"
-  | "tip"
-  | "error"
-  | "base"
-  | "icon"
-  | "suggest"
-  | "suggest-item";
 
-export interface InputPropsType
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange"> {
-  label?: string;
-  tip?: string | ReactNode;
-  leftIcon?: any;
-  rightIcon?: any;
 
-  value?: any;
-  error?: string;
-  suggestions?: string[];
+type CT = "label" | "tip" | "error" | "base" | "icon" | "suggest" | "suggest-item";
 
-  validations?: ValidationRulesType;
-  onlyAlphabet?: boolean;
-  autoUppercase?: boolean;
+export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange"> {
+  label      ?:  string;
+  tip        ?:  string | ReactNode;
+  leftIcon   ?:  any;
+  rightIcon  ?:  any;
 
-  onChange?: (value: any) => any;
-  register?: (name: string, validations?: ValidationRulesType) => void;
+  value        ?:  any;
+  invalid      ?:  string;
+  suggestions  ?:  string[];
+
+  validations   ?:  string;
+  onlyAlphabet  ?:  boolean;
+  uppercase     ?:  boolean;
+  lowercase     ?:  boolean;
+
+  onChange  ?:  (value: any) => any;
+  register  ?:  (name: string, validations?: string) => void;
 
   /** Use custom class with: "label::", "tip::", "error::", "icon::", "suggest::", "suggest-item::". */
-  className?: string;
+  className  ?:  string;
 }
+
+
 
 export function InputComponent({
   label,
@@ -46,92 +38,56 @@ export function InputComponent({
   className = "",
 
   value,
-  error,
+  invalid,
   suggestions,
 
   validations,
   onlyAlphabet,
-  autoUppercase,
+  uppercase,
+  lowercase,
 
   register,
   onChange,
 
   ...props
-}: InputPropsType) {
-  const [inputValue, setInputValue] = useState<any>("");
-  const [isFocus, setIsFocus] = useState(false);
-  const [isInvalid, setIsInvalid] = useState("");
-  const [isFirst, setIsFirst] = useState(true);
+}: InputProps) {
 
-  const [activeSuggestion, setActiveSuggestion] = useState(0);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [dataSuggestions, setDataSuggestions] = useState<string[] | undefined>(
-    [],
-  );
-  const [filteredSuggestions, setFilteredSuggestions] = useState<
-    string[] | undefined
-  >([]);
+
+  const [activeSuggestion, setActiveSuggestion]        =  useState(0);
+  const [showSuggestions, setShowSuggestions]          =  useState(false);
+  const [dataSuggestions, setDataSuggestions]          =  useState<string[] | undefined>([]);
+  const [filteredSuggestions, setFilteredSuggestions]  =  useState<string[] | undefined>([]);
+
 
   // =========================>
-  // ## initial
+  // ## Initial
   // =========================>
-  useEffect(() => {
-    register?.(props.name || "", validations);
-  }, [props.name, validations]);
+  const inputHandler      =  useInputHandler(props.name, value, validations, register, props.type == "file")
+  const randomId          =  useInputRandomId()
 
-  const [randomId, setRandomId] = useState("");
-
-  useEffect(() => {
-    setRandomId(Math.random().toString(36).substring(7));
-  }, []);
 
   // =========================>
-  // ## invalid handler
+  // ## Invalid handler
   // =========================>
-  const [errorMessage] = useValidationHelper(
-    {
-      value: inputValue,
-      rules: validations,
-    },
-    isFirst,
-  );
+  const [invalidMessage]  =  useValidation(inputHandler.value, validations, invalid, inputHandler.idle);
 
-  useEffect(() => {
-    setIsInvalid(errorMessage || error || "");
-  }, [error, errorMessage]);
 
   // =========================>
-  // ## change value handler
+  // ## Change value handler
   // =========================>
   useEffect(() => {
-    setInputValue(value && (props.type != "file" || value instanceof File) ? value : "");
-    value && setIsFirst(false);
-  }, [value]);
+    if (inputHandler.value && typeof inputHandler.value === "string") {
+      let newVal = onlyAlphabet ? inputHandler.value.replace(/[^A-Za-z ]+/g, "") : inputHandler.value;
 
-  useEffect(() => {
-    if (inputValue && typeof inputValue === "string") {
-      const val = inputValue.split("");
-      let newVal = "";
+      if (uppercase) newVal = newVal.toUpperCase();
+      if (lowercase) newVal = newVal.toLowerCase();
 
-      if (onlyAlphabet) {
-        val.map((data) => {
-          if (data == " ") {
-            newVal += " ";
-          } else if (/[A-Za-z]/.test(data)) {
-            newVal += data;
-          }
-        });
-      } else {
-        newVal = inputValue;
-      }
+      if (validations && validation.hasRules(validations, "max")) newVal = newVal.slice(0, parseInt(validation.getRules(validations, "max") || "0"));
 
-      if (autoUppercase) newVal = newVal.toUpperCase();
-
-      if (validations?.max) newVal = newVal.slice(0, validations?.max);
-
-      setInputValue(newVal);
+      inputHandler.setValue(newVal);
     }
-  }, [inputValue, onlyAlphabet, autoUppercase, validations]);
+  }, [inputHandler.value, onlyAlphabet, uppercase, lowercase, validations]);
+
 
   // =========================>
   // ## suggestions handler
@@ -146,11 +102,7 @@ export function InputComponent({
 
       if (e.target.value) {
         filteredSuggestion = dataSuggestions
-          .filter(
-            (suggestion) =>
-              suggestion.toLowerCase().indexOf(e.target.value.toLowerCase()) >
-              -1,
-          )
+          .filter((suggestion) => suggestion.toLowerCase().indexOf(e.target.value.toLowerCase()) > -1)
           .slice(0, 10);
       } else {
         filteredSuggestion = dataSuggestions.slice(0, 10);
@@ -162,6 +114,7 @@ export function InputComponent({
     }
   };
 
+
   const onKeyDownSuggestion = (e: any) => {
     if (dataSuggestions?.length) {
       if (e.keyCode === 13) {
@@ -169,9 +122,9 @@ export function InputComponent({
         setActiveSuggestion(-1);
         setFilteredSuggestions([]);
         setShowSuggestions(false);
-        setInputValue(resultValue ? resultValue : inputValue);
+        inputHandler.setValue(resultValue ? resultValue : inputHandler.value);
         if (onChange) {
-          onChange(resultValue ? resultValue : inputValue);
+          onChange(resultValue ? resultValue : inputHandler.value);
         }
         e.preventDefault();
       } else if (e.keyCode === 38) {
@@ -190,6 +143,7 @@ export function InputComponent({
     }
   };
 
+
   return (
     <>
       <div className="relative flex flex-col gap-y-0.5">
@@ -200,14 +154,14 @@ export function InputComponent({
             pcn<CT>(className, "label"),
             props.disabled && "opacity-50",
             props.disabled && pcn<CT>(className, "label", "disabled"),
-            isFocus && "text-primary",
-            isFocus && pcn<CT>(className, "label", "focus"),
-            isInvalid && "text-danger",
-            isInvalid && pcn<CT>(className, "label", "focus"),
+            inputHandler.focus && "text-primary",
+            inputHandler.focus && pcn<CT>(className, "label", "focus"),
+            !!invalidMessage && "text-danger",
+            !!invalidMessage && pcn<CT>(className, "label", "focus"),
           )}
         >
           {label}
-          {validations?.required && <span className="text-danger">*</span>}
+          {validations && validation.hasRules(validations, "required") && <span className="text-danger">*</span>}
         </label>
 
         {tip && (
@@ -218,9 +172,7 @@ export function InputComponent({
               props.disabled && "opacity-60",
               props.disabled && pcn<CT>(className, "tip", "disabled"),
             )}
-          >
-            {tip}
-          </small>
+          >{tip}</small>
         )}
 
         <div className="relative">
@@ -233,26 +185,24 @@ export function InputComponent({
               leftIcon && "pl-12",
               rightIcon && "pr-12",
               pcn<CT>(className, "base"),
-              isInvalid && "input-error",
-              isInvalid && pcn<CT>(className, "base", "error"),
+              !!invalidMessage && "input-error",
+              !!invalidMessage && pcn<CT>(className, "base", "error"),
             )}
-            value={inputValue}
+            value={inputHandler.value}
             onChange={(e) => {
-              setInputValue(e.target.value);
-              setIsFirst(false);
-              setIsInvalid("");
-              // onChange?.(e.target.value);
+              inputHandler.setValue(e.target.value);
+              inputHandler.setIdle(false);
               onChange?.(props.type == "file" ? e.target?.files && e.target?.files[0] : e.target.value);
               dataSuggestions?.length && filterSuggestion(e);
             }}
             onFocus={(e) => {
               props.onFocus?.(e);
-              setIsFocus(true);
+              inputHandler.setFocus(true);
               dataSuggestions?.length && filterSuggestion(e);
             }}
             onBlur={(e) => {
               props.onBlur?.(e);
-              setTimeout(() => setIsFocus(false), 100);
+              setTimeout(() => inputHandler.setFocus(false), 100);
             }}
             onKeyDown={(e) => {
               dataSuggestions?.length && onKeyDownSuggestion(e);
@@ -265,12 +215,12 @@ export function InputComponent({
           {leftIcon && (
             <FontAwesomeIcon
               className={cn(
-                "left-4 input-icon ",
+                "left-4 input-icon",
                 pcn<CT>(className, "icon"),
                 props.disabled && "opacity-60",
                 props.disabled && pcn<CT>(className, "icon", "disabled"),
-                isFocus && "text-primary",
-                isFocus && pcn<CT>(className, "icon", "focus"),
+                inputHandler.focus && "text-primary",
+                inputHandler.focus && pcn<CT>(className, "icon", "focus"),
               )}
               icon={leftIcon}
             />
@@ -283,25 +233,21 @@ export function InputComponent({
                 pcn<CT>(className, "icon"),
                 props.disabled && "opacity-60",
                 props.disabled && pcn<CT>(className, "icon", "disabled"),
-                isFocus && "text-primary",
-                isFocus && pcn<CT>(className, "icon", "focus"),
+                inputHandler.focus && "text-primary",
+                inputHandler.focus && pcn<CT>(className, "icon", "focus"),
               )}
               icon={rightIcon}
             />
           )}
         </div>
 
-        {!!dataSuggestions?.length &&
-          showSuggestions &&
-          !!filteredSuggestions?.length && (
+        {!!dataSuggestions?.length && showSuggestions && !!filteredSuggestions?.length && (
             <div>
               <ul
                 className={cn(
                   "input-suggest-container",
                   pcn<CT>(className, "suggest"),
-                  isFocus
-                    ? "opacity-100 scale-y-100 -translate-y-0"
-                    : "opacity-0 scale-y-0 -translate-y-1/2",
+                  inputHandler.focus ? "opacity-100 scale-y-100 -translate-y-0" : "opacity-0 scale-y-0 -translate-y-1/2",
                 )}
               >
                 {filteredSuggestions.map((suggestion, key) => {
@@ -310,22 +256,20 @@ export function InputComponent({
                       className={cn(
                         "input-suggest",
                         pcn<CT>(className, "suggest-item"),
-                        inputValue == suggestion &&
-                          "bg-light-primary text-primary",
-                        inputValue == suggestion &&
-                          pcn<CT>(className, "suggest-item", "active"),
+                        inputHandler.value == suggestion && "bg-light-primary text-primary",
+                        inputHandler.value == suggestion && pcn<CT>(className, "suggest-item", "active"),
                       )}
                       key={suggestion}
                       onMouseDown={() => {
-                        setTimeout(() => setIsFocus(true), 110);
+                        setTimeout(() => inputHandler.setFocus(true), 110);
                       }}
                       onMouseUp={() => {
                         setActiveSuggestion(key);
                         setFilteredSuggestions([]);
                         setShowSuggestions(false);
-                        setInputValue(filteredSuggestions[key] || inputValue);
-                        onChange?.(filteredSuggestions[key] || inputValue);
-                        setTimeout(() => setIsFocus(false), 120);
+                        inputHandler.setValue(filteredSuggestions[key] || inputHandler.value);
+                        onChange?.(filteredSuggestions[key] || inputHandler.value);
+                        setTimeout(() => inputHandler.setFocus(false), 120);
                       }}
                     >
                       {suggestion}
@@ -336,12 +280,8 @@ export function InputComponent({
             </div>
           )}
 
-        {isInvalid && (
-          <small
-            className={cn("input-error-message", pcn<CT>(className, "error"))}
-          >
-            {isInvalid}
-          </small>
+        {invalidMessage && (
+          <small className={cn("input-error-message", pcn<CT>(className, "error"))}>{invalidMessage}</small>
         )}
       </div>
     </>

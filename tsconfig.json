@@ -17,10 +17,12 @@
     "incremental"        :  true,
     "paths"              :  {
       "@/*"              :  ["./*"],
-      "@helpers/*"       :  ["./helpers/*"],
+      "@utils/*"         :  ["./utils/*"],
       "@components/*"    :  ["./components/*", "./components/base.components/*", "./components/construct.components/*", "./components/structure.components/*"],
       "@contexts/*"      :  ["./contexts/*"],
       "@pages/*"         :  ["./pages/*"],
+      "@styles/*"        :  ["./styles/*"],
+      "@public/*"        :  ["./public/*"],
     }
   },
 }

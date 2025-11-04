@@ -1,11 +1,19 @@
-import { cn, pcn } from "@/helpers";
+import { cn, pcn } from "@/utils";
 
 type CT = "item" | "active" | "base";
 
-export type TabbarItem = {
-  label: string;
-  value: string | number;
+export interface TabbarItemProps {
+  label  :  string;
+  value  :  string | number;
 };
+
+export interface TabbarProps {
+  items       :  string[] | TabbarItemProps[];
+  onChange   ?:  (item: string | number) => void;
+  active     ?:  string | number;
+  className  ?:  string;
+};
+
 
 export function TabbarComponent({
   items,
@@ -14,12 +22,7 @@ export function TabbarComponent({
 
   /** Use custom class with: "item::", "active::". */
   className = "",
-}: {
-  items: string[] | TabbarItem[];
-  onChange?: (item: string | number) => void;
-  active?: string | number;
-  className?: string;
-}) {
+}: TabbarProps) {
   return (
     <>
       <div

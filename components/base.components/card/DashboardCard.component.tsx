@@ -1,6 +1,18 @@
-import { cn } from "@/helpers";
 import Link from "next/link";
 import React, { ReactNode } from "react";
+import { cn } from "@utils/.";
+
+
+
+export interface DashboardCardProps {
+  content       ?:  string | ReactNode;
+  title         ?:  string | ReactNode;
+  rightContent  ?:  string | ReactNode;
+  path          ?:  string;
+  className     ?:  string;
+}
+
+
 
 export function DashboardCardComponent({
   content,
@@ -8,13 +20,7 @@ export function DashboardCardComponent({
   rightContent,
   path,
   className,
-}: {
-  content?: string | ReactNode;
-  title?: string | ReactNode;
-  rightContent?: string | ReactNode;
-  path?: string;
-  className?: string;
-}) {
+} : DashboardCardProps) {
   return (
     <>
       <Link href={path || ""}>

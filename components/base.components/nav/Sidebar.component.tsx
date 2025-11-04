@@ -1,59 +1,68 @@
 import React, { Fragment, ReactNode, useEffect, useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { cn, pcn } from "@/helpers";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
+import { cn, pcn } from "@utils/.";
+
+
 
 type CT = "backdrop" | "base" | "head-item" | "item" | "child-item";
 
-export type SidebarItemType = {
-  label: string;
-  key?: number;
-  leftContent?: any;
-  rightContent?: any;
-  path?: string;
-  items?: SidebarItemType[];
-  className?: string;
+export interface SidebarItemProps {
+  label          :  string;
+  key           ?:  number;
+  leftContent   ?:  any;
+  rightContent  ?:  any;
+  path          ?:  string;
+  items         ?:  SidebarItemProps[];
+  className     ?:  string;
 };
 
-export type SidebarHeadItemType = {
-  label: string;
-  collapse?: boolean;
-  items?: SidebarItemType[];
-  className?: string;
+export interface SidebarHeadItemProps {
+  label       :  string;
+  collapse   ?:  boolean;
+  items      ?:  SidebarItemProps[];
+  className  ?:  string;
 };
 
-export type sidebarProps = {
-  head?: any;
-  items?: SidebarHeadItemType[];
-  basePath?: string;
-  show?: boolean;
-  toggle?: boolean;
-  onToggleChange?: () => void;
-  children?: any;
-  hasAccess?: number[];
-  onChange?: () => void;
+export interface sidebarProps {
+  head            ?:  any;
+  items           ?:  SidebarHeadItemProps[];
+  basePath        ?:  string;
+  show            ?:  boolean;
+  toggle          ?:  boolean;
+  onToggleChange  ?:  () => void;
+  children        ?:  any;
+  hasAccess       ?:  number[];
+  onChange        ?:  () => void;
 
   /** Use custom class with: "backdrop::", "head-item::", "item::", "child-item::". */
   className?: string;
 };
 
-function ListWrapper({
+interface sidebarWrapperProps {
+  path      ?:  string;
+  onClick   ?:  () => void;
+  children  ?:  any;
+}
+
+
+
+
+function SidebarWrapper({
   path,
   children,
   onClick,
-}: {
-  path?: string;
-  onClick?: () => void;
-  children?: any;
-}) {
+} : sidebarWrapperProps) {
   if (path) {
     return <Link href={path}>{children}</Link>;
   } else {
     return <div onClick={() => onClick?.()}>{children}</div>;
   }
 }
+
+
 
 export function SidebarComponent({
   head,
@@ -64,10 +73,9 @@ export function SidebarComponent({
   // onChange,
   // hasAccess,
   className = "",
-}: sidebarProps) {
-  const router = useRouter();
-  // const { getActive } = useToggleContext();
-  const [shows, setShows] = useState<string[]>([]);
+} : sidebarProps) {
+  const router             =  useRouter();
+  const [shows, setShows]  =  useState<string[]>([]);
 
   const setShow = (key: string) => {
     setShows((prevShows) =>
@@ -172,7 +180,7 @@ export function SidebarComponent({
                     menu_head?.items?.map((menu, menu_key) => {
                       return (
                         <Fragment key={`${menu_head_key}.${menu_key}`}>
-                          <ListWrapper
+                          <SidebarWrapper
                             path={
                               menu?.path ? `${basePath || ""}${menu?.path}` : ""
                             }
@@ -211,7 +219,7 @@ export function SidebarComponent({
                                 )}
                               </div>
                             </div>
-                          </ListWrapper>
+                          </SidebarWrapper>
                           <div className="px-4">
                             <div className="flex flex-col">
                               {menu?.items?.length &&
@@ -221,7 +229,7 @@ export function SidebarComponent({
                                     <Fragment
                                       key={`${menu_head_key}.${menu_key}.${menu_child_key}`}
                                     >
-                                      <ListWrapper
+                                      <SidebarWrapper
                                         path={
                                           child?.path
                                             ? `${basePath || ""}${child?.path}`
@@ -264,7 +272,7 @@ export function SidebarComponent({
                                             )}
                                           </div>
                                         </div>
-                                      </ListWrapper>
+                                      </SidebarWrapper>
                                     </Fragment>
                                   );
                                 })}

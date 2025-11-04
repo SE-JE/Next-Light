@@ -1,323 +1,239 @@
-// import React, { useEffect, useState } from 'react';
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-// import {
-//   faChevronDown,
-//   faChevronUp,
-//   faClock,
-// } from '@fortawesome/free-solid-svg-icons';
-// import { inputTimeProps } from './props/input-time.props';
-// import { useValidationHelper } from '../../../helpers';
-// import styles from './input.module.css';
-// import {
-//   inputContainer,
-//   inputField,
-//   inputIcon,
-//   inputLabel,
-//   inputPadding,
-// } from './input.decorate';
+import React, { InputHTMLAttributes, ReactNode, useEffect, useMemo, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { cn, pcn, useInputHandler, useInputRandomId, useValidation, validation } from "@utils/.";
+import { OutsideClickComponent } from "@components/.";
 
-// export function InputTimeComponent({
-//   name,
-//   disabled,
-//   placeholder,
-//   onChange,
-//   value,
-//   leftIcon,
-//   error,
-//   label,
-//   validations,
-//   size,
-//   // min,
-//   // max,
-//   withSecond,
-//   register,
-//   autoFocus,
-// }: inputTimeProps) {
-//   const [inputValue, setInputValue] = useState<string>('');
-//   const [isFocus, setIsFocus] = useState(false);
-//   const [isInvalid, setIsInvalid] = useState('');
-//   const [isFirst, setIsFirst] = useState(true);
 
-//   useEffect(() => {
-//     register?.(name, validations);
-//   }, [register, name, validations]);
 
-//   const [errorMessage] = useValidationHelper(
-//     {
-//       value: inputValue,
-//       rules: validations,
-//     },
-//     isFirst
-//   );
+type CT = "label" | "tip" | "error" | "input"| "icon";
 
-//   // =========================>
-//   // ## invalid handler
-//   // =========================>
-//   useEffect(() => {
-//     setIsInvalid(errorMessage || error || '');
-//   }, [error, errorMessage]);
+export interface InputTimeProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange"> {
+  label      ?:  string;
+  tip        ?:  string | ReactNode;
+  leftIcon   ?:  any;
+  rightIcon  ?:  any;
 
-//   useEffect(() => {
-//     if (value) {
-//       setInputValue(value);
-//       setIsFirst(false);
-//     } else {
-//       setInputValue('');
-//     }
-//   }, [value]);
+  value        ?:  string;
+  invalid      ?:  string;
+  validations  ?:  string;
 
-//   return (
-//     <>
-//       <div
-//         className={`
-//           ${inputContainer[size || 'md']}
-//         `}
-//       >
-//         <label
-//           htmlFor={`input_${name}`}
-//           className={`
-//             select-none
-//             ${inputLabel[size || 'md']}
-//             ${
-//               isFocus
-//                 ? 'text-primary'
-//                 : isInvalid
-//                 ? 'text-danger'
-//                 : 'text-slate-500'
-//             }
-//             ${disabled && 'opacity-60'}
-//           `}
-//         >
-//           {label}
-//         </label>
+  onChange  ?:  (value: string) => any;
+  register  ?:  (name: string, validations?: string) => void;
 
-//         <input type="hidden" name={name} value={inputValue} />
+  /** Use custom class with: "label::", "tip::", "error::", "icon::". */
+  className  ?:  string;
+}
 
-//         <div className="relative">
-//           <input
-//             readOnly={true}
-//             id={'input_' + name}
-//             placeholder={placeholder || ''}
-//             value={inputValue}
-//             className={`
-//               ${styles.input}
-//               ${isInvalid && styles.input__error}
-//               ${inputField[size || 'md']}
-//               ${leftIcon && inputPadding['left'][size || 'md']}
-//               ${inputPadding['right'][size || 'md']}
-//             `}
-//             name={''}
-//             disabled={disabled}
-//             onFocus={() => {
-//               setIsFocus(true);
-//             }}
-//             autoComplete="off"
-//             autoFocus={autoFocus}
-//           />
 
-//           {leftIcon && (
-//             <FontAwesomeIcon
-//               className={`
-//                 ${styles.input__icon}
-//                 ${inputIcon['left'][size || 'md']}
-//                 ${
-//                   isFocus
-//                     ? 'text-primary'
-//                     : isInvalid
-//                     ? 'text-danger'
-//                     : 'text-slate-400'
-//                 }
-//                 ${disabled && 'opacity-60'}
-//               `}
-//               icon={leftIcon}
-//             />
-//           )}
 
-//           <label
-//             htmlFor={`input_${name}`}
-//             className={`
-//                 cursor-pointer
-//                 ${inputIcon['right'][size || 'md']}
-//                 ${styles.input__icon}
-//             `}
-//           >
-//             <FontAwesomeIcon
-//               className={`
-//                 ${
-//                   isFocus
-//                     ? 'text-primary'
-//                     : isInvalid
-//                     ? 'text-danger'
-//                     : 'text-slate-400'
-//                 }
-//                 ${disabled && 'opacity-60'}
-//               `}
-//               icon={faClock}
-//             />
-//           </label>
+export function InputTimeComponent({
+  label,
+  tip,
+  leftIcon,
+  rightIcon,
+  
+  value,
+  invalid,
+  validations,
 
-//           {!disabled && isFocus && (
-//             <>
-//               <div
-//                 className="fixed top-0 left-0 z-30 w-full h-full bg-black opacity-30"
-//                 onClick={() => setIsFocus(false)}
-//               ></div>
+  register,
+  onChange,
+  
+  className = "",
+  ...props
+}: InputTimeProps) {
 
-//               <div
-//                 className={`
-//                   absolute z-40 right-0 w-max py-2 px-4 mt-2 bg-white border-2 rounded-lg shadow-lg
-//                 `}
-//               >
-//                 <div className="flex gap-4 items-center">
-//                   <InputNumberTimeComponent
-//                     defaultTime={
-//                       inputValue.split(':')[0]
-//                         ? Number(inputValue.split(':')[0])
-//                         : undefined
-//                     }
-//                     onChange={(e) => {
-//                       const splitValue = inputValue.split(':');
-//                       const newValue = `${e}:${splitValue[1] || '00'}:${
-//                         splitValue[2] || '00'
-//                       }`;
+  // =========================>
+  // ## Initial
+  // =========================>
+  const inputHandler  =  useInputHandler(props.name, value, validations, register, false)
+  const randomId      =  useInputRandomId()
+  
+  
+  // =========================>
+  // ## Invalid handler
+  // =========================>
+  const [invalidMessage]  =  useValidation(inputHandler.value, validations, invalid, inputHandler.idle);
 
-//                       setIsFirst(false);
-//                       setInputValue(newValue);
-//                       onChange?.(newValue);
-//                     }}
-//                   />
-//                   <div className="text-xl font-bold">:</div>
-//                   <InputNumberTimeComponent
-//                     max={60}
-//                     onChange={(e) => {
-//                       const splitValue = inputValue.split(':');
-//                       const newValue = `${splitValue[0] || '00'}:${e}:${
-//                         splitValue[2] || '00'
-//                       }`;
 
-//                       setIsFirst(false);
-//                       setInputValue(newValue);
-//                       onChange?.(newValue);
-//                     }}
-//                   />
-//                   {withSecond && (
-//                     <>
-//                       <div className="text-xl font-bold">:</div>
-//                       <InputNumberTimeComponent
-//                         max={60}
-//                         onChange={(e) => {
-//                           const splitValue = inputValue.split(':');
-//                           const newValue = `${splitValue[0] || '00'}:${
-//                             splitValue[1] || '00'
-//                           }:${e}`;
+  return (
+    <div className="relative flex flex-col gap-y-0.5">
+      <label
+        htmlFor={randomId}
+        className={cn(
+          "input-label",
+          pcn<CT>(className, "label"),
+          props.disabled && "opacity-50",
+          inputHandler.focus && "text-primary",
+          !!invalidMessage && "text-danger"
+        )}
+      >
+        {label}
+        {validations && validation.hasRules(validations, "required") && <span className="text-danger">*</span>}
+      </label>
 
-//                           setIsFirst(false);
-//                           setInputValue(newValue);
-//                           onChange?.(newValue);
-//                         }}
-//                       />
-//                     </>
-//                   )}
-//                 </div>
-//               </div>
-//             </>
-//           )}
-//         </div>
+      {tip && (
+        <small
+          className={cn(
+            "input-tip",
+            pcn<CT>(className, "tip"),
+            props.disabled && "opacity-60"
+          )}
+        >{tip}</small>
+      )}
 
-//         {isInvalid && (
-//           <small
-//             className={`
-//               overflow-x-hidden
-//               ${styles.input__error__message}
-//               ${
-//                 size == 'lg'
-//                   ? 'text-sm'
-//                   : size == 'sm'
-//                   ? 'text-[9px]'
-//                   : 'text-xs'
-//               }
-//             `}
-//           >
-//             {isInvalid}
-//           </small>
-//         )}
-//       </div>
-//     </>
-//   );
-// }
+      <OutsideClickComponent onOutsideClick={() => inputHandler.setFocus(false)}>
+        <div className="relative">
+          <input
+            {...props}
+            id={randomId}
+            className={cn(
+              "input",
+              leftIcon && "pl-12",
+              rightIcon && "pr-12",
+              pcn<CT>(className, "input"),
+              !!invalidMessage && "input-error"
+            )}
+            value={inputHandler.value}
+            onChange={(e) => {
+              inputHandler.setValue(e.target.value);
+              inputHandler.setIdle(false);
+              onChange?.(e.target.value);
+            }}
+            onFocus={(e) => {
+              props.onFocus?.(e);
+              inputHandler.setFocus(true);
+            }}
+            autoComplete="off"
+          />
 
-// export function InputNumberTimeComponent({
-//   max,
-//   onChange,
-//   defaultTime,
-// }: {
-//   max?: number;
-//   onChange?: (value: string) => any;
-//   defaultTime?: number;
-// }) {
-//   const [time, setTime] = useState('00');
+          {leftIcon && (
+            <FontAwesomeIcon
+              className={cn(
+                "left-4 input-icon",
+                pcn<CT>(className, "icon"),
+                props.disabled && "opacity-60",
+                inputHandler.focus && "text-primary"
+              )}
+              icon={leftIcon}
+            />
+          )}
 
-//   useEffect(() => {
-//     if (time) {
-//       let newTime = time;
+          {rightIcon && (
+            <FontAwesomeIcon
+              className={cn(
+                "right-4 input-icon",
+                pcn<CT>(className, "icon"),
+                props.disabled && "opacity-60",
+                inputHandler.focus && "text-primary"
+              )}
+              icon={rightIcon}
+            />
+          )}
 
-//       if (Number(time) > (max || 24)) newTime = '00';
-//       if (Number(time) < 0) newTime = max ? String(max).padStart(2, '0') : '24';
+          {inputHandler.focus && (
+            <InputTimePickerComponent
+              onChange={(time) => {
+                inputHandler.setValue(time);
+                onChange?.(time);
+              }}
+            />
+          )}
+        </div>
+      </OutsideClickComponent>
 
-//       setTime(newTime);
-//       onChange?.(newTime);
-//     }
-//     // eslint-disable-next-line react-hooks/exhaustive-deps
-//   }, [time, max]);
+      {invalidMessage && (
+        <small className={cn("input-error-message", pcn<CT>(className, "error"))}>{invalidMessage}</small>
+      )}
+    </div>
+  );
+}
 
-//   useEffect(() => {
-//     if (defaultTime) {
-//       let newTime = String(defaultTime);
 
-//       if (Number(time) > (max || 24)) newTime = '00';
-//       if (Number(time) < 0) newTime = max ? String(max).padStart(2, '0') : '24';
 
-//       setTime(newTime.padStart(2, '0'));
-//     } else {
-//       setTime('00');
-//     }
-//     // eslint-disable-next-line react-hooks/exhaustive-deps
-//   }, [defaultTime, max]);
+interface InputTimePickerProps {
+  onChange      ?:  (time: string) => void;
+  rightElement  ?:  ReactNode;
+};
 
-//   return (
-//     <div className="w-14 flex flex-col items-center">
-//       <div
-//         className="cursor-pointer"
-//         onClick={() => setTime(String(Number(time) + 1).padStart(2, '0'))}
-//       >
-//         <FontAwesomeIcon icon={faChevronUp} className="text-sm" />
-//       </div>
-//       <input
-//         type="text"
-//         className={`text-2xl bg-background font-semibold text-center w-full p-2 rounded-md`}
-//         value={time}
-//         onChange={(e) => {
-//           if (/^[0-9\b]+$/.test(e.target.value) || e.target.value == '')
-//             setTime(e.target.value.slice(0, 2));
-//         }}
-//         onBlur={() => {
-//           setTime(time.padStart(2, '0'));
-//         }}
-//         onKeyDown={(e) => {
-//           if (e.keyCode === 38) {
-//             setTime(String(Number(time) + 1).padStart(2, '0'));
-//           } else if (e.keyCode === 40) {
-//             setTime(String(Number(time) - 1).padStart(2, '0'));
-//           }
-//         }}
-//       />
-//       <div className="cursor-pointer">
-//         <FontAwesomeIcon
-//           icon={faChevronDown}
-//           className="text-sm"
-//           onClick={() => setTime(String(Number(time) - 1).padStart(2, '0'))}
-//         />
-//       </div>
-//     </div>
-//   );
-// }
+
+
+
+export const InputTimePickerComponent: React.FC<InputTimePickerProps> = ({
+  onChange,
+  rightElement,
+}) => {
+  const [hour, setHour]      =  useState(0);
+  const [minute, setMinute]  =  useState(0);
+  const [second, setSecond]  =  useState(0);
+
+  const hours    =  Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0"));
+  const minutes  =  Array.from({ length: 60 }, (_, i) => String(i).padStart(2, "0"));
+  const seconds  =  Array.from({ length: 60 }, (_, i) => String(i).padStart(2, "0"));
+
+  const handleSelect = (type: "h" | "m" | "s", val: string) => {
+    if (type === "h") setHour(Number(val));
+    if (type === "m") setMinute(Number(val));
+    if (type === "s") setSecond(Number(val));
+  };
+
+  useEffect(() => {
+    const formatted = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}:${String(second).padStart(2, "0")}`;
+    onChange?.(formatted);
+  }, [hour, minute, second]);
+
+  const renderColumn = (items: string[], type: "h" | "m" | "s", activeValue: number) => (
+    <div className="flex-1 overflow-y-auto max-h-40 text-center input-scroll">
+      {items.map((item) => {
+        const active = Number(item) === activeValue;
+
+        return (
+          <div
+            key={item}
+            onClick={() => handleSelect(type, item)}
+            className={cn(
+              "p-2 cursor-pointer rounded text-sm",
+              active ? "bg-primary text-background font-semibold" : "hover:bg-light-primary"
+            )}
+          >{item}</div>
+        );
+      })}
+    </div>
+  );
+
+  const timeSlots = useMemo(() => {
+    const newTimeSlots = [];
+
+    for (let i = 0; i <= 24 * 60; i += 30) {
+      const hours    =  Math.floor(i / 60);
+      const minutes  =  i % 60;
+      const label    =  `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+
+      newTimeSlots.push(label);
+    }
+
+    return newTimeSlots;
+  }, [])
+
+  return (
+    <div className="absolute z-50 top-full left-0 mt-1 w-max bg-white border rounded-[6px] p-2 shadow flex gap-2">
+      <div className="max-h-40 overflow-y-auto bg-white rounded-[6px] input-scroll">
+        {timeSlots.map((time) => (
+          <div
+            key={time}
+            className="p-2 text-sm rounded cursor-pointer hover:bg-light-primary"
+            onClick={() => onChange?.(time)}
+          >{time}</div>
+        ))}
+      </div>
+
+      <div className="flex gap-2">
+        {renderColumn(hours, "h", hour)}
+        {renderColumn(minutes, "m", minute)}
+        {renderColumn(seconds, "s", second)}
+      </div>
+
+      {rightElement && <div>{rightElement}</div>}
+    </div>
+  );
+};

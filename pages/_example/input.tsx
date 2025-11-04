@@ -10,6 +10,10 @@ import { InputCurrencyComponent } from "@/components/base.components/input/Input
 import { InputDateComponent } from "@/components/base.components/input/InputDate.component";
 import { InputNumberComponent } from "@/components/base.components/input/InputNumber.component";
 import { SelectComponent } from "@/components/base.components/input/Select.component";
+import { InputTimeComponent } from "@/components/base.components/input/InputTime.component";
+import { InputDatetimeComponent } from "@/components/base.components/input/InputDatetime.component";
+import { InputMapComponent } from "@/components/base.components/input/InputMap.component";
+import { InputImageComponent } from "@/components/base.components/input/InputImage.component";
 
 export default function Input() {
   return (
@@ -63,7 +67,7 @@ export default function Input() {
               name=""
               label="Nama Lengkap"
               placeholder="Contoh: Joko Gunawan..."
-              error="Nama tidak valid"
+              invalid="Nama tidak valid"
             />
           </div>
           <div className="col-span-4">
@@ -72,7 +76,7 @@ export default function Input() {
               name=""
               label="Nama Lengkap"
               placeholder="Contoh: Joko Gunawan..."
-              error="Nama tidak valid"
+              invalid="Nama tidak valid"
             />
           </div>
           <div className="col-span-4">
@@ -171,6 +175,22 @@ export default function Input() {
           </div>
 
           <div className="col-span-4">
+            <InputTimeComponent
+              name="input_time"
+              label="Input Time"
+              placeholder="HH:MM"
+            />
+          </div>
+
+          <div className="col-span-4">
+            <InputDatetimeComponent
+              name="input_datetime"
+              label="Input Datetime"
+              placeholder="YYYY-MM-DD hh:mm:ss"
+            />
+          </div>
+
+          <div className="col-span-4">
             <InputNumberComponent
               name="input_number"
               label="Input Number"
@@ -220,6 +240,22 @@ export default function Input() {
               })}
               searchable
               multiple
+            />
+          </div>
+
+          <div className="col-span-4">
+            <InputMapComponent
+              name="input_map"
+              label="Input Map"
+              placeholder="Choice option..."
+            />
+          </div>
+
+          <div className="col-span-4">
+            <InputImageComponent
+              name="input_image"
+              label="Input Image"
+              // placeholder="Choice option..."
             />
           </div>
         </div>

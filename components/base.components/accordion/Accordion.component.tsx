@@ -1,19 +1,20 @@
-import { cn, pcn } from "@/helpers";
-import {
-  faChevronDown,
-  faChevronLeft,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { ReactNode, useEffect, useState } from "react";
+import { faChevronDown, faChevronLeft } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { cn, pcn } from "@utils/.";
+
+
 
 type CT = "container" | "head" | "active" | "base";
 
-export type AccordionPropsType = {
-  setActive?: number | null;
-  items: { head: ReactNode; content: ReactNode }[];
-  horizontal?: boolean;
-  className?: string;
+export interface AccordionProps {
+  setActive   ?:  number | null;
+  items        :  { head: ReactNode; content: ReactNode }[];
+  horizontal  ?:  boolean;
+  className   ?:  string;
 };
+
+
 
 export function AccordionComponent({
   items,
@@ -22,7 +23,7 @@ export function AccordionComponent({
 
   /** Use custom class with: "container::", "head::", "active::". */
   className = "",
-}: AccordionPropsType) {
+}: AccordionProps) {
   const [isActive, setIsActive] = useState<number | null>(setActive);
 
   useEffect(() => {
@@ -60,27 +61,18 @@ export function AccordionComponent({
                 isActive !== key && "rotate-180",
               )}
             >
-              <FontAwesomeIcon
-                icon={horizontal ? faChevronLeft : faChevronDown}
-              />
+              <FontAwesomeIcon icon={horizontal ? faChevronLeft : faChevronDown} />
             </div>
           </div>
           <div
             className={cn(
               "transition-all overflow-hidden",
-              horizontal
-                ? isActive === key
-                  ? "max-w-max pr-4 py-2"
-                  : "max-w-0 px-0"
-                : isActive === key
-                  ? "max-h-max pb-4 px-4"
-                  : "max-h-0 pb-0 px-4",
+              horizontal ? isActive === key  ? "max-w-max pr-4 py-2" : "max-w-0 px-0"
+                : isActive === key ? "max-h-max pb-4 px-4" : "max-h-0 pb-0 px-4",
               pcn<CT>(className, "base"),
               isActive === key && pcn<CT>(className, "active"),
             )}
-          >
-            {content}
-          </div>
+          >{content}</div>
         </div>
       ))}
     </div>

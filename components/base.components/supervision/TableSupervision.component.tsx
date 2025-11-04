@@ -2,102 +2,81 @@ import React, { ReactNode, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import { faQuestionCircle } from "@fortawesome/free-regular-svg-icons";
 import { faEdit, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { ApiType, useGetApi, useResponsive } from "@/helpers";
-import { FloatingPageComponent, FloatingPagePropsType } from "@components/modal/FloatingPage.component";
-import { ButtonComponent, IconButtonComponent } from "@components/button";
-import { TableColumnType, TableComponent } from "@components/table/Table.component";
-import FormSupervisionComponent, { FormType } from "@components/supervision/FormSupervision.component";
-import { ModalConfirmComponent } from "@components/modal";
+import { ApiType, useGetApi, useResponsive } from "@utils/.";
+import { FloatingPageComponent, FloatingPageProps, ButtonComponent, IconButtonComponent, TableColumnType, TableComponent, FormSupervisionComponent, FormType, ModalConfirmComponent } from "@components/.";
 
 
-export type TableSupervisionColumnType = {
-  selector: string;
-  label?: string;
-  width?: string;
-  sortable?: boolean;
-  item?: (data: any) => string | ReactNode;
-  permissionCode?: string;
+export interface TableSupervisionColumnProps {
+  selector         :  string;
+  label           ?:  string;
+  width           ?:  string;
+  sortable        ?:  boolean;
+  item            ?:  (data: any) => string | ReactNode;
+  permissionCode  ?:  string;
 };
 
-export type TableSupervisionFormType = {
-  forms: string[] | (FormType & { visibility?: "*" | "create" | "update" })[];
-  customDefaultValue?: object;
-  payload?: (values: any) => object;
-  modalControl?: FloatingPagePropsType;
-  contentType?: "application/json" | "multipart/form-data";
+export interface TableSupervisionFormProps {
+  forms                :  string[] | (FormType & { visibility?: "*" | "create" | "update" })[];
+  customDefaultValue  ?:  object;
+  payload             ?:  (values: any) => object;
+  modalControl        ?:  FloatingPageProps;
+  contentType         ?:  "application/json" | "multipart/form-data";
 };
 
-export type TableSupervisionPropsType = {
-  title?: string;
-  fetchControl: ApiType;
-  setToRefresh?: boolean;
-  refreshOnClose?: boolean;
-  setToLoading?: boolean;
-  // customTopBarWithForm?: any;
-  headBar?: any;
-  columnControl?: string[] | TableSupervisionColumnType[];
-  // customTopBar?: any;
-  // formControl?:
-  // columnControl?: tableSupervisionColumnGroupProps;
-  formControl?: TableSupervisionFormType;
-  // formUpdateControl?: tableSupervisionFormUpdateGroupProps;
-  // includeFilters?: getFilterParams[];
-  // unUrlPage?: boolean;
-  // noControlBar?: boolean;
-  actionControl  ?:  
-    | boolean
-    | (
-        | string
-        | ((
-            row: object,
-            setModal: (type: "form" | "delete" | "show") => void,
-            setDataSelected: () => void
-          ) => ReactNode[])
-      )[];
-  permissionCode?: number;
-  searchable?: boolean;
-  customDetail?: (data: object) => any;
+export type TableSupervisionProps = {
+  title           ?:  string;
+  fetchControl     :  ApiType;
+  setToRefresh    ?:  boolean;
+  refreshOnClose  ?:  boolean;
+  setToLoading    ?:  boolean;
+  headBar         ?:  any;
+  columnControl   ?:  string[] | TableSupervisionColumnProps[];
+  formControl     ?:  TableSupervisionFormProps;
+  permissionCode  ?:  number;
+  searchable      ?:  boolean;
+  customDetail    ?:  (data: object) => any;
+  actionControl   ?:  boolean | (
+    | string
+    | ((
+        row              :  object,
+        setModal         :  (type: "form" | "delete" | "show") => void,
+        setDataSelected  :  () => void
+      ) => ReactNode[])
+  )[];
 };
 
-export default function TableSupervisionComponent({
+export function TableSupervisionComponent({
   title,
   fetchControl,
   setToLoading,
   columnControl,
   formControl,
   actionControl,
-}: TableSupervisionPropsType) {
-  const router = useRouter();
-  const { isSm } = useResponsive();
+}: TableSupervisionProps) {
+  const router    =  useRouter();
+  const { isSm }  =  useResponsive();
   const {
-    page: pageParams,
-    paginate: paginateParams,
-    search: searchParams,
-    "sort.direction": sortDirectionParams,
-    "sort.column": sortColumnParams,
+    page              :  pageParams,
+    paginate          :  paginateParams,
+    search            :  searchParams,
+    "sort.direction"  :  sortDirectionParams,
+    "sort.column"     :  sortColumnParams,
   } = router.query;
 
-  const [paginate, setPaginate] = useState(10);
-  const [page, setPage] = useState(1);
-  const [sort, setSort] = useState<{
-    column: string;
-    direction: "desc" | "asc";
-  }>({
-    column: "created_at",
-    direction: "desc",
-  });
-  const [search, setSearch] = useState<string>("");
+  const [paginate, setPaginate]  =  useState(10);
+  const [page, setPage]          =  useState(1);
+  const [sort, setSort]          =  useState<{ column: string; direction: "desc" | "asc"; }>({ column: "created_at", direction: "desc" });
+  const [search, setSearch]      =  useState<string>("");
   // const [searchColumn, setSearchColumn] = useState<string>("");
   // const [filter, setFilter] = useState<GetFilterType[]>([]);
 
-  const [modal, setModal] = useState<"form" | "delete" | "show" | null>(null);
-  const [dataSelected, setDataSelected] = useState<object | null>(null);
+  const [modal, setModal]                =  useState<"form" | "delete" | "show" | null>(null);
+  const [dataSelected, setDataSelected]  =  useState<object | null>(null);
 
   // ============================
   // ## fetching
   // ============================
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [{ loading, code, data, reset }] = useGetApi(
+  const { loading, data, reset } = useGetApi(
     {
       ...fetchControl,
       method  :  "GET",
@@ -303,23 +282,17 @@ export default function TableSupervisionComponent({
         controlBar={[
           ...(!isSm
             ? [
-                () => {
-                  return (
-                    <div className="pl-2 pr-4 mr-2 border-r">
-                      <ButtonComponent
-                        icon={faPlus}
-                        label="Tambah Data"
-                        size="sm"
-                        onClick={() => setModal("form")}
-                      />
-                    </div>
-                  );
-                },
+                <div className="pl-2 pr-4 mr-2 border-r" key="button-add">
+                  <ButtonComponent
+                    icon={faPlus}
+                    label="Tambah Data"
+                    size="sm"
+                    onClick={() => setModal("form")}
+                  />
+                </div>
               ]
             : []),
-          "search",
-          "filterColumn",
-          "refresh",
+          "SEARCHABLE", "SEARCH", "SELECTABLE", "REFRESH",
         ]}
       />
 

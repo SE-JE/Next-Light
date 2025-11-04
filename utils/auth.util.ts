@@ -1,8 +1,8 @@
 import Router from 'next/router';
 import Cookies from 'js-cookie';
-import { encryption } from '@helpers/.';
+import { encryption } from '@/utils';
 
-export const middleware = {
+export const auth = {
   // ==============================>
   // ## Path of login page
   // ==============================>
@@ -26,21 +26,21 @@ export const middleware = {
   // ==============================>
   // ## set access token to cookie
   // ==============================>
-  setAccessToken                :  (token: string | null, expired?: number) => Cookies.set(middleware.ACCESS_TOKEN_NAME, token ? encryption.set(token) : "", { expires: expired || middleware.ACCESS_TOKEN_EXPIRED, secure: true }),
-  
+  setAccessToken                :  (token: string | null, expired?: number) => Cookies.set(auth.ACCESS_TOKEN_NAME, token ? encryption.set(token) : "", { expires: expired || auth.ACCESS_TOKEN_EXPIRED, secure: true }),
+
   // ==============================>
   // ## get access token from cookie
   // ==============================>
-  getAccessToken                :  () => encryption.get(Cookies.get(middleware.ACCESS_TOKEN_NAME) || ""),
+  getAccessToken                :  () => encryption.get(Cookies.get(auth.ACCESS_TOKEN_NAME) || ""),
 
   // ==============================>
   // ## delete access token from cookie
   // ==============================>
-  deleteAccessToken             :  () => Cookies.remove(middleware.ACCESS_TOKEN_NAME),
+  deleteAccessToken             :  () => Cookies.remove(auth.ACCESS_TOKEN_NAME),
 
   // ==============================>
   // ## Check auth
   // ==============================>
-  check                         :   () => (!Cookies.get(middleware.ACCESS_TOKEN_NAME)) && Router.push(middleware.PATH_LOGIN),
+  check                         :  () => (!Cookies.get(auth.ACCESS_TOKEN_NAME)) && Router.push(auth.PATH_LOGIN),
 }
 

@@ -1,8 +1,22 @@
-import { cn, pcn } from "@/helpers";
-import Image from "next/image";
 import React from "react";
+import Image from "next/image";
+import { cn, pcn } from "@utils/.";
+
+
 
 type CT = "image" | "base" | "content";
+
+export interface ProductCardProps {
+  name          :  string;
+  price        ?:  string;
+  image        ?:  string;
+  description  ?:  string | React.ReactNode;
+
+  /** Use custom class with: "image::", "content::". */
+  className  ?:  string;
+}
+
+
 
 export function ProductCardComponent({
   image = "",
@@ -10,15 +24,7 @@ export function ProductCardComponent({
   price,
   description,
   className = "",
-}: {
-  name: string;
-  price?: string;
-  image?: string;
-  description?: string | React.ReactNode;
-
-  /** Use custom class with: "image::", "content::". */
-  className?: string;
-}) {
+} : ProductCardProps) {
   return (
     <>
       <div

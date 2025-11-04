@@ -8,7 +8,6 @@ export default function Table() {
     <>
       <div>
         <TableComponent
-          controlBar
           columns={[
             {
               label: "Column 1",

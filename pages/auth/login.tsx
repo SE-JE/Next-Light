@@ -1,5 +1,4 @@
-import { ButtonComponent, CardComponent } from "@/components/base.components";
-import FormSupervisionComponent from "@/components/base.components/supervision/FormSupervision.component";
+import { ButtonComponent, CardComponent, FormSupervisionComponent } from "@/components/base.components";
 import { useAuthContext } from "@/contexts/Auth.context";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -16,14 +15,14 @@ export default function Login() {
         <p className="text-sm font-semibold mt-6">Sign in with your account!</p>
 
         <CardComponent className="mt-4 p-6 w-[400px] rounded-2xl">
-          <FormSupervisionComponent 
+          <FormSupervisionComponent
             forms={[
               {
                 construction: {
                   name: "email",
                   label: "E-mail",
                   placeholder: "Ex: example@mail.com",
-                  validations: {required: true, email: true}
+                  validations: "required|min:10|max:50|email"
                 }
               },
               {

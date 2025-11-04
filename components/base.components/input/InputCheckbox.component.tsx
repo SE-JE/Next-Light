@@ -1,46 +1,41 @@
 import React, { ReactNode, useEffect, useState } from "react";
-import {
-  api,
-  ApiType,
-  cn,
-  pcn,
-  useValidationHelper,
-  ValidationRulesType,
-} from "@helpers/.";
-import { CheckboxComponent } from "./Checkbox.component";
+import { api, ApiType, cn, pcn, useInputHandler, useValidation, validation } from "@utils/.";
+import { CheckboxComponent } from "@components/.";
+
+
 
 type CT = "label" | "tip" | "error" | "input" | "icon";
 
-export type InputCheckboxOptionPropsType = {
+export interface InputCheckboxOptionProps {
   value: string | number;
   label: string;
 };
 
-export type InputCheckboxPropsType = {
-  name: string;
-  label?: string;
-  tip?: string | ReactNode;
-  vertical?: boolean;
+export interface InputCheckboxProps {
+  name       :  string;
+  label     ?:  string;
+  tip       ?:  string | ReactNode;
+  vertical  ?:  boolean;
 
-  value?: string[] | number[];
-  disabled?: boolean;
-  error?: string;
+  value     ?:  string[] | number[];
+  disabled  ?:  boolean;
+  invalid   ?:  string;
 
-  options              ?:  InputCheckboxOptionPropsType[];
+  options              ?:  InputCheckboxOptionProps[];
   serverOptionControl  ?:  ApiType;
   customOptions        ?:  any;
-  validations          ?:  ValidationRulesType;
+  validations          ?:  string;
   
   onChange             ?:  (value: string[] | number[]) => any;
-  register             ?:  (name: string, validations?: ValidationRulesType) => void;
-  
+  register             ?:  (name: string, validations?: string) => void;
 
   /** Use custom class with: "label::", "tip::", "error::", "icon::", "suggest::", "suggest-item::". */
   className            ?: string;
-
   /** Use custom class with: "label::", "checked::", "error::". */
   classNameCheckbox    ?: string;
 };
+
+
 
 export function InputCheckboxComponent({
   name,
@@ -52,7 +47,7 @@ export function InputCheckboxComponent({
 
   value,
   disabled,
-  error,
+  invalid,
 
   options,
   serverOptionControl,
@@ -61,26 +56,23 @@ export function InputCheckboxComponent({
 
   register,
   onChange,
-}: InputCheckboxPropsType) {
-  const [isInvalid, setIsInvalid]      =  useState("");
-  const [inputValue, setInputValue]    =  useState<string[] | number[]>([]);
-  const [dataOptions, setDataOptions]  =  useState<InputCheckboxPropsType[]>([]);
+}: InputCheckboxProps) {
+
+  const [dataOptions, setDataOptions]  =  useState<InputCheckboxOptionProps[]>([]);
   const [loading, setLoading]          =  useState(false);
+
 
   // =========================>
   // ## initial
   // =========================>
-  useEffect(() => {
-    register?.(name || "", validations);
-  }, [name, validations]);
+  const inputHandler = useInputHandler(name, value, validations, register, false)
 
-  useEffect(() => {
-    if (value) {
-      setInputValue(value);
-    } else {
-      setInputValue([]);
-    }
-  }, [value]);
+
+  // =========================>
+  // ## Invalid handler
+  // =========================>
+  const [invalidMessage] = useValidation(inputHandler.value, validations, invalid, inputHandler.idle);
+
 
   // =========================>
   // ## fetch option
@@ -90,9 +82,7 @@ export function InputCheckboxComponent({
       setLoading(true);
       const mutateOptions = await api(serverOptionControl || {});
       if (mutateOptions?.status == 200) {
-        customOptions
-          ? setDataOptions([customOptions, ...mutateOptions.data])
-          : setDataOptions(mutateOptions.data);
+        customOptions ? setDataOptions([customOptions, ...mutateOptions.data]) : setDataOptions(mutateOptions.data);
         setLoading(false);
       }
     };
@@ -104,19 +94,6 @@ export function InputCheckboxComponent({
     }
   }, [serverOptionControl?.path, serverOptionControl?.url]);
 
-  // =========================>
-  // ## invalid handler
-  // =========================>
-  const [errorMessage] = useValidationHelper({
-    value: inputValue,
-    rules: validations,
-  });
-
-  useEffect(() => {
-    setIsInvalid(errorMessage || error || "");
-  }, [error, errorMessage]);
-
-  const dummy = vertical ? [1, 2, 3, 4, 5, 6, 7, 8, 9] : [1, 2, 3];
 
   return (
     <>
@@ -127,12 +104,12 @@ export function InputCheckboxComponent({
             pcn<CT>(className, "label"),
             disabled && "opacity-50",
             disabled && pcn<CT>(className, "label", "disabled"),
-            isInvalid && "text-danger",
-            isInvalid && pcn<CT>(className, "label", "focus"),
+            invalidMessage && "text-danger",
+            invalidMessage && pcn<CT>(className, "label", "focus"),
           )}
         >
           {label}
-          {validations?.required && <span className="text-danger">*</span>}
+          {validations && validation.hasRules(validations, "required") && <span className="text-danger">*</span>}
         </label>
 
         {tip && (
@@ -143,67 +120,60 @@ export function InputCheckboxComponent({
               disabled && "opacity-60",
               disabled && pcn<CT>(className, "tip", "disabled"),
             )}
-          >
-            {tip}
-          </small>
+          >{tip}</small>
         )}
 
         <div
           className={cn(
-            `input overflow-auto input-scroll w-full flex flex-nowrap gap-y-2 gap-4 ${
-              vertical && `flex-col flex-wrap ${vertical}`
-            }`,
+            `input overflow-auto input-scroll w-full flex flex-nowrap gap-y-2 gap-4`,
+            vertical && "flex-col flex-wrap",
             pcn<CT>(className, "input"),
-            isInvalid && "input-error",
-            isInvalid && pcn<CT>(className, "input", "error"),
+            invalidMessage && "input-error",
+            invalidMessage && pcn<CT>(className, "input", "error"),
           )}
         >
-          {loading &&
-            dummy.map((_, key) => {
-              return (
-                <>
-                  <div
-                    key={key}
-                    className="w-1/3 h-6 skeleton-loading rounded-lg"
-                  ></div>
-                </>
-              );
-            })}
-          {(options || dataOptions) &&
-            (options || dataOptions)?.map((option, key) => {
-              const checked = Array()
-                .concat(inputValue)
-                .find((val) => val == option.value);
-              return (
-                <CheckboxComponent
-                  key={key}
-                  label={option.label}
-                  name={`option[${option.value}]#${name}`}
-                  checked={!!checked}
-                  disabled={disabled}
-                  className={classNameCheckbox}
-                  onChange={() => {
-                    let newVal: string[] | number[] = [];
-                    if (checked) {
-                      newVal = Array()
-                        .concat(inputValue)
-                        .filter((val) => val != option.value);
-                    } else {
-                      newVal = [
-                        ...Array()
-                          .concat(inputValue)
-                          .filter((val) => val != option.value),
-                        option.value,
-                      ];
-                    }
+          {loading && (vertical ? [1, 2, 3, 4, 5, 6, 7, 8, 9] : [1, 2, 3]).map((_, key) => {
+            return <div key={key} className="w-1/3 h-6 skeleton-loading rounded-lg"></div>;
+          })}
 
-                    setInputValue(newVal);
-                    onChange?.(newVal);
-                  }}
-                />
-              );
-            })}
+          {(options || dataOptions) && (options || dataOptions)?.map((option, key) => {
+            const checked = Array().concat(inputHandler.value).find((val) => val == option.value);
+
+            return (
+              <CheckboxComponent
+                key={key}
+                label={option.label}
+                name={`option[${option.value}]#${name}`}
+                checked={!!checked}
+                disabled={disabled}
+                className={classNameCheckbox}
+                onChange={() => {
+                  // let newVal: string[] | number[] = [];
+
+                  // if (checked) {
+                  //   newVal = Array().concat(inputHandler.value).filter((val) => val != option.value);
+                  // } else {
+                  //   newVal = [
+                  //     ...Array().concat(inputHandler.value).filter((val) => val != option.value),
+                  //     option.value,
+                  //   ];
+                  // }
+
+                  const newVal = (Array.isArray(inputHandler.value) ? inputHandler.value : [])
+                    .filter((val) => val !== option.value)
+                    .concat(checked ? [] : [option.value]);
+
+                  inputHandler.setValue(newVal);
+                  onChange?.(newVal);
+                }}
+              />
+            );
+          })}
         </div>
+
+        {invalidMessage && (
+          <small className={cn("input-error-message", pcn<CT>(className, "error"))}>{invalidMessage}</small>
+        )}
       </div>
     </>
   );
