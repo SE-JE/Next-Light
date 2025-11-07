@@ -15,8 +15,7 @@ export const baseBlueprints = [
   {
     model: "Feature",
     schema: {
-      feature_group_id:
-        "type:bigInteger foreignIdFor:FeatureGroup fillable selectable index",
+      feature_group_id: "type:bigInteger foreignIdFor:FeatureGroup fillable selectable index",
       code: "type:string,3 unique required fillable searchable selectable index",
       name: "type:string,20 unique required fillable searchable selectable",
       description: "type:string,255 fillable searchable selectable index",

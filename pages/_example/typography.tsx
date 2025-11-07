@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import ExampleLayout from "./_layout";
-import { CardComponent } from "@/components/base.components";
+import { CardComponent } from "@components/.";
 
 export default function Table() {
   return (

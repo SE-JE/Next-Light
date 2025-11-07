@@ -1,9 +1,13 @@
 import React, { ReactNode } from "react";
 
+
+
 export interface WizardProps {
   items   :  {label: string, circle_content: ReactNode}[];
   active  :  number;
 };
+
+
 
 export function WizardComponent({ 
   items, 

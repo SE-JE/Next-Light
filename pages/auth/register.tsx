@@ -1,5 +1,5 @@
-import { ButtonComponent, CardComponent, FormSupervisionComponent } from "@/components/base.components";
-import { useAuthContext } from "@/contexts/Auth.context";
+import { ButtonComponent, CardComponent, FormSupervisionComponent } from "@components/.";
+import { useAuthContext } from "@contexts/.";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";

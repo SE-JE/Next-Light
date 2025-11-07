@@ -1,7 +1,7 @@
 import {
   SidebarComponent,
   SidebarContentComponent,
-} from "@/components/base.components";
+} from "@/components/base.components/_";
 import React, { ReactNode } from "react";
 
 export default function ExampleLayout({ children }: { children: ReactNode }) {

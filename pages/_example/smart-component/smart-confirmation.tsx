@@ -1,8 +1,7 @@
 import React, { ReactNode, useState } from "react";
-import ExampleLayout from "../_layout";
-import { ModalConfirmComponent } from "@/components/base.components/modal";
-import { ButtonComponent } from "@/components/base.components";
 import { faQuestionCircle } from "@fortawesome/free-regular-svg-icons";
+import ExampleLayout from "../_layout";
+import { ButtonComponent, ModalConfirmComponent } from "@components/.";
 
 export default function SmartConfirmation() {
   const [show, setShow] = useState(false);
@@ -17,7 +16,7 @@ export default function SmartConfirmation() {
         title={`Konfirmasi`}
         submitControl={{
           onSubmit: {
-            method: "post",
+            method: "POST",
             path: "confirmation",
           },
           onSuccess: () => {

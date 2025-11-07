@@ -14,7 +14,7 @@ export interface BottombarProps {
 
 
 
-export function BottomBarComponent({
+export function BottombarComponent({
   className = "",
   active,
 }: BottombarProps) {

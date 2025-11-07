@@ -1,9 +1,9 @@
-import { ButtonComponent, CardComponent } from "@/components/base.components";
-import { useAuthContext } from "@/contexts/Auth.context";
-import { middleware } from "@/utils";
-import Image from "next/image";
-import { useRouter } from "next/router";
 import React from "react";
+import { useRouter } from "next/router";
+import Image from "next/image";
+import { auth } from "@utils/.";
+import { useAuthContext } from "@contexts/.";
+import { ButtonComponent, CardComponent } from "@components/.";
 
 export default function Login() {
   const router = useRouter();
@@ -42,7 +42,7 @@ export default function Login() {
                 className="py-1.5" 
                 block 
                 onClick={() => {
-                  middleware.deleteAccessToken()
+                  auth.deleteAccessToken()
                   router.push("/auth/login")
                 }}
               />

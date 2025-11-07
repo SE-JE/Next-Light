@@ -1,19 +1,7 @@
 import { ReactNode } from "react";
-import ExampleLayout from "./_layout";
-import { CardComponent, InputComponent } from "@/components/base.components";
 import { faUserTag } from "@fortawesome/free-solid-svg-icons";
-import { CheckboxComponent } from "@/components/base.components/input/Checkbox.component";
-import { InputCheckboxComponent } from "@/components/base.components/input/InputCheckbox.component";
-import { RadioComponent } from "@/components/base.components/input/Radio.component";
-import { InputRadioComponent } from "@/components/base.components/input/InputRadio.component";
-import { InputCurrencyComponent } from "@/components/base.components/input/InputCurrency.component";
-import { InputDateComponent } from "@/components/base.components/input/InputDate.component";
-import { InputNumberComponent } from "@/components/base.components/input/InputNumber.component";
-import { SelectComponent } from "@/components/base.components/input/Select.component";
-import { InputTimeComponent } from "@/components/base.components/input/InputTime.component";
-import { InputDatetimeComponent } from "@/components/base.components/input/InputDatetime.component";
-import { InputMapComponent } from "@/components/base.components/input/InputMap.component";
-import { InputImageComponent } from "@/components/base.components/input/InputImage.component";
+import ExampleLayout from "./_layout";
+import { CardComponent, CheckboxComponent, InputCheckboxComponent, InputComponent, InputCurrencyComponent, InputDateComponent, InputDatetimeComponent, InputImageComponent, InputMapComponent, InputNumberComponent, InputRadioComponent, InputTimeComponent, RadioComponent, SelectComponent } from "@components/.";
 
 export default function Input() {
   return (

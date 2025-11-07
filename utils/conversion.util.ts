@@ -4,50 +4,48 @@ export const conversion = {
   // ==============================>
   // ## string formatter
   // ==============================>
-  str: {
-    snake(value: string, delimiter: string = "_"): string {
-      return value
-        .replace(/\.?([A-Z]+)/g, (x, y) => delimiter + y.toLowerCase())
-        .replace(new RegExp("^" + delimiter), "");
-    },
+  strSnake(value: string, delimiter: string = "_"): string {
+    return value
+      .replace(/\.?([A-Z]+)/g, (x, y) => delimiter + y.toLowerCase())
+      .replace(new RegExp("^" + delimiter), "");
+  },
 
-    slug(value: string, delimiter: string = "-"): string {
-      return value
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, delimiter)
-        .replace(new RegExp(`${delimiter}+$`), "")
-        .replace(new RegExp(`^${delimiter}+`), "");
-    },
+  strSlug(value: string, delimiter: string = "-"): string {
+    return value
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, delimiter)
+      .replace(new RegExp(`${delimiter}+$`), "")
+      .replace(new RegExp(`^${delimiter}+`), "");
+  },
 
-    camel(value: string): string {
-      return value
-        .replace(/[-_](.)/g, (_, group1) => group1.toUpperCase())
-        .replace(/^(.)/, (match) => match.toLowerCase());
-    },
+  strCamel(value: string): string {
+    return value
+      .replace(/[-_](.)/g, (_, group1) => group1.toUpperCase())
+      .replace(/^(.)/, (match) => match.toLowerCase());
+  },
 
-    plural(value: string): string {
-      const studly = value
-        .replace(/[-_]/g, " ")
-        .replace(/\b\w/g, (l) => l.toUpperCase())
-        .replace(/\s+/g, "");
+  strPascal(str: string): string {
+    return str
+      .replace(/[_\- ]+/g, " ")     
+      .split(" ")     
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join("");
+  },
 
-      return studly.endsWith("s") ? studly : studly + "s";
-    },
+  strPlural(value: string): string {
+    const studly = value
+      .replace(/[-_]/g, " ")
+      .replace(/\b\w/g, (l) => l.toUpperCase())
+      .replace(/\s+/g, "");
 
-    studly(value: string): string {
-      return value
-        .replace(/[-_]/g, " ")
-        .replace(/\b\w/g, (l) => l.toUpperCase())
-        .replace(/\s+/g, "");
-    },
+    return studly.endsWith("s") ? studly : studly + "s";
+  },
 
-    pascal(str: string): string {
-      return str
-        .replace(/[_\- ]+/g, " ")     
-        .split(" ")     
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-        .join("");
-    }
+  strSingular(value: string): string {
+    return value
+      .replace(/[-_]/g, " ")
+      .replace(/\b\w/g, (l) => l.toUpperCase())
+      .replace(/\s+/g, "");
   },
 
   // ==============================>

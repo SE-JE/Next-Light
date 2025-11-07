@@ -1,9 +1,9 @@
 import React, { ReactNode } from "react";
-import ExampleLayout from "./_layout";
-import { SidebarComponent } from "@/components/base.components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLineChart } from "@fortawesome/free-solid-svg-icons";
 import { faStar } from "@fortawesome/free-regular-svg-icons";
+import { SidebarComponent } from "@components/.";
+import ExampleLayout from "./_layout";
 
 export default function Sidebar() {
   return (

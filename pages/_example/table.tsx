@@ -1,7 +1,6 @@
 import React, { ReactNode } from "react";
 import ExampleLayout from "./_layout";
-import { TableComponent } from "@/components/base.components/table/Table.component";
-import { ButtonComponent } from "@/components/base.components";
+import { ButtonComponent, TableComponent } from "@components/.";
 
 export default function Table() {
   return (

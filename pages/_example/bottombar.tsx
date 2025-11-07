@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import ExampleLayout from "./_layout";
-import { BottombarComponent } from "@/components/base.components";
+import { BottombarComponent } from "@components/.";
 
 export default function BottomBar() {
   return (

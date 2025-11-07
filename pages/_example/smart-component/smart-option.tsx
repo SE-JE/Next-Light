@@ -1,11 +1,6 @@
 import React, { ReactNode } from "react";
 import ExampleLayout from "../_layout";
-import {
-  CardComponent,
-  InputCheckboxComponent,
-  InputRadioComponent,
-  SelectComponent,
-} from "@/components/base.components";
+import { CardComponent, InputCheckboxComponent, InputRadioComponent, SelectComponent } from "@components/.";
 
 export default function SmartOption() {
   return (

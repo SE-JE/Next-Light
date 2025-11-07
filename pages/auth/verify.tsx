@@ -1,8 +1,8 @@
-import { ButtonComponent, CardComponent, FormSupervisionComponent } from "@/components/base.components";
-import { useAuthContext } from "@/contexts/Auth.context";
+import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React from "react";
+import { ButtonComponent, CardComponent, FormSupervisionComponent } from "@components/.";
+import { useAuthContext } from "@contexts/.";
 
 export default function Verify() {
   const router = useRouter();

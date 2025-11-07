@@ -1,4 +1,6 @@
-import { cn, pcn } from "@/utils";
+import { cn, pcn } from "@utils/.";
+
+
 
 type CT = "item" | "active" | "base";
 
@@ -13,6 +15,7 @@ export interface TabbarProps {
   active     ?:  string | number;
   className  ?:  string;
 };
+
 
 
 export function TabbarComponent({

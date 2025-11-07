@@ -1,30 +1,27 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import fs from "fs";
 import path from "path";
-import { baseBlueprints } from "../index.js";
 import { fileURLToPath } from "url";
+import { baseBlueprints } from "@/blueprints/.";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-baseBlueprints.forEach(({ schema, controllers }) => {
-  const controllerKey = Object.keys(controllers)[0];
-  const title =
-    controllers[controllerKey]?.split("/")?.pop()?.replace("Controller", "") ||
-    "Title";
-  const fetchUrl = `${controllerKey}`;
-  const templatePath = path.join(__dirname, "./table.stub");
-  let content = fs.readFileSync(templatePath, "utf-8");
+baseBlueprints.forEach(({ schema, controllers }: any) => {
+  const controllerKey  =  Object.keys(controllers)[0];
+  const title          =  controllers[controllerKey]?.split("/")?.pop()?.replace("Controller", "") || "Title";
+  const fetchUrl       =  controllerKey;
+  const templatePath   =  path.join(__dirname, "./table.stub");
+  let   content        =  fs.readFileSync(templatePath, "utf-8");
 
-  const columns = Object.entries(schema)
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    .filter(([_, value]) => value.includes("selectable"))
+  const columns = Object.entries(schema).filter(([_, value]: any) => value.includes("selectable"))
     .map(([key]) => ({
       selector: key,
       label: key.charAt(0).toUpperCase() + key.slice(1),
     }));
 
-  const forms = Object.entries(schema)
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    .filter(([_, value]) => value.includes("fillable"))
+  const forms = Object.entries(schema).filter(([_, value]: any) => value.includes("fillable"))
     .map(([key]) => ({
       col: "12",
       construction: {
@@ -44,9 +41,7 @@ baseBlueprints.forEach(({ schema, controllers }) => {
   const outputDir = path.join(__dirname, `../../pages/${title}`);
   const outputFile = path.join(outputDir, "index.tsx");
 
-  if (!fs.existsSync(outputDir)) {
-    fs.mkdirSync(outputDir, { recursive: true });
-  }
+  if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
 
   fs.writeFileSync(outputFile, content);
 });

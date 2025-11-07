@@ -5,12 +5,17 @@ import { faBell, faHistory, faPowerOff, faUser, faUserCog } from "@fortawesome/f
 import { OutsideClickComponent } from "@components/.";
 import { cn, auth } from "@utils/.";
 
+
+
 export interface HeadbarProps {
-  children?: ReactNode;
-  className?: string;
+  children   ?:  ReactNode;
+  className  ?:  string;
 };
 
-export function HeadBarComponent({
+
+
+
+export function HeadbarComponent({
   children,
   className = "",
 }: HeadbarProps) {

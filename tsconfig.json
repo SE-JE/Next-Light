@@ -17,8 +17,11 @@
     "incremental"        :  true,
     "paths"              :  {
       "@/*"              :  ["./*"],
+      "@utils"           :  ["./utils/index.ts"],
       "@utils/*"         :  ["./utils/*"],
+      "@components"      :  ["./components/index.ts"],
       "@components/*"    :  ["./components/*", "./components/base.components/*", "./components/construct.components/*", "./components/structure.components/*"],
+      "@contexts"        :  ["./contexts/index.ts"],
       "@contexts/*"      :  ["./contexts/*"],
       "@pages/*"         :  ["./pages/*"],
       "@styles/*"        :  ["./styles/*"],

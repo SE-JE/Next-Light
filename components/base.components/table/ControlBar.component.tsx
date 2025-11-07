@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react'
 import { faEyeLowVision, faMagnifyingGlass, faRefresh } from '@fortawesome/free-solid-svg-icons';
 import { useToggleContext } from '@/contexts/Toggle.context';
 import { cn } from '@utils/.';
-import { IconButtonComponent, InputCheckboxComponent, InputComponent, SelectComponent, OutsideClickComponent } from '@components/.';
+import { IconButtonComponent, InputCheckboxComponent, InputComponent, SelectComponent, OutsideClickComponent } from '@components';
 
 
 

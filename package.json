@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "barrels": "bun run utils/commands/barrels.ts",
+    "dev": "concurrently --raw \"bun run barrels\" \"next dev --turbopack\"",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "light:blueprint": "node blueprints/main/run.mjs"
+    "light:blueprint": "node utils/commands/blueprint.ts"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
@@ -23,7 +24,6 @@
     "js-cookie": "^3.0.5",
     "moment": "^2.30.1",
     "next": "15.1.4",
-    "path": "^0.12.7",
     "postcss": "^8.5.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -43,6 +43,8 @@
     "eslint": "^9.19.0",
     "eslint-config-next": "^15.1.6",
     "eslint-config-prettier": "^10.0.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "barrelsby": "^2.8.1",
+    "concurrently": "^9.2.1"
   }
 }

@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import ExampleLayout from "./_layout";
-import { WizardComponent } from "@/components/base.components/wizard";
+import { WizardComponent } from "@components/.";
 
 export default function Table() {
   return (

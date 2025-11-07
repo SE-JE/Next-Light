@@ -1,16 +1,12 @@
 import React from "react";
-
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faBell,
-  faHistory,
-  faStore,
-  faUser,
-} from "@fortawesome/free-solid-svg-icons";
-import { ButtonComponent } from "../button";
+import { faBell, faHistory, faStore, faUser } from "@fortawesome/free-solid-svg-icons";
+import { ButtonComponent } from "@components/.";
 
-export default function NavbarComponent({}) {
+
+
+export function NavbarComponent() {
   return (
     <>
       <div className="relative py-2.5 bg-background rounded-[6px] z-40 hidden lg:block">
