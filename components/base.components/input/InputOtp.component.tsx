@@ -1,5 +1,5 @@
 import React, { ReactNode, useEffect, useRef, useState } from "react";
-import { cn, pcn } from "@utils/.";
+import { cn, pcn } from "@utils";
 
 
 

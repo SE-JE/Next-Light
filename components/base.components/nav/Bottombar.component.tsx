@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClipboard, faCrosshairs, faHome, faSackDollar, faUserCircle } from "@fortawesome/free-solid-svg-icons";
-import { cn, pcn, useKeyboardOpen } from "@utils/.";
+import { cn, pcn, useKeyboardOpen } from "@utils";
 
 
 

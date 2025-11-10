@@ -1,6 +1,6 @@
 import Image from "next/image";
 import React from "react";
-import { cn, pcn } from "@utils/.";
+import { cn, pcn } from "@utils";
 
 
 

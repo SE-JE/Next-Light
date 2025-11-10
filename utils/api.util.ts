@@ -34,11 +34,13 @@ export type ApiFilterType = {
 // ## Type of api params
 // =========================>
 export type ApiParamsType = {
-  paginate       ?:  number;
   page           ?:  number;
-  sortBy         ?:  string;
-  sortDirection  ?:  string;
+  paginate       ?:  number;
+  sort           ?:  string[];
   search         ?:  string;
+  searchable     ?:  string[];
+  selectable     ?:  string[];
+  expand         ?:  string[];
   filter         ?:  ApiFilterType[];
 };
 
@@ -48,7 +50,7 @@ export type ApiParamsType = {
 export type ApiType = {
   path           ?:  string;
   url            ?:  string;
-  method         ?:  "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "OPTIONS";
+  method         ?:  "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   params         ?:  ApiParamsType;
   payload        ?:  any;
   includeParams  ?:  object;
@@ -161,8 +163,8 @@ export const useGetApi = (props: ApiType & { method?: "GET" | "OPTIONS", cacheNa
     props.params?.paginate,
     props.params?.page,
     props.params?.search,
-    props.params?.sortBy,
-    props.params?.sortDirection,
+    props.params?.sort,
+    // props.params?.sortDirection,
     props.params?.filter,
     props.includeParams,
     props.headers,

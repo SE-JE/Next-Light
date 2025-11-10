@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { faArrowRight, faStar } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ExampleLayout from "./_layout";
-import { ButtonComponent, CardComponent, IconButtonComponent } from "@components/.";
+import { ButtonComponent, CardComponent, IconButtonComponent } from "@components";
 
 export default function Button() {
   return (

@@ -1,8 +1,8 @@
 import { ReactNode, useEffect, useState } from "react";
 import { faQuestion } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { api, ApiType, cn, pcn } from "@utils/.";
-import { ToastComponent, ButtonComponent, ButtonProps } from "@components/.";
+import { api, ApiType, cn, pcn } from "@utils";
+import { ToastComponent, ButtonComponent, ButtonProps } from "@components";
 
 
 

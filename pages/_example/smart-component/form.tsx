@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import ExampleLayout from "../_layout";
-import { CardComponent, FormSupervisionComponent } from "@components/.";
+import { CardComponent, FormSupervisionComponent } from "@components";
 
 export default function Form() {
   return (

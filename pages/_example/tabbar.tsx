@@ -1,6 +1,6 @@
 import React, { ReactNode, useState } from "react";
 import ExampleLayout from "./_layout";
-import { TabbarComponent } from "@components/.";
+import { TabbarComponent } from "@components";
 
 export default function Tabbar() {
   const [active, setActive] = useState<string | number>("Menu 1");

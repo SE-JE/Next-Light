@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import ExampleLayout from "../_layout";
-import { TableSupervisionComponent } from "@components/.";
+import { TableSupervisionComponent } from "@components";
 
 export default function Table() {
   return (

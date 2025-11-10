@@ -1,9 +1,9 @@
 import React from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
-import { auth } from "@utils/.";
+import { auth } from "@utils";
 import { useAuthContext } from "@contexts/.";
-import { ButtonComponent, CardComponent } from "@components/.";
+import { ButtonComponent, CardComponent } from "@components";
 
 export default function Login() {
   const router = useRouter();

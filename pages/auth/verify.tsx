@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { ButtonComponent, CardComponent, FormSupervisionComponent } from "@components/.";
+import { ButtonComponent, CardComponent, FormSupervisionComponent } from "@components";
 import { useAuthContext } from "@contexts/.";
 
 export default function Verify() {

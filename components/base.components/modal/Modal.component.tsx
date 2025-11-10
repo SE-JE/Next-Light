@@ -1,7 +1,7 @@
 import { ReactNode, useEffect } from "react";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
-import { cn, pcn } from "@utils/.";
-import { IconButtonComponent } from "@components/.";
+import { cn, pcn } from "@utils";
+import { IconButtonComponent } from "@components";
 
 
 

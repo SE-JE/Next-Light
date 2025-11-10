@@ -1,6 +1,6 @@
 import React, { ReactNode, useEffect, useState } from "react";
 import { faSave, faQuestionCircle, faPlus, faTimes } from "@fortawesome/free-solid-svg-icons";
-import { ApiType, cn, pcn, FormErrorType, FormRegisterType, FormValueType, useForm } from "@utils/.";
+import { ApiType, cn, pcn, FormErrorType, FormRegisterType, FormValueType, useForm } from "@utils";
 import {
   InputCheckboxComponent,
   InputComponent,
@@ -29,7 +29,7 @@ import {
   InputDatetimeComponent,
   InputTimeComponent,
   IconButtonComponent,
-} from "@components/.";
+} from "@components";
 
 
 
@@ -57,6 +57,8 @@ type ClusterConstruction = {
   tip        :  string;
   forms      :  FormType[];
   wrap       :  boolean;
+
+  /** Use custom class with: "label::", "tip::", "error::", "icon::", "suggest::", "suggest-item::". */
   className  :  string;
 };
 
@@ -239,7 +241,7 @@ export function FormSupervisionComponent({
               <IconButtonComponent
                 icon={faTimes}
                 paint="danger"
-                variant="light"
+                variant="outline"
                 size="xs"
                 className={cn("absolute top-10 right-2 translate-x-[50%] -translate-y-[50%]", wrap && "translate-x-0 -translate-y-0 top-1 right-1")}
                 onClick={() => removeGroup(gIndex)}
@@ -251,7 +253,7 @@ export function FormSupervisionComponent({
             <ButtonComponent
               icon={faPlus}
               label={`Tambah ${mapName}`}
-              variant="light"
+              variant="outline"
               size="sm"
               onClick={addGroup}
             />

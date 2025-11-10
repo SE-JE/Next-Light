@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import ExampleLayout from "./_layout";
-import { FooterComponent } from "@components/.";
+import { FooterComponent } from "@components";
 
 export default function Footer() {
   return (

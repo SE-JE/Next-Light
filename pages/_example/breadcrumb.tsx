@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import ExampleLayout from "./_layout";
-import { BreadcrumbComponent, CardComponent } from "@components/.";
+import { BreadcrumbComponent, CardComponent } from "@components";
 
 export default function Breadcrumb() {
   return (

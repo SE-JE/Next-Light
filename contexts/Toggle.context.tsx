@@ -10,7 +10,7 @@ const ToggleContext = createContext<ToggleContextInterface | undefined>(undefine
 export const ToggleContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [actives, setActives] = useState<Record<string, string | number | object | boolean>>({});
 
-  const setActive = (key: string, value: (string | number | object | boolean) = true) => setActives((prev) => ({ ...prev, [key]: value }));
+  const setActive = (key: string, value?: (string | number | object | boolean)) => setActives((prev) => ({ ...prev, [key]: value != undefined ? value : !prev?.[key] }));
 
   return <ToggleContext.Provider value={{toggle: actives, setToggle: setActive}}>{children}</ToggleContext.Provider>;
 };

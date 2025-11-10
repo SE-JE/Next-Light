@@ -2,8 +2,8 @@ import React, { InputHTMLAttributes, ReactNode, useEffect, useMemo, useRef, useS
 import moment from "moment";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
-import { cn, pcn, useInputHandler, useInputRandomId, useValidation, validation } from "@utils/.";
-import { OutsideClickComponent } from "@components/.";
+import { cn, pcn, useInputHandler, useInputRandomId, useValidation, validation } from "@utils";
+import { OutsideClickComponent } from "@components";
 
 
 

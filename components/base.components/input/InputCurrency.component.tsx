@@ -1,6 +1,6 @@
 import React, { InputHTMLAttributes, ReactNode } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { cn, conversion, pcn, useInputHandler, useInputRandomId, useValidation, validation } from "@utils/.";
+import { cn, conversion, pcn, useInputHandler, useInputRandomId, useValidation, validation } from "@utils";
 
 
 
@@ -12,7 +12,7 @@ export interface InputCurrencyProps extends Omit<InputHTMLAttributes<HTMLInputEl
   leftIcon   ?:  any;
   rightIcon  ?:  any;
 
-  value        ?:  string;
+  value        ?:  number;
   invalid      ?:  string;
   validations  ?:  string;
   format       ?:  {

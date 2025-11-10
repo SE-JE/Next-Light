@@ -1,0 +1,342 @@
+import React, { useState, useEffect } from "react";
+import { faChevronUp, faPlus, faRotate, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { cn } from "@utils";
+import { useToggleContext } from "@contexts";
+import {ButtonComponent, IconButtonComponent, InputComponent, InputCurrencyComponent, InputDateComponent, InputNumberComponent, SelectComponent} from "@components";
+
+
+
+export type FilterColumnOption = {
+    label: string;
+    selector: string;
+    type: "text" | "number" | "currency" | "date";
+  } | {
+    label: string;
+    selector: string;
+    type: "select";
+    options: { label: string; value: any }[];
+  };
+
+export interface FilterRule {
+  column     :  string;
+  operator   :  string;
+  value     ?:  string | number | number[] | string[] | null;
+  logic     ?:  "and" | "or";
+}
+
+export interface AdvancedFilterProps {
+  columns     :  FilterColumnOption[];
+  onChange   ?:  (filters: FilterRule[]) => void;
+  className  ?:  string;
+}
+
+const FILTER_OPERATORS = [
+  { label: "Cari", value: "li" },
+  { label: "Sama", value: "eq" },
+  { label: "Tidak Sama", value: "ne" },
+  { label: "Termasuk", value: "in" },
+  { label: "Tidak Termasuk", value: "ni" },
+  { label: "Antara", value: "bw" },
+];
+
+const LOGIC_OPTIONS = [
+  { label: "Dan", value: "and" },
+  { label: "Atau", value: "or" },
+];
+
+
+
+export function FilterComponent({
+  columns,
+  onChange,
+  className = "",
+}: AdvancedFilterProps) {
+  const { setToggle }         =  useToggleContext()
+  const [filters, setFilters] = useState<FilterRule[]>([]);
+
+  const handleChange = (index: number, key: keyof FilterRule, value: any) => {
+    const updated = [...filters];
+    updated[index][key] = value;
+
+    if (key === "column") {
+      updated[index].operator = "";
+      updated[index].value = "";
+    }
+
+    setFilters(updated);
+  };
+
+  const addFilter = () => {
+    setFilters([
+      ...filters,
+      { column: "", operator: "", value: "", logic: filters.length ? "and" : undefined },
+    ]);
+  };
+
+  const removeFilter = (index: number) => {
+    const updated = filters.filter((_, i) => i !== index);
+    setFilters(updated);
+  };
+
+  useEffect(() => {
+    if (onChange) onChange(filters);
+  }, [filters]);
+
+
+
+  return (
+    <>
+      <div className={cn("p-4 border rounded-sm", className)}>
+        <div className="flex justify-between items-center mb-2">
+          <p className="">Filter</p>
+          <div className="flex gap-2">
+            <ButtonComponent
+              icon={faRotate}
+              label="Bersihkan"
+              variant="outline"
+              paint="primary"
+              className="text-slate-400 icon::text-slate-400"
+              size="xs"
+            />
+
+            <IconButtonComponent
+              icon={faChevronUp}
+              variant="outline"
+              paint="primary"
+              className="text-slate-400 icon::text-slate-400"
+              size="xs"
+              onClick={() => setToggle("FILTER")}
+            />
+          </div>
+        </div>
+
+        {filters.map((f, i) => {
+          const column = columns.find((c) => c.selector === f.column);
+
+          return (
+            <div key={i} className="flex items-center gap-2 mb-2">
+              {i > 0 && (
+                <div className="w-[90px]">
+                  <SelectComponent
+                    name={`filter_logic_${i}`}
+                    options={LOGIC_OPTIONS}
+                    placeholder="Dan/Atau"
+                    value={f.logic}
+                    onChange={(e) => handleChange(i, "logic", e as "and" | "or")}
+                    className="text-sm p-2 px-3"
+                  />
+                </div>
+              )}
+
+              <div className={i > 0 ? "w-64" : "w-[355px]"}>
+                <SelectComponent
+                  name={`filter_column_${i}`}
+                  options={columns.map((c) => ({
+                    label: c.label,
+                    value: c.selector,
+                  }))}
+                  placeholder="Kolom"
+                  value={f.column}
+                  onChange={(e) => handleChange(i, "column", e)}
+                  className="text-sm p-2 px-3"
+                />
+              </div>
+
+              <div className="w-56">
+                <SelectComponent
+                  name={`filter_operator_${i}`}
+                  options={FILTER_OPERATORS}
+                  placeholder="Operator"
+                  value={f.operator}
+                  onChange={(e) => handleChange(i, "operator", e)}
+                  className="text-sm p-2 px-3"
+                />
+              </div>
+              
+              {column && (
+                <InputFilterValueComponent 
+                  name={`filter_value_${i}`}
+                  placeholder="..."
+                  value={f.value || ""}
+                  onChange={(e: any) => handleChange(i, "value", e)}
+                  options={column.type === "select" && column.options ? column.options : []}
+                  className="text-sm p-2 px-3"
+                  between={f.operator === "bw"}
+                  multiple={["in", "ni"].includes(f.operator)}
+                />
+              )}
+
+              <IconButtonComponent 
+                icon={faTimes}
+                paint="danger"
+                variant="outline"
+                onClick={() => removeFilter(i)}
+                size="xs"
+              />
+            </div>
+          );
+        })}
+
+        <ButtonComponent
+          label="Tambahkan"
+          icon={faPlus}
+          variant="outline"
+          paint="primary"
+          size="sm"
+          onClick={addFilter}
+          className="mt-4"
+        />
+      </div>
+    </>
+  );
+}
+
+
+
+interface FilterInputProps {
+  type         ?:  string | null;
+  name          :  string;
+  value         :  string | number | number[] | string[] | null;
+  onChange      :  (value: any) => void;
+  options      ?:  { label: string; value: any }[];
+  placeholder  ?:  string;
+  className    ?:  string;
+  between      ?:  boolean;
+  multiple     ?:  boolean;
+}
+
+export function InputFilterValueComponent({
+  type,
+  name,
+  value,
+  onChange,
+  options = [],
+  placeholder = "",
+  className = "",
+  between,
+  multiple,
+}: FilterInputProps) {
+  const resolvedType = type || "text";
+
+  if (!between) {
+    switch (resolvedType) {
+      case "select":
+        return (
+          <SelectComponent
+            name={name}
+            options={options}
+            placeholder={placeholder}
+            value={options.find((o) => o.value === value)?.label}
+            onChange={onChange}
+            className={className}
+          />
+        );
+
+      case "number":
+        return (
+          <InputNumberComponent
+            name={name}
+            value={Number(value) || 0}
+            onChange={onChange}
+            placeholder={placeholder}
+            className={className}
+            multiple={multiple}
+          />
+        );
+
+      case "currency":
+        return (
+          <InputCurrencyComponent
+            name={name}
+            value={Number(value) || 0}
+            onChange={onChange}
+            placeholder={placeholder}
+            className={className}
+          />
+        );
+
+      case "date":
+        return (
+          <InputDateComponent
+            name={name}
+            value={value as string || ""}
+            onChange={onChange}
+            placeholder={placeholder}
+            className={className}
+          />
+        );
+
+      default:
+        return (
+          <InputComponent
+            name={name}
+            value={value || ""}
+            onChange={onChange}
+            placeholder={placeholder}
+            className={className}
+            multiple={multiple}
+          />
+        );
+    }
+  }
+
+  const val = Array.isArray(value) ? value : ["", ""];
+  const [from, to] = val;
+
+  const renderInput = (pos: "from" | "to") => {
+    const currentValue = pos === "from" ? from : to;
+    const handle = (v: any) =>
+      onChange(pos === "from" ? [v, to] : [from, v]);
+
+    switch (resolvedType) {
+      case "number":
+        return (
+          <InputNumberComponent
+            name={`${name}_${pos}`}
+            value={Number(currentValue) || 0}
+            onChange={handle}
+            placeholder={pos === "from" ? "Dari" : "Sampai"}
+            className={className}
+          />
+        );
+      case "currency":
+        return (
+          <InputCurrencyComponent
+            name={`${name}_${pos}`}
+            value={Number(currentValue) || 0}
+            onChange={handle}
+            placeholder={pos === "from" ? "Dari" : "Sampai"}
+            className={className}
+          />
+        );
+      case "date":
+        return (
+          <InputDateComponent
+            name={`${name}_${pos}`}
+            value={currentValue as string || ""}
+            onChange={handle}
+            placeholder={pos === "from" ? "Dari" : "Sampai"}
+            className={className}
+          />
+        );
+      default:
+        return (
+          <InputComponent
+            name={`${name}_${pos}`}
+            value={currentValue || ""}
+            onChange={(e: any) => handle(e.target.value)}
+            placeholder={pos === "from" ? "Dari" : "Sampai"}
+            className={className}
+          />
+        );
+    }
+  };
+
+  return (
+    <div className="flex items-center gap-2 flex-1">
+      {renderInput("from")}
+      <span>s/d</span>
+      {renderInput("to")}
+    </div>
+  );
+}

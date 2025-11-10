@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { cn, pcn } from "@utils/.";
-import { InputRadioComponent } from "@components/.";
+import { cn, pcn } from "@utils";
+import { InputRadioComponent } from "@components";
 
 
 

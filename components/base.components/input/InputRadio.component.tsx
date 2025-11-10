@@ -1,6 +1,6 @@
 import React, { ReactNode, useEffect, useState } from "react";
-import { api, ApiType, cn, pcn, useInputHandler, useValidation, validation } from "@utils/.";
-import { RadioComponent } from "@components/.";
+import { api, ApiType, cn, pcn, useInputHandler, useValidation, validation } from "@utils";
+import { RadioComponent } from "@components";
 
 
 

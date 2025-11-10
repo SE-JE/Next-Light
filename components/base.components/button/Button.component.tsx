@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { cn, pcn } from "@utils/.";
+import { cn, pcn } from "@utils";
 import { buttonVariant, buttonContainer, buttonRadius } from "./button.decorate";
 
 

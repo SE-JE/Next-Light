@@ -1,6 +1,6 @@
 import React, { InputHTMLAttributes, ReactNode, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { cn, pcn, useInputHandler, useInputRandomId, useValidation, validation } from "@utils/.";
+import { cn, pcn, useInputHandler, useInputRandomId, useValidation, validation } from "@utils";
 
 
 

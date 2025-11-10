@@ -1,7 +1,7 @@
 import React, { ReactNode, useState } from "react";
 import { faQuestionCircle } from "@fortawesome/free-regular-svg-icons";
 import ExampleLayout from "../_layout";
-import { ButtonComponent, ModalConfirmComponent } from "@components/.";
+import { ButtonComponent, ModalConfirmComponent } from "@components";
 
 export default function SmartConfirmation() {
   const [show, setShow] = useState(false);

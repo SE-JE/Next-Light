@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { faUserTag } from "@fortawesome/free-solid-svg-icons";
 import ExampleLayout from "./_layout";
-import { CardComponent, CheckboxComponent, InputCheckboxComponent, InputComponent, InputCurrencyComponent, InputDateComponent, InputDatetimeComponent, InputImageComponent, InputMapComponent, InputNumberComponent, InputRadioComponent, InputTimeComponent, RadioComponent, SelectComponent } from "@components/.";
+import { CardComponent, CheckboxComponent, InputCheckboxComponent, InputComponent, InputCurrencyComponent, InputDateComponent, InputDatetimeComponent, InputImageComponent, InputMapComponent, InputNumberComponent, InputRadioComponent, InputTimeComponent, RadioComponent, SelectComponent } from "@components";
 
 export default function Input() {
   return (

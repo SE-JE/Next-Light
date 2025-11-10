@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import ExampleLayout from "./_layout";
-import { ScrollContainerComponent } from "@components/.";
+import { ScrollContainerComponent } from "@components";
 
 export default function ScrollContainer() {
   return (

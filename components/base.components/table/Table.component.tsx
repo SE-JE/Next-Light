@@ -1,10 +1,9 @@
-/* eslint-disable @next/next/no-img-element */
-
 import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowDownZA, faArrowUpAZ, faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
-import { cn, pcn, useLazySearch } from "@utils/.";
-import { ControlBarComponent, ControlBarOptionType, PaginationComponent, PaginationProps, ScrollContainerComponent } from "@components/.";
+import { cn, pcn, useLazySearch } from "@utils";
+import { useToggleContext } from "@contexts";
+import { ControlBarComponent, ControlBarOptionType, PaginationComponent, PaginationProps, ScrollContainerComponent, FilterComponent, FilterColumnOption } from "@components";
 
 
 
@@ -15,8 +14,10 @@ export interface TableColumnType {
   label       :  string;
   width      ?:  string;
   sortable   ?:  boolean;
+  searchable ?:  boolean;
   className  ?:  string;
   item       ?:  (data: any) => string | ReactNode;
+  tip        ?:  string | ((data: any) => string);
 };
 
 export interface TableProps {
@@ -27,8 +28,8 @@ export interface TableProps {
   pagination                ?:  PaginationProps;
 
   loading                   ?:  boolean;
-  sortBy                    ?:  { column: string; direction: "asc" | "desc" };
-  onChangeSortBy            ?:  ({ column, direction } : { column: string; direction: "asc" | "desc"; }) => void;
+  sortBy                    ?:  string[];
+  onChangeSortBy            ?:  (sort: string[]) => void;
   search                    ?:  string;
   onChangeSearch            ?:  (search: string) => void;
   searchableColumn          ?:  string[];
@@ -61,68 +62,73 @@ export function TableComponent({
 
   className = "",
 }: TableProps) {
-  const [displayColumns, setDisplayColumns] = useState<string[]>([]);
-  const [showFloatingAction, setShowFloatingAction] = useState(false);
-  const [floatingActionActive, setFloatingActionActive] = useState<false | number>(false);
-  const [keyword, setKeyword] = useState<string>("");
-  const [keywordSearch] = useLazySearch(keyword);
+  const { toggle }                                       =  useToggleContext()
+  const [displayColumns, setDisplayColumns]              =  useState<string[]>([]);
+  const [showFloatingAction, setShowFloatingAction]      =  useState(false);
+  const [floatingActionActive, setFloatingActionActive]  =  useState<false | number>(false);
+  const [keyword, setKeyword]                            =  useState<string>("");
+  const [keywordSearch]                                  =  useLazySearch(keyword);
 
   const actionColumnRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (columns) setDisplayColumns([...columns.map((column) => column.selector)]);
   }, [columns]);
+  
 
   useEffect(() => {
     setKeyword(search || "");
-    pagination?.onChange?.(pagination.totalRow, pagination.paginate, 1);
   }, [search]);
 
   useEffect(() => {
-    if (keywordSearch) {
-      onChangeSearch?.(keywordSearch);
-    } else {
-      onChangeSearch?.("");
-    }
+    keywordSearch ? onChangeSearch?.(keywordSearch) : onChangeSearch?.("");
+    pagination?.onChange?.(pagination.totalRow, pagination.paginate, 1);
   }, [keywordSearch]);
 
   const columnMapping = useMemo(() => {
     return ( columns?.filter((column) => displayColumns.includes(column.selector)) || []);
   }, [columns, displayColumns]);
 
-  function numberOfRow(key: number) {
-    const page = pagination?.page || 1;
-    return pagination && page != 1 ? pagination?.paginate * (page - 1) + key + 1 : key + 1;
-  }
+
 
   const styles = {
     head            :  "px-4 py-2.5 font-bold w-full flex justify-between gap-2 items-center text-sm text-foreground capitalize",
-    column          :  cn("px-4 py-2 font-medium", pcn<CT>(className, "column")),
-    row             :  "flex items-center gap-4 rounded-[6px] relative animate-intro-right border-b",
+    column          :  cn("px-4 py-4 font-medium", pcn<CT>(className, "column")),
+    row             :  "flex items-center gap-4 rounded-[4px] relative animate-intro-right border-b hover:bg-light-primary/30",
     floatingAction  :  cn("sticky bg-background -right-5 z-30 cursor-pointer flex items-center shadow rounded-l-lg", pcn<CT>(className, "floating-action")),
   };
 
+
+  const numberOfRow = (key: number) => pagination && (pagination?.page || 1) != 1 ? pagination?.paginate * ((pagination?.page || 1) - 1) + key + 1 : key + 1;
+
+
+
   function renderItem(item: object) {
-    const itemMapping = columnMapping.map((column) =>
-        column?.item ? column?.item(item) : 
-        (typeof item[column.selector as keyof object] == "object"
-          ? JSON.stringify(item[column.selector as keyof object])
-          : item[column.selector as keyof object]) || "-"
+    const itemMapping = columnMapping.map((column) => column?.item 
+      ? column?.item(item) : (typeof item[column.selector as keyof object] == "object" ? JSON.stringify(item[column.selector as keyof object]) 
+      : item[column.selector as keyof object]) || "-"
     );
 
     return (
       <>
         {itemMapping?.map((one, key) => {
+          const column = columnMapping?.[key];
+        
+          let title = one as string;
+          if (column?.tip) {
+            if (typeof column.tip === "string") {
+              title = (item[column.tip as keyof object] as any)?.toString() || "-";
+            } else if (typeof column.tip === "function") {
+              title = column.tip(item);
+            }
+          }
           return (
             <div
               key={key}
-              className={styles.column}
-              style={{
-                width: columnMapping?.at(key)?.width || 200,
-              }}
-              onClick={() => {
-                onRowClick?.(item, key);
-              }}
+              className={cn(styles.column, onRowClick && "cursor-pointer")}
+              style={{ width: columnMapping?.at(key)?.width || 200 }}
+              onClick={() => onRowClick?.(item, key) }
+              title={title}
             >
               {one}
             </div>
@@ -132,10 +138,15 @@ export function TableComponent({
     );
   }
 
+
+
   function renderHead() {
     return (
       <>
         {columnMapping?.map((column, key) => {
+          const sortColumn  = sortBy?.find((e) => e.split(" ")?.at(0) == column.selector)?.split(" ")?.at(0) || "";
+          const sortDirection  = sortBy?.find((e) => e.split(" ")?.at(0) == column.selector)?.split(" ")?.at(1) || "";
+
           return (
             <div
               key={key}
@@ -144,26 +155,14 @@ export function TableComponent({
                 column.sortable && "cursor-pointer",
                 pcn<CT>(className, "head-column")
               )}
-              style={{
-                width: column.width ? column.width : 200,
-              }}
-              onClick={() =>
-                column.sortable &&
-                onChangeSortBy?.({
-                  column: column.selector,
-                  direction:
-                    sortBy?.column == column.selector &&
-                    sortBy?.direction == "desc" ? "asc" : "desc",
-                })
-              }
+              style={{ width: column.width ? column.width : 200 }}
+              onClick={() => column.sortable && onChangeSortBy?.([`${column.selector} ${sortDirection == "desc" ? "asc" : "desc"}`])}
             >
               {column.label}
 
-              {sortBy?.column == column.selector && (
+              {!!sortColumn && (
                 <FontAwesomeIcon
-                  icon={
-                    sortBy.direction == "desc" ? faArrowDownZA : faArrowUpAZ
-                  }
+                  icon={sortDirection == "desc" ? faArrowDownZA : faArrowUpAZ}
                   className="text-light-foreground/70"
                 />
               )}
@@ -174,15 +173,20 @@ export function TableComponent({
     );
   }
 
+
+
+
   return (
     <div className={pcn<CT>(className, "base")}>
       {controlBar != false && (
         <ControlBarComponent 
-          options={!controlBar ? ["SEARCHABLE", "SEARCH", "SELECTABLE", "REFRESH"] : controlBar}
+          options={!controlBar ? ["CREATE", "SEARCH", "FILTER", "SELECTABLE", "REFRESH"] : controlBar}
+          searchableOptions={columns?.filter((c: TableColumnType) => c.searchable)}
           onSearchable={(e) => onChangeSearchableColumn?.(String(e))}
           searchable={searchableColumn || []}
           onSearch={(e) => setKeyword(e)}
           search={keyword}
+          selectableOptions={columns}
           onSelectable={(e) => setDisplayColumns(e)}
           selectable={displayColumns}
           onRefresh={() => onRefresh?.()}
@@ -190,16 +194,17 @@ export function TableComponent({
         />
       )}
 
+      <FilterComponent 
+        className={cn("", !toggle.FILTER ? "p-0 h-0 hidden overflow-hidden" : "mb-2 animate-intro-down")}
+        columns={columns?.map((c: any) => ({label: c.label, selector: c.selector})) as FilterColumnOption[]}
+      />
+
       <div className="relative w-full">
         <ScrollContainerComponent
           scrollFloating
           onScroll={(e) => {
-            actionColumnRef.current?.clientWidth &&
-              e.scrollLeft &&
-              setShowFloatingAction(
-                e.scrollLeft + e.clientWidth <=
-                  e.scrollWidth - actionColumnRef.current?.clientWidth
-              );
+            actionColumnRef.current?.clientWidth &&  e.scrollLeft &&
+              setShowFloatingAction(e.scrollLeft + e.clientWidth <=  e.scrollWidth - actionColumnRef.current?.clientWidth);
           }}
         >
           {
@@ -217,9 +222,7 @@ export function TableComponent({
                       <div
                         key={key}
                         className={`px-6 py-3 skeleton-loading`}
-                        style={{
-                          width: "200px",
-                        }}
+                        style={{ width: "200px" }}
                       ></div>
                     );
                   })}
@@ -228,9 +231,7 @@ export function TableComponent({
                   {[1, 2, 3, 4, 5, 6].map((_, key) => {
                     return (
                       <div
-                        style={{
-                          animationDelay: `${0.25 + key * 0.05}s`,
-                        }}
+                        style={{ animationDelay: `${0.25 + key * 0.05}s` }}
                         className="flex items-center gap-4 bg-white rounded-lg shadow-sm relative p-2.5"
                         key={key}
                       >
@@ -240,9 +241,7 @@ export function TableComponent({
                             <div
                               key={key}
                               className="px-4 py-2.5 text-lg font-medium skeleton-loading"
-                              style={{
-                                width: "200px",
-                              }}
+                              style={{ width: "200px" }}
                             ></div>
                           );
                         })}
@@ -261,15 +260,7 @@ export function TableComponent({
                   // =========================>
                 }
                 <div className="flex gap-4">
-                  <div
-                    className={cn(
-                      styles.head,
-                      "w-8",
-                      pcn<CT>(className, "head-column")
-                    )}
-                  >
-                    #
-                  </div>
+                  <div className={cn(styles.head, "w-8", pcn<CT>(className, "head-column"))}>#</div>
                   {renderHead()}
                 </div>
                 {
@@ -277,31 +268,22 @@ export function TableComponent({
                   // ## Body Column
                   // =========================>
                 }
-                <div className={`flex flex-col gap-y-1.5`}>
+                <div className={`flex flex-col gap-y-0.5`}>
                   {data && data.length ? (
                     data.map((item: object, key) => {
                       return (
                         <div
-                          style={{
-                            animationDelay: `${(key + 1) * 0.05}s`,
-                          }}
+                          style={{ animationDelay: `${(key + 1) * 0.05}s` }}
                           className={cn(
                             styles.row,
-                            key % 2 ? "bg-white/40" : "bg-white",
-                            onRowClick &&
-                              "cursor-pointer hover:bg-light-primary/40",
+                            key % 2 ? "bg-light-primary/10" : "bg-white",
                             pcn<CT>(className, "row")
                           )}
                           key={key}
                         >
-                          <div className={cn("w-8", styles?.column)}>
-                            {numberOfRow(key)}
-                          </div>
+                          <div className={cn("w-8", styles?.column)}>{numberOfRow(key)}</div>
                           {renderItem(item)}
-                          <div
-                            ref={actionColumnRef}
-                            className={`flex-1 flex justify-end gap-2 px-4 py-2`}
-                          >
+                          <div ref={actionColumnRef} className={cn(`flex-1 flex justify-end gap-2 px-4 py-2`)}>
                             {item["action" as keyof object]}
                           </div>
 
@@ -311,30 +293,14 @@ export function TableComponent({
                                 className={styles.floatingAction}
                                 onClick={() =>
                                   floatingActionActive !== false &&
-                                  floatingActionActive == key
-                                    ? setFloatingActionActive(false)
-                                    : setFloatingActionActive(key)
+                                  floatingActionActive == key ? setFloatingActionActive(false) : setFloatingActionActive(key)
                                 }
                               >
                                 <div className="pl-4 pr-7 py-2">
-                                  <FontAwesomeIcon
-                                    icon={
-                                      floatingActionActive === false ||
-                                      floatingActionActive != key
-                                        ? faChevronLeft
-                                        : faChevronRight
-                                    }
-                                  />
+                                  <FontAwesomeIcon icon={floatingActionActive === false || floatingActionActive != key ? faChevronLeft : faChevronRight}/>
                                 </div>
 
-                                <div
-                                  className={`py-1 flex gap-2 ${
-                                    floatingActionActive !== false &&
-                                    floatingActionActive == key
-                                      ? "w-max pl-2 pr-8"
-                                      : "w-0"
-                                  }`}
-                                >
+                                <div className={`py-1 flex gap-2 ${floatingActionActive !== false && floatingActionActive == key ? "w-max pl-2 pr-8" : "w-0"}`}>
                                   {item["action" as keyof object]}
                                 </div>
                               </div>
@@ -350,12 +316,7 @@ export function TableComponent({
                         // =========================>
                       }
                       <div className="flex flex-col items-center justify-center gap-8 p-20 opacity-50">
-                        <img
-                          src="/204.svg"
-                          width={"160px"}
-                          alt="server error"
-                        />
-                        <h1 className="text-2xl text-foreground">
+                        <h1 className="text-lg text-foreground">
                           Belum Ada Data
                         </h1>
                       </div>

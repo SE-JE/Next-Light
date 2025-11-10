@@ -1,6 +1,6 @@
 import React, { ReactNode, useState } from "react";
 import ExampleLayout from "./_layout";
-import { ButtonComponent, FloatingPageComponent, ModalComponent, ModalConfirmComponent, ToastComponent } from "@components/.";
+import { ButtonComponent, FloatingPageComponent, ModalComponent, ModalConfirmComponent, ToastComponent } from "@components";
 
 export default function Modal() {
   const [show, setShow] = useState<string | null>(null);

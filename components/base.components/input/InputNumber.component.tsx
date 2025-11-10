@@ -1,7 +1,7 @@
 import React, { InputHTMLAttributes, ReactNode } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSortDown, faSortUp } from "@fortawesome/free-solid-svg-icons";
-import { cn, pcn, useInputHandler, useInputRandomId, useValidation, validation } from "@utils/.";
+import { cn, pcn, useInputHandler, useInputRandomId, useValidation, validation } from "@utils";
 
 
 

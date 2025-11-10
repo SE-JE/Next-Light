@@ -1,4 +1,4 @@
-import { cn, pcn } from "@utils/.";
+import { cn, pcn } from "@utils";
 
 
 

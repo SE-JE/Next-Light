@@ -1,7 +1,7 @@
 import React, { ReactNode, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheckCircle, faChevronDown, faTimes,} from "@fortawesome/free-solid-svg-icons";
-import { api, ApiType, cavity, cn, pcn, useInputHandler, useInputRandomId, useLazySearch, useValidation, validation,} from "@utils/.";
+import { api, ApiType, cavity, cn, pcn, useInputHandler, useInputRandomId, useLazySearch, useValidation, validation,} from "@utils";
 
 
 
@@ -28,6 +28,7 @@ export interface SelectProps {
   validations  ?:  string;
   multiple     ?:  boolean;
   autoFocus    ?:  boolean;
+  clearable    ?:  boolean;
 
   options              ?:  SelectOptionProps[];
   searchable           ?:  boolean;
@@ -64,6 +65,7 @@ export function SelectComponent({
   validations,
   multiple,
   autoFocus,
+  clearable,
 
   options = [],
   searchable,
@@ -113,8 +115,7 @@ export function SelectComponent({
   useEffect(() => {
     if (value) {
       inputHandler.setValue(value);
-      Array.isArray(dataOptions) && 
-        setInputShowValue((newOption ? [newOption, ...dataOptions] : dataOptions)?.find((option) => option.value == value)?.label || "");
+      Array.isArray(dataOptions) && setInputShowValue((newOption ? [newOption, ...dataOptions] : dataOptions)?.find((option) => option.value == value)?.label || "");
       inputHandler.setIdle(false);
     } else {
       inputHandler.setValue("");
@@ -127,8 +128,7 @@ export function SelectComponent({
   // ## options handler
   // =========================>
   useEffect(() => {
-    options?.length &&
-      setDataOptions([...options, ...includedOptions].filter((op: SelectOptionProps) => !exceptOptions?.includes(op.value)));
+    options?.length && setDataOptions([...options, ...includedOptions].filter((op: SelectOptionProps) => !exceptOptions?.includes(op.value)));
   }, [options]);
 
 
@@ -287,7 +287,7 @@ export function SelectComponent({
             placeholder={!inputHandler.value || (Array.isArray(inputHandler.value) && !inputHandler.value.length) ? placeholder : ""}
             disabled={disabled}
             className={cn(
-              "input",
+              "input cursor-pointer",
               leftIcon && "pl-12",
               rightIcon && "pr-12",
               pcn<CT>(className, "input"),
@@ -395,7 +395,7 @@ export function SelectComponent({
             />
           )}
 
-          {!multiple && inputHandler.value && (
+          {!multiple && clearable && inputHandler.value && (
             <div
               className={cn(
                 "right-12 input-icon cursor-pointer hover:text-danger",

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
-import { cn, pcn, useInputRandomId } from "@utils/.";
+import { cn, pcn, useInputRandomId } from "@utils";
 
 
 
@@ -87,8 +87,8 @@ export function CheckboxComponent({
         <span
           className={cn(
             "whitespace-nowrap",
-            pcn<CT>(className, "label"),
             checked && "font-semibold",
+            pcn<CT>(className, "label"),
             checked && pcn<CT>(className, "label", "checked"),
             disabled && pcn<CT>(className, "label", "disabled"),
           )}

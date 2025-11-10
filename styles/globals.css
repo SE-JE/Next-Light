@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #ebf4fc;
+  --color-background: #FBFDFF;
   --color-foreground: #575757;
   --color-light-foreground: #9b9b9b;
   --color-primary: #5aafff;
@@ -17,10 +17,18 @@
   --color-disable: #c4c3c3;
   --color-light-disable: #f4f4f4;
 
-  --animate-intro-right: intro_right 0.2s ease-in-out;
+  --animate-intro-right: intro_right 0.1s ease-in-out;
   @keyframes intro_right {
     from {
       transform: translateX(100);
+      opacity: 0;
+    }
+  }
+  --animate-intro-down: intro_down 0.1s ease-in-out;
+  @keyframes intro_down {
+    from {
+      transform: translateY(-100);
+      opacity: 0;
     }
   }
 }

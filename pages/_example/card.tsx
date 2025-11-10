@@ -2,7 +2,7 @@ import React, { ReactNode } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell } from "@fortawesome/free-regular-svg-icons";
 import { faBoxArchive } from "@fortawesome/free-solid-svg-icons";
-import { AlertCardComponent, CardComponent, DashboardCardComponent, GalleryCardComponent, ProductCardComponent, ProfileCardComponent } from "@components/.";
+import { AlertCardComponent, CardComponent, DashboardCardComponent, GalleryCardComponent, ProductCardComponent, ProfileCardComponent } from "@components";
 import ExampleLayout from "./_layout";
 
 export default function Card() {

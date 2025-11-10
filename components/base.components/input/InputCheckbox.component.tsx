@@ -1,6 +1,6 @@
 import React, { ReactNode, useEffect, useState } from "react";
-import { api, ApiType, cn, pcn, useInputHandler, useValidation, validation } from "@utils/.";
-import { CheckboxComponent } from "@components/.";
+import { api, ApiType, cn, pcn, useInputHandler, useValidation, validation } from "@utils";
+import { CheckboxComponent } from "@components";
 
 
 
@@ -29,8 +29,9 @@ export interface InputCheckboxProps {
   onChange             ?:  (value: string[] | number[]) => any;
   register             ?:  (name: string, validations?: string) => void;
 
-  /** Use custom class with: "label::", "tip::", "error::", "icon::", "suggest::", "suggest-item::". */
+  /** Use custom class with: "label::", "tip::", "error::", "icon::". */
   className            ?: string;
+  
   /** Use custom class with: "label::", "checked::", "error::". */
   classNameCheckbox    ?: string;
 };
@@ -148,17 +149,6 @@ export function InputCheckboxComponent({
                 disabled={disabled}
                 className={classNameCheckbox}
                 onChange={() => {
-                  // let newVal: string[] | number[] = [];
-
-                  // if (checked) {
-                  //   newVal = Array().concat(inputHandler.value).filter((val) => val != option.value);
-                  // } else {
-                  //   newVal = [
-                  //     ...Array().concat(inputHandler.value).filter((val) => val != option.value),
-                  //     option.value,
-                  //   ];
-                  // }
-
                   const newVal = (Array.isArray(inputHandler.value) ? inputHandler.value : [])
                     .filter((val) => val !== option.value)
                     .concat(checked ? [] : [option.value]);

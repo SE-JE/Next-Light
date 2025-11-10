@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import ExampleLayout from "./_layout";
-import { CarouselComponent } from "@components/.";
+import { CarouselComponent } from "@components";
 
 export default function Carousel() {
   return (

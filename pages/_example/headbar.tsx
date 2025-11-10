@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import ExampleLayout from "./_layout";
-import { HeadbarComponent } from "@/components/base.components/_";
+import { HeadbarComponent } from "@components";
 
 export default function HeadBar() {
   return (

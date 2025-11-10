@@ -1,8 +1,8 @@
 import React, { InputHTMLAttributes, ReactNode, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendarAlt, faClock } from "@fortawesome/free-solid-svg-icons";
-import { cn, pcn, useInputHandler, useInputRandomId, useValidation, validation } from "@utils/.";
-import { OutsideClickComponent, InputDatePickerComponent, InputTimePickerComponent } from "@components/.";
+import { cn, pcn, useInputHandler, useInputRandomId, useValidation, validation } from "@utils";
+import { OutsideClickComponent, InputDatePickerComponent, InputTimePickerComponent } from "@components";
 
 
 

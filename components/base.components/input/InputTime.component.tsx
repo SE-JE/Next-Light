@@ -1,7 +1,7 @@
 import React, { InputHTMLAttributes, ReactNode, useEffect, useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { cn, pcn, useInputHandler, useInputRandomId, useValidation, validation } from "@utils/.";
-import { OutsideClickComponent } from "@components/.";
+import { cn, pcn, useInputHandler, useInputRandomId, useValidation, validation } from "@utils";
+import { OutsideClickComponent } from "@components";
 
 
 

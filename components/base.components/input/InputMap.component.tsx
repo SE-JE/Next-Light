@@ -3,8 +3,8 @@ import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot, faLocationCrosshairs } from "@fortawesome/free-solid-svg-icons";
 import { GoogleMap, LoadScript } from "@react-google-maps/api";
-import { cn, pcn, useInputHandler, useInputRandomId, useValidation, validation } from "@utils/.";
-import { OutsideClickComponent } from "@components/.";
+import { cn, pcn, useInputHandler, useInputRandomId, useValidation, validation } from "@utils";
+import { OutsideClickComponent } from "@components";
 
 
 
