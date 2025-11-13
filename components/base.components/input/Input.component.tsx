@@ -1,6 +1,7 @@
 import React, { InputHTMLAttributes, ReactNode, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { cn, pcn, useInputHandler, useInputRandomId, useValidation, validation } from "@utils";
+import { InputValues } from "./InputValues.component";
 
 
 
@@ -20,6 +21,7 @@ export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
   onlyAlphabet  ?:  boolean;
   uppercase     ?:  boolean;
   lowercase     ?:  boolean;
+  multiple      ?:  boolean;
 
   onChange  ?:  (value: any) => any;
   register  ?:  (name: string, validations?: string) => void;
@@ -45,6 +47,7 @@ export function InputComponent({
   onlyAlphabet,
   uppercase,
   lowercase,
+  multiple,
 
   register,
   onChange,
@@ -142,8 +145,7 @@ export function InputComponent({
       }
     }
   };
-
-
+  
   return (
     <>
       <div className="relative flex flex-col gap-y-0.5">
@@ -179,6 +181,7 @@ export function InputComponent({
           <input
             {...props}
             id={randomId}
+            placeholder={!multiple || (multiple && !inputHandler.value?.length) ? props.placeholder : ""}
             className={cn(
               "input",
               props.type == "file" && "input-file",
@@ -188,12 +191,14 @@ export function InputComponent({
               !!invalidMessage && "input-error",
               !!invalidMessage && pcn<CT>(className, "base", "error"),
             )}
-            value={inputHandler.value}
+            value={!multiple ? inputHandler.value: undefined}
             onChange={(e) => {
-              inputHandler.setValue(e.target.value);
-              inputHandler.setIdle(false);
-              onChange?.(props.type == "file" ? e.target?.files && e.target?.files[0] : e.target.value);
-              dataSuggestions?.length && filterSuggestion(e);
+              if(!multiple) {
+                inputHandler.setValue(e.target.value);
+                inputHandler.setIdle(false);
+                onChange?.(props.type == "file" ? e.target?.files && e.target?.files[0] : e.target.value);
+                dataSuggestions?.length && filterSuggestion(e);
+              }
             }}
             onFocus={(e) => {
               props.onFocus?.(e);
@@ -206,11 +211,41 @@ export function InputComponent({
             }}
             onKeyDown={(e) => {
               dataSuggestions?.length && onKeyDownSuggestion(e);
+
+              if (multiple && e.key === "Enter" || e.key === ",") {
+                e.preventDefault();
+                const currentValue = e.currentTarget.value.trim();
+                if (!currentValue) return;
+                
+                const currentValues = Array.isArray(inputHandler.value) ? [...inputHandler.value] : [];
+                if (!currentValues.includes(currentValue)) {
+                  const newValues = [...currentValues, currentValue];
+                  onChange?.(newValues);
+                  inputHandler.setValue(newValues);
+                  e.currentTarget.value = "";
+                }
+              }
             }}
-            autoComplete={
-              props.autoComplete || dataSuggestions?.length ? "off" : ""
-            }
+            autoComplete={props.autoComplete || dataSuggestions?.length ? "off" : ""}
           />
+
+
+          {(multiple) && (
+            <InputValues 
+              value={inputHandler.value || []} 
+              isFocus={inputHandler.focus} 
+              onFocus={() => setTimeout(() => inputHandler.setFocus(true), 110)}
+              onDelete={(_, index) => {
+                const values = Array().concat(inputHandler.value);
+                const newValues = values.filter((_, val) => val != index);
+
+                inputHandler.setValue(newValues);
+                onChange?.(newValues);
+              }}
+              className={`${!inputHandler.focus && (leftIcon ? "ml-[2.5rem]" : "ml-[1rem]")}`} 
+              style={{ maxWidth: `calc(100% - ${leftIcon ? "5.2rem" : "2rem"})` }}
+            />
+          )}
 
           {leftIcon && (
             <FontAwesomeIcon

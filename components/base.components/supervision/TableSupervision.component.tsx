@@ -198,6 +198,7 @@ export function TableSupervisionComponent({
       {title && <h1 className="text-lg lg:text-xl font-bold mb-2 lg:mb-4">{title}</h1>}
 
       <TableComponent
+        id={tableKey}
         columns={columns as TableColumnType[]}
         data={dataTables}
         loading={loading}
@@ -214,12 +215,14 @@ export function TableSupervisionComponent({
         onChangeSortBy={(e) => setParam('sort', e)}
         search={params?.search}
         onChangeSearch={(e) => setParam('search', e)}
+        filter={params?.filter}
+        onChangeFilter={(e) => setParam('filter', e)}
         onRefresh={() => reset()}
         onRowClick={onRowClick ? onRowClick : detailControl != false ? (e) => {
           setToggle(`MODAL_SHOW_${conversion.strSnake(tableKey).toUpperCase()}`)
           setSelected(e)
         } : undefined}
-        controlBar={[...(!isSm ? ["CREATE"] : []), "SEARCH", , "FILTER", "SELECTABLE", "REFRESH"]}
+        controlBar={[...(!isSm ? ["CREATE"] : []), "SEARCH", , "FILTER", "SORT", "SELECTABLE", "REFRESH"]}
       />
 
       <IconButtonComponent

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #FBFDFF;
+  --color-background: #FAFDFF;
   --color-foreground: #575757;
   --color-light-foreground: #9b9b9b;
   --color-primary: #5aafff;
@@ -43,6 +43,7 @@ body {
 
 @layer base {
 }
+
 
 @layer components {
   .button {
@@ -128,11 +129,11 @@ body {
   }
 
   .input-values-item {
-    @apply flex text-sm px-1 pl-2 justify-between bg-white text-foreground items-center rounded-[4px];
+    @apply flex text-sm px-1 pl-2 justify-between bg-white text-foreground border items-center rounded-[4px];
   }
 
   .input-values-delete {
-    @apply text-sm cursor-pointer pl-2 pr-1 py-1 hover:text-danger;
+    @apply text-xs cursor-pointer text-light-foreground pl-2 pr-1 py-1 hover:text-danger;
   }
 
   .input-scroll::-webkit-scrollbar {

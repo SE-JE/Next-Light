@@ -1,6 +1,6 @@
 import React, { ReactNode, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheckCircle, faChevronDown, faTimes,} from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faChevronDown, faTimes,} from "@fortawesome/free-solid-svg-icons";
 import { api, ApiType, cavity, cn, pcn, useInputHandler, useInputRandomId, useLazySearch, useValidation, validation,} from "@utils";
 
 
@@ -348,7 +348,9 @@ export function SelectComponent({
             autoComplete="off"
             autoFocus={autoFocus}
           />
-          {(!searchable || (searchable && !inputHandler.focus)) && (
+
+
+          {(multiple && !searchable || (searchable && !inputHandler.focus)) && (
             <div
               className={`absolute top-1/2 -translate-y-1/2 overflow-x-auto py-1.5 input-scroll ${leftIcon ? "ml-[2.5rem]" : "ml-2"}`}
               style={{ maxWidth: `calc(100% - ${leftIcon ? "5.2rem" : "3.2rem"})` }}
@@ -380,6 +382,7 @@ export function SelectComponent({
               </div>
             </div>
           )}
+
 
           {leftIcon && (
             <FontAwesomeIcon
@@ -457,7 +460,7 @@ export function SelectComponent({
                         } else {
                           const values: string[] | number[] = Array.isArray(inputHandler.value) 
                             ? Array().concat(inputHandler.value).filter((val) => val != option.value)
-                            : [];
+                            : [];                          
 
                           setInputShowValue("");
                           serverSearchable && setKeyword("");
@@ -477,7 +480,7 @@ export function SelectComponent({
                     >
                       {selected && (
                         <FontAwesomeIcon
-                          icon={faCheckCircle}
+                          icon={faCheck}
                           className="mr-2 text-sm"
                         />
                       )}

@@ -24,10 +24,12 @@ const handleErrors = (fetch: AxiosResponse) => {
 // ## Type of filter params
 // =========================>
 export type ApiFilterType = {
+  /** Use filter logic with: "and" / "or". */
+  logic   ?:  "and" | "or";
   /** Use filter type with: "eq" = Equal, "ne" = Not Equal, "in" = In, "ni" = Not In, "bw" = Between. */
-  type    ?:  "eq" | "ne" | "in" | "ni" | "bw";
+  type    ?:  "eq" | "ne" | "in" | "ni" | "bw" | "";
   column  ?:  string;
-  value   ?:  string | string[];
+  value   ?:  string | number | number[] | string[] | null;
 };
 
 // =========================>
@@ -91,10 +93,22 @@ export const api = async ({
   buildHeaders["Content-Type"]                =  buildHeaders["Content-Type"] || "multipart/form-data";
   
   const filter: Record<string, any>           =  {};
+  const jsonParams: Record<string, any>       =  {};
   
   if (params?.filter) {
     params?.filter?.map((val) => {
       filter[val.column as keyof object] = `${ApiFilterValue[val.type as keyof object]}:${Array.isArray(val.value) ? val.value.join(",") : val.value}`;
+    });
+  }
+
+  if (params) {
+    const normalizeToJson = ["sort", "searchable", "selectable", "expand"];
+
+    normalizeToJson.forEach((key) => {
+      const k = key as keyof ApiParamsType;
+      if (Array.isArray(params[k])) {
+        jsonParams[k] = JSON.stringify(params[k]) as any;
+      }
     });
   }
 
@@ -104,8 +118,9 @@ export const api = async ({
       data     :  payload,
       params   : {
         ...params,
+        ...jsonParams,
+        ...(params?.filter ? { filter: JSON.stringify(filter)} : {}),
         ...includeParams,
-        ...(params?.filter ? { filter: JSON.stringify(filter)} : {})
       },
     })
     .then((res) => res)
@@ -152,9 +167,8 @@ export const useGetApi = (props: ApiType & { method?: "GET" | "OPTIONS", cacheNa
       // =========================>
       if (props.expired) cavity.set({key: props?.cacheName || `fetch_${props?.path}`, data: response?.data, expired: props.expired});
     }
-
   };
-
+  
   useEffect(() => {
     if (!sleep && (props.path || props.url)) fetch();
   }, [
@@ -164,7 +178,6 @@ export const useGetApi = (props: ApiType & { method?: "GET" | "OPTIONS", cacheNa
     props.params?.page,
     props.params?.search,
     props.params?.sort,
-    // props.params?.sortDirection,
     props.params?.filter,
     props.includeParams,
     props.headers,

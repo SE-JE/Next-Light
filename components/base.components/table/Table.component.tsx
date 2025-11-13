@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowDownZA, faArrowUpAZ, faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
-import { cn, pcn, useLazySearch } from "@utils";
+import { ApiFilterType, cn, pcn, useLazySearch } from "@utils";
 import { useToggleContext } from "@contexts";
 import { ControlBarComponent, ControlBarOptionType, PaginationComponent, PaginationProps, ScrollContainerComponent, FilterComponent, FilterColumnOption } from "@components";
 
@@ -21,6 +21,8 @@ export interface TableColumnType {
 };
 
 export interface TableProps {
+  id                        ?: string;
+  
   controlBar                ?:  false | ControlBarOptionType[];
 
   columns                    :  TableColumnType[];
@@ -34,6 +36,9 @@ export interface TableProps {
   onChangeSearch            ?:  (search: string) => void;
   searchableColumn          ?:  string[];
   onChangeSearchableColumn  ?:  (column: string) => void;
+  filter                    ?:  ApiFilterType[];
+  onChangeFilter            ?:  (filters: ApiFilterType[]) => void;
+
   onRowClick                ?:  (data: object, key: number) => void;
   onRefresh                 ?:  () => void;
 
@@ -44,6 +49,7 @@ export interface TableProps {
 
 
 export function TableComponent({
+  id,
   controlBar,
   columns,
   data,
@@ -56,6 +62,8 @@ export function TableComponent({
   onChangeSearch,
   searchableColumn,
   onChangeSearchableColumn,
+  filter,
+  onChangeFilter,
 
   onRowClick,
   onRefresh,
@@ -180,6 +188,7 @@ export function TableComponent({
     <div className={pcn<CT>(className, "base")}>
       {controlBar != false && (
         <ControlBarComponent 
+          id={id}
           options={!controlBar ? ["CREATE", "SEARCH", "FILTER", "SELECTABLE", "REFRESH"] : controlBar}
           searchableOptions={columns?.filter((c: TableColumnType) => c.searchable)}
           onSearchable={(e) => onChangeSearchableColumn?.(String(e))}
@@ -189,6 +198,9 @@ export function TableComponent({
           selectableOptions={columns}
           onSelectable={(e) => setDisplayColumns(e)}
           selectable={displayColumns}
+          sortableOptions={columns?.filter((c: TableColumnType) => c.sortable)}
+          sort={sortBy}
+          onSort={(sort) => onChangeSortBy?.(sort)}
           onRefresh={() => onRefresh?.()}
           className={pcn<CT>(className, "controller-bar") || ""}
         />
@@ -197,6 +209,8 @@ export function TableComponent({
       <FilterComponent 
         className={cn("", !toggle.FILTER ? "p-0 h-0 hidden overflow-hidden" : "mb-2 animate-intro-down")}
         columns={columns?.map((c: any) => ({label: c.label, selector: c.selector})) as FilterColumnOption[]}
+        onChange={(filters) => onChangeFilter?.(filters)}
+        value={filter}
       />
 
       <div className="relative w-full">

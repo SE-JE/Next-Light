@@ -27,6 +27,7 @@ export * from "./input/InputOtp.component";
 export * from "./input/InputPassword.component";
 export * from "./input/InputRadio.component";
 export * from "./input/InputTime.component";
+export * from "./input/InputValues.component";
 export * from "./input/Radio.component";
 export * from "./input/Select.component";
 export * from "./modal/FloatingPage.component";

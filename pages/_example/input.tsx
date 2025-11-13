@@ -76,6 +76,14 @@ export default function Input() {
             />
           </div>
           <div className="col-span-4">
+            <InputComponent
+              name=""
+              label="Nama Lengkap"
+              placeholder="Contoh: Joko Gunawan..."
+              multiple
+            />
+          </div>
+          <div className="col-span-4">
             <div className="flex gap-4">
               <CheckboxComponent name="check" value="check" label="Checkbox" />
               <CheckboxComponent

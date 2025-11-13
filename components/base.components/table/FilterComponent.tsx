@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { faChevronUp, faPlus, faRotate, faTimes } from "@fortawesome/free-solid-svg-icons";
-import { cn } from "@utils";
+import { ApiFilterType, cn } from "@utils";
 import { useToggleContext } from "@contexts";
 import {ButtonComponent, IconButtonComponent, InputComponent, InputCurrencyComponent, InputDateComponent, InputNumberComponent, SelectComponent} from "@components";
 
@@ -17,16 +17,17 @@ export type FilterColumnOption = {
     options: { label: string; value: any }[];
   };
 
-export interface FilterRule {
-  column     :  string;
-  operator   :  string;
-  value     ?:  string | number | number[] | string[] | null;
-  logic     ?:  "and" | "or";
-}
+// export interface FilterRule {
+//   column     :  string;
+//   type       :   "eq" | "ne" | "in" | "ni" | "bw";
+//   value     ?:  string | number | number[] | string[] | null;
+//   logic     ?:  "and" | "or";
+// }
 
 export interface AdvancedFilterProps {
   columns     :  FilterColumnOption[];
-  onChange   ?:  (filters: FilterRule[]) => void;
+  onChange   ?:  (filters: ApiFilterType[]) => void;
+  value      ?:  ApiFilterType[];
   className  ?:  string;
 }
 
@@ -49,17 +50,18 @@ const LOGIC_OPTIONS = [
 export function FilterComponent({
   columns,
   onChange,
+  value,
   className = "",
 }: AdvancedFilterProps) {
   const { setToggle }         =  useToggleContext()
-  const [filters, setFilters] = useState<FilterRule[]>([]);
+  const [filters, setFilters] = useState<ApiFilterType[]>([]);
 
-  const handleChange = (index: number, key: keyof FilterRule, value: any) => {
+  const handleChange = (index: number, key: keyof ApiFilterType, value: any) => {
     const updated = [...filters];
     updated[index][key] = value;
 
     if (key === "column") {
-      updated[index].operator = "";
+      updated[index].type = "";
       updated[index].value = "";
     }
 
@@ -69,7 +71,7 @@ export function FilterComponent({
   const addFilter = () => {
     setFilters([
       ...filters,
-      { column: "", operator: "", value: "", logic: filters.length ? "and" : undefined },
+      { column: "", type: "", value: "", logic: filters.length ? "and" : undefined },
     ]);
   };
 
@@ -83,6 +85,7 @@ export function FilterComponent({
   }, [filters]);
 
 
+  useEffect(() => {}, [value]);
 
   return (
     <>
@@ -97,6 +100,7 @@ export function FilterComponent({
               paint="primary"
               className="text-slate-400 icon::text-slate-400"
               size="xs"
+              onClick={() => setFilters([])}
             />
 
             <IconButtonComponent
@@ -147,8 +151,8 @@ export function FilterComponent({
                   name={`filter_operator_${i}`}
                   options={FILTER_OPERATORS}
                   placeholder="Operator"
-                  value={f.operator}
-                  onChange={(e) => handleChange(i, "operator", e)}
+                  value={f.type}
+                  onChange={(e) => handleChange(i, "type", e)}
                   className="text-sm p-2 px-3"
                 />
               </div>
@@ -161,8 +165,8 @@ export function FilterComponent({
                   onChange={(e: any) => handleChange(i, "value", e)}
                   options={column.type === "select" && column.options ? column.options : []}
                   className="text-sm p-2 px-3"
-                  between={f.operator === "bw"}
-                  multiple={["in", "ni"].includes(f.operator)}
+                  between={f.type === "bw"}
+                  multiple={["in", "ni"].includes(f.type || "")}
                 />
               )}
 

@@ -63,7 +63,7 @@ export function ModalConfirmComponent({
 
       <div
         className={cn(
-          "modal rounded-[6px] border-t-4 !border-primary",
+          "modal rounded-[4px] border-t-4 !border-primary",
           "w-[calc(100vw-2rem)] md:w-[50vw] max-w-[300px]",
           !show && "-translate-y-full opacity-0 scale-y-0",
           pcn<CT>(className, "base")
@@ -76,14 +76,14 @@ export function ModalConfirmComponent({
               pcn<CT>(className, "header")
             )}
           >
-            <div className="mt-4">
+            <div className="mt-6">
               <FontAwesomeIcon
                 icon={icon || faQuestion}
-                className={`text-2xl`}
+                className={`text-xl`}
               />
             </div>
 
-            <h6 className="text-lg font-semibold">{title}</h6>
+            <h6 className="font-semibold text-lg">{title}</h6>
           </div>
         )}
 
@@ -95,19 +95,21 @@ export function ModalConfirmComponent({
           </div>
         )}
 
-        <div className="flex justify-center gap-4 pt-2 pb-4">
+        <div className="flex justify-center pt-6">
           <ButtonComponent
             label="Batal"
             variant="simple"
             onClick={() => onClose()}
-            className="text-foreground"
-            size="sm"
+            className="text-foreground bg-background rounded-none"
+            // size="sm"
+            block
           />
           <ButtonComponent
             label={"Konfirmasi"}
-            paint={"warning"}
             loading={loading}
             onClick={async () => {
+              if(!submitControl?.onSubmit) return;
+
               setLoading(true);
               if (typeof submitControl?.onSubmit == "function") {
                 submitControl?.onSubmit?.();
@@ -125,7 +127,9 @@ export function ModalConfirmComponent({
                 }
               }
             }}
-            size="sm"
+            // size="sm"
+            className="rounded-none"
+            block
             {...submitControl}
           />
         </div>

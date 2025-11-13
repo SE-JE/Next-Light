@@ -351,11 +351,11 @@ export const useInputHandler = (
   value?: any, 
   validations?: string,
   register?: (name: string, validations?: string) => void,
-  isFile: boolean = false,
+  isFile?: boolean,
+  // multiple?: boolean,
 ) => {
   const [inputValue, setInputValue]                    =  useState<any>("");
   const [focus, setFocus]                              =  useState<boolean>(false);
-  // const [invalid, setInvalid]                          =  useState("");
   const [idle, setIdle]                                =  useState(true);
 
   useEffect(() => {

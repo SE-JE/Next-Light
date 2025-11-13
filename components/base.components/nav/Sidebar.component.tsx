@@ -134,15 +134,13 @@ export function SidebarComponent({
       pcn<CT>(className, "backdrop"),
     ),
     base: cn(
-      "flex flex-col fixed w-64 h-screen px-2 py-4 overflow-y-auto bg-white z-20 rounded-r-[8px] border-r scroll",
+      "flex flex-col fixed w-64 h-screen px-2 py-4 overflow-y-auto bg-white z-20 rounded-r-[8px] border-r scroll-sm",
       toggle ? "scale-x-100 md:scale-x-0" : "scale-x-0 md:scale-x-100",
       pcn<CT>(className, "base"),
     ),
-    headItem:
-      "flex justify-between items-center text-light-foreground font-semibold py-2 text-xs uppercase",
+    headItem: "flex justify-between items-center text-light-foreground font-semibold py-2 text-xs uppercase",
     item: "flex items-center justify-between px-2 py-2 gap-2 transition-colors duration-300 transform hover:text-primary cursor-pointer transition-none",
-    childItem:
-      "flex items-center justify-between px-2 py-2 gap-2 transition-colors duration-300 transform hover:text-primary cursor-pointer transition-none border-l-2",
+    childItem:"flex items-center justify-between px-2 py-2 gap-2 transition-colors duration-300 transform hover:text-primary cursor-pointer transition-none border-l-2",
   };
 
   return (
