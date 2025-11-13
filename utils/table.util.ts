@@ -9,6 +9,7 @@ export type TableStateType = {
   params?: ApiParamsType;
   data?: Record<string, any>[];
   selected?: Record<string, any> | null;
+  checks?: (string | number)[] | null;
 };
 
 type FetchControlType = {
@@ -127,6 +128,8 @@ export const useTable = (
   const setParam = <K extends keyof ApiParamsType>(key: K, value: ApiParamsType[K]) => setState((prev) => ({ ...prev, params: { ...prev.params, [key]: value } }));
 
   const setSelected = (selected: Record<string, any> | null) => setState((prev) => ({ ...prev, selected }))
+  
+  const setChecks = (checks: (string | number)[] | null) => setState((prev) => ({ ...prev, checks }))
 
   return {
     tableKey,
@@ -137,5 +140,7 @@ export const useTable = (
     setParam,
     selected: state.selected,
     setSelected: setSelected,
+    checks: state.checks,
+    setChecks: setChecks,
   };
 };

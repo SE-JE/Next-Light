@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowDownZA, faArrowUpAZ, faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { ApiFilterType, cn, pcn, useLazySearch } from "@utils";
 import { useToggleContext } from "@contexts";
-import { ControlBarComponent, ControlBarOptionType, PaginationComponent, PaginationProps, ScrollContainerComponent, FilterComponent, FilterColumnOption } from "@components";
+import { ControlBarComponent, ControlBarOptionType, PaginationComponent, PaginationProps, ScrollContainerComponent, FilterComponent, FilterColumnOption, CheckboxComponent } from "@components";
 
 
 
@@ -15,6 +15,12 @@ export interface TableColumnType {
   width      ?:  string;
   sortable   ?:  boolean;
   searchable ?:  boolean;
+  filterable ?:  boolean | {
+    type      : "text" | "number" | "currency" | "date";
+  } | {
+    type      :  "select";
+    options   :  { label: string; value: any }[];
+  };
   className  ?:  string;
   item       ?:  (data: any) => string | ReactNode;
   tip        ?:  string | ((data: any) => string);
@@ -26,7 +32,7 @@ export interface TableProps {
   controlBar                ?:  false | ControlBarOptionType[];
 
   columns                    :  TableColumnType[];
-  data                       :  object[];
+  data                       :  Record<string, any>[];
   pagination                ?:  PaginationProps;
 
   loading                   ?:  boolean;
@@ -38,6 +44,9 @@ export interface TableProps {
   onChangeSearchableColumn  ?:  (column: string) => void;
   filter                    ?:  ApiFilterType[];
   onChangeFilter            ?:  (filters: ApiFilterType[]) => void;
+  checks                    ?:  (string | number)[];
+  onChangeChecks            ?:  (checks: (string | number)[]) => void;
+  actionBulking             ?:  ((checks: (string | number)[]) => ReactNode) | false
 
   onRowClick                ?:  (data: object, key: number) => void;
   onRefresh                 ?:  () => void;
@@ -64,6 +73,9 @@ export function TableComponent({
   onChangeSearchableColumn,
   filter,
   onChangeFilter,
+  checks,
+  onChangeChecks,
+  actionBulking,
 
   onRowClick,
   onRefresh,
@@ -208,7 +220,12 @@ export function TableComponent({
 
       <FilterComponent 
         className={cn("", !toggle.FILTER ? "p-0 h-0 hidden overflow-hidden" : "mb-2 animate-intro-down")}
-        columns={columns?.map((c: any) => ({label: c.label, selector: c.selector})) as FilterColumnOption[]}
+        columns={columns?.filter((c) => !!c?.filterable)?.map((c) => ({
+          label: c.label, 
+          selector: c.selector, 
+          type: typeof c?.filterable == "object" ? c?.filterable?.type : "text",
+          options: typeof c?.filterable == "object" &&  c?.filterable?.type == "select" ? c?.filterable?.options : undefined
+        })) as FilterColumnOption[]}
         onChange={(filters) => onChangeFilter?.(filters)}
         value={filter}
       />
@@ -274,6 +291,16 @@ export function TableComponent({
                   // =========================>
                 }
                 <div className="flex gap-4">
+                  {!!actionBulking && (
+                    <div className={cn(styles.head, "w-max")}>
+                      <CheckboxComponent
+                        name="selected_table"
+                        className="w-5 h-5"
+                        checked={data.length > 0 && checks?.length === data.length}
+                        onChange={() => data.length > 0 && checks?.length === data.length ? onChangeChecks?.([]) : onChangeChecks?.(data.map((d) => d.id))}
+                      />
+                    </div>
+                  )}
                   <div className={cn(styles.head, "w-8", pcn<CT>(className, "head-column"))}>#</div>
                   {renderHead()}
                 </div>
@@ -284,7 +311,7 @@ export function TableComponent({
                 }
                 <div className={`flex flex-col gap-y-0.5`}>
                   {data && data.length ? (
-                    data.map((item: object, key) => {
+                    data.map((item: Record<string, any>, key) => {
                       return (
                         <div
                           style={{ animationDelay: `${(key + 1) * 0.05}s` }}
@@ -295,6 +322,16 @@ export function TableComponent({
                           )}
                           key={key}
                         >
+                          {!!actionBulking && (
+                            <div className={cn("w-max", styles.column)}>
+                              <CheckboxComponent
+                                name="selected_table"
+                                className="w-5 h-5"
+                                checked={checks?.includes(item?.id)}
+                                onChange={() => checks?.includes(item?.id) ? onChangeChecks?.(checks.filter((i) => i !== item?.id)) : onChangeChecks?.([...(checks || []), item?.id])}
+                              />
+                            </div>
+                          )}
                           <div className={cn("w-8", styles?.column)}>{numberOfRow(key)}</div>
                           {renderItem(item)}
                           <div ref={actionColumnRef} className={cn(`flex-1 flex justify-end gap-2 px-4 py-2`)}>
@@ -342,6 +379,15 @@ export function TableComponent({
           )}
         </ScrollContainerComponent>
       </div>
+
+      {!!actionBulking && !!checks?.length && (
+        <div className="rounded-[6px] bg-white mt-4 w-full px-4 py-2 border flex justify-between items-center">
+          <div className="text-sm font-semibold">{checks?.length} Data Terpilih</div>
+          <div className="flex justify-end items-center gap-2">
+            {actionBulking?.(checks)}
+          </div>
+        </div>
+      )}
 
       {pagination && (
         <div className="mt-4">

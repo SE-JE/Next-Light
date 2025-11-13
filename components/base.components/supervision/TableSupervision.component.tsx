@@ -3,7 +3,7 @@ import { faQuestionCircle } from "@fortawesome/free-regular-svg-icons";
 import { faEdit, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { ApiType, cn, conversion, useResponsive, useTable } from "@utils";
 import { useToggleContext } from "@contexts";
-import { FloatingPageComponent, FloatingPageProps, ButtonComponent, IconButtonComponent, TableColumnType, TableComponent, FormSupervisionComponent, FormType, ModalConfirmComponent, TypographyColumnComponent } from "@components";
+import { FloatingPageComponent, FloatingPageProps, ButtonComponent, IconButtonComponent, TableColumnType, TableComponent, FormSupervisionComponent, FormType, ModalConfirmComponent, TypographyColumnComponent, ButtonProps, ModalConfirmProps, TableProps } from "@components";
 
 
 
@@ -13,8 +13,15 @@ export interface TableSupervisionColumnProps {
   width       ?:  string;
   sortable    ?:  boolean;
   searchable  ?:  boolean;
+  filterable  ?:  boolean | {
+    type       :  "text" | "number" | "currency" | "date";
+  } | {
+    type       :  "select";
+    options    :   { label: string; value: any }[];
+  };
   accessCode  ?:  string;
   item        ?:  (data: any) => string | ReactNode;
+  tip         ?:  string | ((data: any) => string);
 };
 
 export interface TableSupervisionFormProps {
@@ -24,6 +31,7 @@ export interface TableSupervisionFormProps {
   modalControl        ?:  FloatingPageProps;
   contentType         ?:  "application/json" | "multipart/form-data";
 };
+
 
 export type TableSupervisionProps = {
   fetchControl     :  ApiType;
@@ -39,13 +47,17 @@ export type TableSupervisionProps = {
     className     ?:  string;
   });
   actionControl   ?:  boolean | (
-    | 'edit' | 'delete'
-    | ((
-        row              :  object,
-        setModal         :  (type: "form" | "delete" | "show") => void,
-        setDataSelected  :  () => void
-      ) => ReactNode[])
+    | 'edit' | 'delete' | {
+      label           :  string,
+      modal          ?:  ModalConfirmProps,
+      button         ?:  ButtonProps,
+    } | ((
+      row              :  object,
+      setModal         :  (type: "EDIT" | "DELETE") => void,
+      setDataSelected ?:  () => void
+    ) => ReactNode[])
   )[];
+  actionBulkingControl ?: TableProps["actionBulking"],
 };
 
 
@@ -60,8 +72,9 @@ export function TableSupervisionComponent({
   onRowClick,
   detailControl,
   actionControl,
+  actionBulkingControl,
 }: TableSupervisionProps) {
-  const { tableKey, params, setParam, data, loading, selected, setSelected, reset }  =  useTable(fetchControl, id, title, encodeParams)
+  const { tableKey, params, setParam, data, loading, selected, setSelected, checks, setChecks, reset }  =  useTable(fetchControl, id, title, encodeParams)
   const { setToggle, toggle }                                                        =  useToggleContext()
   const { isSm }                                                                     =  useResponsive();
 
@@ -92,6 +105,92 @@ export function TableSupervisionComponent({
 
 
 
+  const renderTableAction = (
+    actions             :  TableSupervisionProps["actionControl"],
+    item               ?:  Record<string,                          any>,
+    options            ?:  {size?: ButtonProps['size'], className?: string}
+  ) => {
+    return (
+      <>
+        <div className={cn("flex items-center gap-2", options?.className)}>
+          {(Array.isArray(actions) ? actions : (actions || actions == undefined) ? ['edit', "delete"] : [])?.map((action, key) => {
+            if(action == "edit") {
+              return (
+                <ButtonComponent
+                  key={key}
+                  icon={faEdit}
+                  label={"Ubah"}
+                  variant="outline"
+                  paint="warning"
+                  size={options?.size || "xs"}
+                  rounded
+                  onClick={() => {
+                    setToggle(`MODAL_FORM_${conversion.strSnake(tableKey).toUpperCase()}`);
+                    item && setSelected?.(item);
+                  }}
+                />
+              )
+            }
+
+            if(action == "delete") {
+              return (
+                <ButtonComponent
+                  key={key}
+                  icon={faTrash}
+                  label={"Hapus"}
+                  variant="outline"
+                  paint="danger"
+                  size={options?.size || "xs"}
+                  rounded
+                  onClick={() => {
+                    setToggle(`MODAL_DELETE_${conversion.strSnake(tableKey).toUpperCase()}`);
+                    item && setSelected?.(item);
+                  }}
+                />
+              )
+            }
+
+            if(typeof action == "object") {
+              <ButtonComponent
+                key={key}
+                label={action?.button?.label || action?.label}
+                variant={action?.button?.variant || "outline"}
+                paint={action?.button?.paint || "primary"}
+                size={action?.button?.size || options?.size || "xs"}
+                rounded={action?.button?.rounded || true}
+                onClick={() => {
+                  if (action?.button?.onClick) {
+                    action?.button?.onClick(item)
+                  } else {
+                    setToggle(`MODAL_${conversion.strSnake(action?.label).toUpperCase()}_${conversion.strSnake(tableKey).toUpperCase()}`);
+                    item && setSelected?.(item);
+                  }
+                }}
+                {...action.button}
+              />
+            }
+
+            if(typeof action == "function") {
+              action(item || {}, (type: "EDIT" | "DELETE") => {
+                if(type == "EDIT") {
+                  setToggle(`MODAL_FORM_${conversion.strSnake(tableKey).toUpperCase()}`);
+                  item && setSelected?.(item);
+                } 
+                
+                if (type == "DELETE") {
+                  setToggle(`MODAL_DELETE_${conversion.strSnake(tableKey).toUpperCase()}`);
+                  item && setSelected?.(item);
+                }
+              })
+            }
+            
+            return "";
+          })}
+        </div>
+      </>
+    )
+  }
+
 
   // ============================
   // ## Data table preparation
@@ -100,53 +199,7 @@ export function TableSupervisionComponent({
     return data?.data?.map((row: object) => {
       return {
         ...row,
-        action: (actionControl !== false || (Array.isArray(actionControl) && actionControl?.length)) && (
-          <div className="flex items-center gap-2">
-            {(!Array.isArray(actionControl) || actionControl?.filter((ac) => typeof ac === "string").includes("edit")) && (
-              <ButtonComponent
-                icon={faEdit}
-                label={"Ubah"}
-                variant="outline"
-                paint="warning"
-                size={"xs"}
-                rounded
-                onClick={() => {
-                  setToggle(`MODAL_FORM_${conversion.strSnake(tableKey).toUpperCase()}`);
-                  setSelected(row);
-                }}
-              />
-            )}
-
-            {(!Array.isArray(actionControl) || actionControl?.filter((ac) => typeof ac === "string").includes("delete")) && (
-              <ButtonComponent
-                icon={faTrash}
-                label={"Hapus"}
-                variant="outline"
-                paint="danger"
-                size={"xs"}
-                rounded
-                onClick={() => {
-                  setToggle(`MODAL_DELETE_${conversion.strSnake(tableKey).toUpperCase()}`);
-                  setSelected(row);
-                }}
-              />
-            )}
-
-            {Array.isArray(actionControl) && 
-              actionControl?.filter((ac) => typeof ac === "function").map((ac) => ac(row, (type: "EDIT" | "DELETE") => {
-                if(type == "EDIT") {
-                  setToggle(`MODAL_FORM_${conversion.strSnake(tableKey).toUpperCase()}`); 
-                  setSelected(row)
-                } 
-                
-                if (type == "DELETE") {
-                  setToggle(`MODAL_DELETE_${conversion.strSnake(tableKey).toUpperCase()}`); 
-                  setSelected(row)
-                }
-              }))
-            }
-          </div>
-        ),
+        action: renderTableAction(actionControl, row),
       };
     });
   }, [actionControl, data]);
@@ -222,7 +275,16 @@ export function TableSupervisionComponent({
           setToggle(`MODAL_SHOW_${conversion.strSnake(tableKey).toUpperCase()}`)
           setSelected(e)
         } : undefined}
-        controlBar={[...(!isSm ? ["CREATE"] : []), "SEARCH", , "FILTER", "SORT", "SELECTABLE", "REFRESH"]}
+        checks={checks || []}
+        onChangeChecks={(e) => setChecks(e)}
+        controlBar={[
+          ...(!isSm ? ["CREATE"] : []), 
+          "SEARCH", 
+          ...(columns?.filter((c) => !!(c as { filterable?: any }).filterable)?.length ? ["FILTER"] : []),
+          ...(columns?.filter((c) => !!(c as { sortable?: any }).sortable)?.length ? ["SORT"] : []),
+          "SELECTABLE", "REFRESH"
+        ]}
+        actionBulking={actionBulkingControl}
       />
 
       <IconButtonComponent
@@ -238,51 +300,7 @@ export function TableSupervisionComponent({
         onClose={() => setToggle(`MODAL_SHOW_${conversion.strSnake(tableKey).toUpperCase()}`, false)}
         title="Detail"
         className="bg-white"
-        footer={
-          (actionControl !== false || (Array.isArray(actionControl) && actionControl?.length)) && (
-            <div className="flex justify-end items-center gap-2">
-              {(!Array.isArray(actionControl) || actionControl?.filter((ac) => typeof ac === "string").includes("edit")) && (
-                <ButtonComponent
-                  icon={faEdit}
-                  label={"Ubah"}
-                  variant="outline"
-                  paint="warning"
-                  size={"sm"}
-                  rounded
-                  onClick={() => {
-                    setToggle(`MODAL_FORM_${conversion.strSnake(tableKey).toUpperCase()}`);
-                  }}
-                />
-              )}
-
-              {(!Array.isArray(actionControl) || actionControl?.filter((ac) => typeof ac === "string").includes("delete")) && (
-                <ButtonComponent
-                  icon={faTrash}
-                  label={"Hapus"}
-                  variant="outline"
-                  paint="danger"
-                  size={"sm"}
-                  rounded
-                  onClick={() => {
-                    setToggle(`MODAL_DELETE_${conversion.strSnake(tableKey).toUpperCase()}`);
-                  }}
-                />
-              )}
-
-              {Array.isArray(actionControl) && 
-                actionControl?.filter((ac) => typeof ac === "function").map((ac) => ac(selected, (type: "EDIT" | "DELETE") => {
-                  if(type == "EDIT") {
-                    setToggle(`MODAL_FORM_${conversion.strSnake(tableKey).toUpperCase()}`);
-                  } 
-                  
-                  if (type == "DELETE") {
-                    setToggle(`MODAL_DELETE_${conversion.strSnake(tableKey).toUpperCase()}`);
-                  }
-                }))
-              }
-            </div>
-          )
-        }
+        footer={renderTableAction(actionControl, undefined, {className: "justify-end", size: "md"})}
       >
         <div className="p-4">
           <div className={cn(
@@ -320,16 +338,21 @@ export function TableSupervisionComponent({
       >
         <div className="p-4">
           <FormSupervisionComponent
-            submitControl={fetchControl.path 
-              ? { path: `${fetchControl.path}/${(selected as { id: number })?.id || "" }`} 
-              : { url: `${fetchControl.url}/${(selected as { id: number })?.id || ""}`}
+            submitControl={fetchControl.path ? { 
+                path: `${fetchControl.path}/${(selected as { id: number })?.id || "" }`,
+                method: !(selected as { id: number })?.id ? "POST" : "PUT", 
+              } : { 
+                url: `${fetchControl.url}/${(selected as { id: number })?.id || ""}`,
+                method: !(selected as { id: number })?.id ? "POST" : "PUT", 
+              }
             }
             forms={forms as FormType[]}
             defaultValue={formControl?.defaultValue ? formControl?.defaultValue(selected || null) : selected}
             payload={formControl?.payload}
             onSuccess={() => {
               reset();
-              setToggle("MODAL_FORM", false);
+              setToggle(`MODAL_FORM_${conversion.strSnake(tableKey).toUpperCase()}`, false);
+              setSelected(null);
             }}
           />
         </div>
@@ -357,6 +380,34 @@ export function TableSupervisionComponent({
       >
         <p className="px-2 pb-2 text-sm text-center">Yakin yang dihapus sudah benar?</p>
       </ModalConfirmComponent>
+
+      {actionControl && Array.isArray(actionControl) && actionControl.filter((ac) => typeof ac == "object")?.map((ac, acKey) => {
+        const submitControl = ac.modal?.submitControl?.onSubmit as ApiType;
+        return (
+          <ModalConfirmComponent
+            key={acKey}
+            show={!!toggle[`MODAL_${conversion.strSnake(ac.label).toUpperCase()}_${conversion.strSnake(tableKey).toUpperCase()}`]}
+            onClose={() => setToggle(`MODAL_${conversion.strSnake(ac.label).toUpperCase()}_${conversion.strSnake(tableKey).toUpperCase()}`, false)}
+            icon={ac?.modal?.icon || faQuestionCircle}
+            title={ac?.modal?.title || ac.label}
+            submitControl={{
+              onSubmit: {
+                ...(submitControl?.path 
+                  ? {path: `${submitControl?.path}/${(selected as { id: number })?.id || ""}`} 
+                  : {url: `${submitControl?.url}/${(selected as { id: number })?.id || ""}`}
+                ),
+                method: submitControl?.method || "POST",
+              },
+              onSuccess: () => {
+                reset();
+                setToggle(`MODAL_${conversion.strSnake(ac.label).toUpperCase()}_${conversion.strSnake(tableKey).toUpperCase()}`, false);
+                setSelected(null)
+                ac.modal?.submitControl?.onSuccess?.()
+              },
+            }}
+          >{ac.modal?.children}</ModalConfirmComponent>
+        )
+      })}
     </>
   );
 }
