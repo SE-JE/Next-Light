@@ -57,6 +57,7 @@ export type TableSupervisionProps = {
       setDataSelected ?:  () => void
     ) => ReactNode[])
   )[];
+  block                ?: boolean,
   actionBulkingControl ?: TableProps["actionBulking"],
 };
 
@@ -65,7 +66,6 @@ export type TableSupervisionProps = {
 export function TableSupervisionComponent({
   title,
   id,
-  encodeParams,
   fetchControl,
   columnControl,
   formControl,
@@ -73,10 +73,12 @@ export function TableSupervisionComponent({
   detailControl,
   actionControl,
   actionBulkingControl,
+  block,
+  encodeParams,
 }: TableSupervisionProps) {
-  const { tableKey, params, setParam, data, loading, selected, setSelected, checks, setChecks, reset }  =  useTable(fetchControl, id, title, encodeParams)
-  const { setToggle, toggle }                                                        =  useToggleContext()
-  const { isSm }                                                                     =  useResponsive();
+  const { tableKey, tableControl, data, selected, setSelected, checks, setChecks, reset }  =  useTable(fetchControl, id, title, encodeParams)
+  const { setToggle, toggle }                                                              =  useToggleContext()
+  const { isSm }                                                                           =  useResponsive();
 
 
 
@@ -252,31 +254,6 @@ export function TableSupervisionComponent({
 
       <TableComponent
         id={tableKey}
-        columns={columns as TableColumnType[]}
-        data={dataTables}
-        loading={loading}
-        pagination={{
-          totalRow  :  data?.total_row,
-          page      :  params?.page || 1,
-          paginate  :  params?.paginate || 10,
-          onChange  :  (_, paginate, page) => {
-            setParam('paginate', paginate);
-            setParam('page', page);
-          },
-        }}
-        sortBy={params?.sort}
-        onChangeSortBy={(e) => setParam('sort', e)}
-        search={params?.search}
-        onChangeSearch={(e) => setParam('search', e)}
-        filter={params?.filter}
-        onChangeFilter={(e) => setParam('filter', e)}
-        onRefresh={() => reset()}
-        onRowClick={onRowClick ? onRowClick : detailControl != false ? (e) => {
-          setToggle(`MODAL_SHOW_${conversion.strSnake(tableKey).toUpperCase()}`)
-          setSelected(e)
-        } : undefined}
-        checks={checks || []}
-        onChangeChecks={(e) => setChecks(e)}
         controlBar={[
           ...(!isSm ? ["CREATE"] : []), 
           "SEARCH", 
@@ -284,7 +261,17 @@ export function TableSupervisionComponent({
           ...(columns?.filter((c) => !!(c as { sortable?: any }).sortable)?.length ? ["SORT"] : []),
           "SELECTABLE", "REFRESH"
         ]}
+        columns={columns as TableColumnType[]}
+        data={dataTables}
+        onRowClick={onRowClick ? onRowClick : detailControl != false ? (e) => {
+          setToggle(`MODAL_SHOW_${conversion.strSnake(tableKey).toUpperCase()}`)
+          setSelected(e)
+        } : undefined}
         actionBulking={actionBulkingControl}
+        checks={checks || []}
+        onChangeChecks={(e) => setChecks(e)}
+        block={block}
+        {...tableControl}
       />
 
       <IconButtonComponent

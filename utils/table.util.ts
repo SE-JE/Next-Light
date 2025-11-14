@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import LZString from "lz-string";
-import { ApiParamsType, conversion, useGetApi } from "@utils";
+import { ApiFilterType, ApiParamsType, conversion, useGetApi } from "@utils";
 
 
 
@@ -30,15 +30,15 @@ export const useTable = (
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // ==========================================================
+  // ======================
   // ## Table state key
-  // ==========================================================
+  // ======================
   const getTableKey = () => id || (title ? conversion.strSlug(title) : null) || fetchControl.path || "";
   const tableKey = getTableKey();
 
-  // ==========================================================
+  // ======================
   // ## Parse state url
-  // ==========================================================
+  // ======================
   const getParamsFromUrl = (): ApiParamsType => {
     if (compressed) {
       const t = searchParams.get(tableKey ? `${tableKey}.t` : "t");
@@ -65,9 +65,9 @@ export const useTable = (
     return params;
   };
 
-  // ==========================================================
+  // =======================
   // ## Update url state
-  // ==========================================================
+  // =======================
   const updateUrlParams = (params: ApiParamsType) => {
     const url = new URL(window.location.href);
 
@@ -102,9 +102,9 @@ export const useTable = (
 
 
 
-  // ==========================================================
+  // ===========================
   // ## get url state
-  // ==========================================================
+  // ===========================
   useEffect(() => {
     const params = getParamsFromUrl();
     setState((prev) => ({ ...prev, params }));
@@ -112,9 +112,9 @@ export const useTable = (
 
 
 
-  // ==========================================================
+  // ==========================
   // ## Fetch api
-  // ==========================================================
+  // ==========================
   const { loading, data, reset } = useGetApi({
     ...fetchControl,
     method: "GET",
@@ -122,14 +122,38 @@ export const useTable = (
   });
   
 
-  // ==========================================================
+  // ==========================
   // ## Setter helper
-  // ==========================================================
+  // ==========================
   const setParam = <K extends keyof ApiParamsType>(key: K, value: ApiParamsType[K]) => setState((prev) => ({ ...prev, params: { ...prev.params, [key]: value } }));
 
   const setSelected = (selected: Record<string, any> | null) => setState((prev) => ({ ...prev, selected }))
   
   const setChecks = (checks: (string | number)[] | null) => setState((prev) => ({ ...prev, checks }))
+
+
+  // ==========================
+  // ## Table Control
+  // ==========================
+  const tableControl  =  {
+    loading: loading,
+    sortBy          :  state?.params?.sort,
+    onChangeSortBy  :  (e: string[]) => setParam('sort', e),
+    search          :  state?.params?.search,
+    onChangeSearch  :  (e: string) => setParam('search', e),
+    filter          :  state?.params?.filter,
+    onChangeFilter  :  (e: ApiFilterType[]) => setParam('filter', e),
+    onRefresh       :  () => reset(),
+    pagination      :  {
+      totalRow      :  data?.total_row,
+      page          :  state?.params?.page          ||  1,
+      paginate      :  state?.params?.paginate      ||  10,
+      onChange      :  (_: number, paginate: number, page: number) => {
+        setParam('paginate', paginate);
+        setParam('page', page);
+      },
+    },
+  };
 
   return {
     tableKey,
@@ -142,5 +166,6 @@ export const useTable = (
     setSelected: setSelected,
     checks: state.checks,
     setChecks: setChecks,
+    tableControl,
   };
 };

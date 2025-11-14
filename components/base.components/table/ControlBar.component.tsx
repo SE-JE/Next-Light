@@ -66,7 +66,7 @@ export function ControlBarComponent({
   
   return (
     <>
-      <div className={cn("py-1 bg-white rounded-[6px] border flex items-center mb-2", className)}>
+      <div className={cn("py-1 px-1.5 bg-white rounded-[6px] border flex items-center mb-2", className)}>
         {options?.map((option: ControlBarOptionType, key: number) => {
           {
             // =========================>
@@ -75,7 +75,7 @@ export function ControlBarComponent({
           }
           if (option == "CREATE") {
             return (
-              <div className="pl-2 pr-4 mr-2 border-r" key="button-add">
+              <div className="pl-1.5 pr-3 mr-2 border-r" key="button-add">
                 <ButtonComponent
                   icon={faPlus}
                   label="Tambah Data"
@@ -234,7 +234,7 @@ export function ControlBarComponent({
           }
           if (option == "REFRESH") {
             return (
-              <div className="p-1.5 relative mr-2" key={key}>
+              <div className="p-1.5 relative" key={key}>
                 <IconButtonComponent
                   icon={faRefresh}
                   variant="outline"

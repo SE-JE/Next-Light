@@ -124,7 +124,7 @@ export function ScrollContainerComponent({
         className={cn(
           "w-full overflow-x-auto scroll",
           scrollFloating && "scroll-none",
-          pcn<CT>(className, "base"),
+          pcn<CT>(className, "container"),
         )}
       >
         {children}
@@ -140,10 +140,9 @@ export function ScrollContainerComponent({
           >
             <div className="h-0.5 opacity-0">{children}</div>
           </div>
+          {footer}
         </div>
       )}
-
-      {footer}
     </div>
   );
 }

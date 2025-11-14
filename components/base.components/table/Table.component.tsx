@@ -51,6 +51,8 @@ export interface TableProps {
   onRowClick                ?:  (data: object, key: number) => void;
   onRefresh                 ?:  () => void;
 
+  block                     ?: boolean;
+
   /** Use custom class with: "controller-bar::", "head-column::", "column::", "floating-action::", "row::". */
   className?: string;
 };
@@ -64,7 +66,7 @@ export function TableComponent({
   data,
   pagination,
   loading,
-
+  
   sortBy,
   onChangeSortBy,
   search,
@@ -79,7 +81,9 @@ export function TableComponent({
 
   onRowClick,
   onRefresh,
-
+  
+  block,
+  
   className = "",
 }: TableProps) {
   const { toggle }                                       =  useToggleContext()
@@ -197,11 +201,11 @@ export function TableComponent({
 
 
   return (
-    <div className={pcn<CT>(className, "base")}>
+    <div className={cn("relative", pcn<CT>(className, "base"))}>
       {controlBar != false && (
         <ControlBarComponent 
           id={id}
-          options={!controlBar ? ["CREATE", "SEARCH", "FILTER", "SELECTABLE", "REFRESH"] : controlBar}
+          options={!controlBar ? ["SEARCH", "SELECTABLE", "REFRESH"] : controlBar}
           searchableOptions={columns?.filter((c: TableColumnType) => c.searchable)}
           onSearchable={(e) => onChangeSearchableColumn?.(String(e))}
           searchable={searchableColumn || []}
@@ -230,13 +234,27 @@ export function TableComponent({
         value={filter}
       />
 
-      <div className="relative w-full">
+      <div className="relative">
         <ScrollContainerComponent
           scrollFloating
+          className="w-full"
           onScroll={(e) => {
             actionColumnRef.current?.clientWidth &&  e.scrollLeft &&
               setShowFloatingAction(e.scrollLeft + e.clientWidth <=  e.scrollWidth - actionColumnRef.current?.clientWidth);
           }}
+          footer={
+            <>
+              {block && pagination && (
+                <>
+                  <div className="py-6"></div>
+                  <div className="my-2 absolute bottom-0 w-full">
+                    <PaginationComponent {...pagination} />
+                  </div>
+                </>
+              )}
+            </>
+          }
+
         >
           {
             // =========================>
@@ -389,7 +407,7 @@ export function TableComponent({
         </div>
       )}
 
-      {pagination && (
+      {!block && pagination && (
         <div className="mt-4">
           <PaginationComponent {...pagination} />
         </div>
