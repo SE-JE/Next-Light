@@ -6,29 +6,32 @@ import { ApiFilterType, ApiParamsType, conversion, useGetApi } from "@utils";
 
 
 export type TableStateType = {
-  params?: ApiParamsType;
-  data?: Record<string, any>[];
-  selected?: Record<string, any> | null;
-  checks?: (string | number)[] | null;
+  params    ?:  ApiParamsType;
+  data      ?:  Record<string, any>[];
+  selected  ?:  Record<string, any> | null;
+  checks    ?:  (string | number)[] | null;
 };
 
-type FetchControlType = {
-  path?: string;
-  url?: string;
-  headers?: Record<string, any>;
+export type FetchControlType = {
+  path           ?:  string;
+  url            ?:  string;
+  headers        ?:  Record<string, any>;
+  params         ?:  ApiParamsType;
+  includeParams  ?:  object;
+  bearer         ?:  string;
 };
 
 
 
 export const useTable = (
-  fetchControl: FetchControlType,
-  id: string = "",
-  title: string = "",
-  compressed: boolean = false
+  fetchControl  :  FetchControlType,
+  id            :  string = "",
+  title         :  string = "",
+  compressed    :  boolean = false
 ) => {
-  const [state, setState] = useState<TableStateType>({});
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  const [state, setState]  =  useState<TableStateType>({});
+  const router             =  useRouter();
+  const searchParams       =  useSearchParams();
 
   // ======================
   // ## Table state key
@@ -112,13 +115,17 @@ export const useTable = (
 
 
 
+
   // ==========================
   // ## Fetch api
   // ==========================
   const { loading, data, reset } = useGetApi({
     ...fetchControl,
     method: "GET",
-    params: state.params,
+    params: {
+      ...state.params,
+      ...fetchControl.params
+    },
   });
   
 

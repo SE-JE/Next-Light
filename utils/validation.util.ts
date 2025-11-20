@@ -83,9 +83,7 @@ export const validation = {
         case "between": {
           const [minVal, maxVal] = (param || "0,0").split(",").map(Number)
           if (!validator.isLength(strValue, { min: minVal, max: maxVal })) {
-            errorMessage = validationLangs.min_max
-              .replace(/@min/g, String(minVal))
-              .replace(/@max/g, String(maxVal))
+            errorMessage = validationLangs.min_max.replace(/@min/g, String(minVal)).replace(/@max/g, String(maxVal))
             return { valid: false, message: errorMessage }
           }
           break
@@ -95,10 +93,7 @@ export const validation = {
         case "in": {
           const allowed = (param || "").split(",")
           if (!allowed.includes(strValue)) {
-            return {
-              valid: false,
-              message: `${validationLangs.in || "Harus salah satu dari"} ${allowed.join(", ")}`,
-            }
+            return { valid: false, message: `${validationLangs.in || "Harus salah satu dari"} ${allowed.join(", ")}` }
           }
           break
         }
@@ -106,10 +101,7 @@ export const validation = {
         case "not_in": {
           const notAllowed = (param || "").split(",")
           if (notAllowed.includes(strValue)) {
-            return {
-              valid: false,
-              message: `${validationLangs.not_in || "Tidak boleh salah satu dari"} ${notAllowed.join(", ")}`,
-            }
+            return { valid: false, message: `${validationLangs.not_in || "Tidak boleh salah satu dari"} ${notAllowed.join(", ")}` }
           }
           break
         }
@@ -130,6 +122,9 @@ export const validation = {
 
     return { valid: true, message: "" }
   },
+
+
+
   // =========================>
   // ## Parse rules
   // =========================>
@@ -141,6 +136,8 @@ export const validation = {
       return { name: name.trim(), param: param?.trim() }
     })
   },
+
+
 
   // =========================>
   // ## Check has rules of validations
@@ -155,6 +152,8 @@ export const validation = {
     return parsed.includes(ruleName)
   },
 
+
+
   // =========================>
   // ## get has rules params
   // =========================>
@@ -163,8 +162,6 @@ export const validation = {
     return found ? found.split(":")[1] : undefined
   }
 }
-
-
 
 
 

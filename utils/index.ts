@@ -100,6 +100,3 @@ export const useLazySearch = (keyword: string) => {
   return [keywordSearch];
 };
 
-
-
-

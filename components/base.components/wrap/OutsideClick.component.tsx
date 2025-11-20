@@ -4,7 +4,7 @@ import React, { ReactNode, useEffect, useRef } from "react";
 
 export interface OutsideClickHandlerProps {
   children: ReactNode;
-  onOutsideClick: () => void;
+  onOutsideClick?: () => void;
 }
 
 

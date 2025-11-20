@@ -1,19 +1,20 @@
 import React, { ReactNode, useState } from "react";
 import ExampleLayout from "./_layout";
-import { ButtonComponent, FloatingPageComponent, ModalComponent, ModalConfirmComponent, ToastComponent } from "@components";
+import { BottomSheetComponent, ButtonComponent, FloatingPageComponent, ModalComponent, ModalConfirmComponent, ToastComponent } from "@components";
 
 export default function Modal() {
   const [show, setShow] = useState<string | null>(null);
 
   return (
     <>
-      <div className="grid grid-cols-5">
+      <div className="grid grid-cols-5 gap-4">
         <ButtonComponent label="Modal" block onClick={() => setShow("modal")} />
         <ButtonComponent
           label="Floating Page"
           block
           onClick={() => setShow("floating-page")}
         />
+        <ButtonComponent label="Bottom Sheet" block onClick={() => setShow("sheet")} />
         <ButtonComponent
           label="Modal Confirm"
           block
@@ -58,6 +59,19 @@ export default function Modal() {
         </div>
       </FloatingPageComponent>
 
+
+      <BottomSheetComponent
+        show={show == "sheet"}
+        maxSize="99vh"
+        onClose={() => setShow(null)}
+      >
+        <div className="px-4 pb-4">
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis quod
+          placeat omnis accusantium tenetur id voluptate quae consequuntur illo
+          unde!
+        </div>
+      </BottomSheetComponent>
+
       <ModalConfirmComponent
         show={show == "modal-confirm"}
         onClose={() => setShow(null)}
@@ -74,6 +88,11 @@ export default function Modal() {
           repellat.
         </div>
       </ToastComponent>
+
+
+      {/* <DraggableComponent>
+        <div className="w-[400px] h-[400px] bg-primary"></div>
+      </DraggableComponent> */}
     </>
   );
 }

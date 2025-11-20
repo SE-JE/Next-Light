@@ -1,9 +1,9 @@
-import React, { ReactNode, useMemo } from "react";
+import React, { ReactNode, useEffect, useMemo } from "react";
 import { faQuestionCircle } from "@fortawesome/free-regular-svg-icons";
 import { faEdit, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { ApiType, cn, conversion, useResponsive, useTable } from "@utils";
+import { ApiType, cn, conversion, FetchControlType, useResponsive, useTable } from "@utils";
 import { useToggleContext } from "@contexts";
-import { FloatingPageComponent, FloatingPageProps, ButtonComponent, IconButtonComponent, TableColumnType, TableComponent, FormSupervisionComponent, FormType, ModalConfirmComponent, TypographyColumnComponent, ButtonProps, ModalConfirmProps, TableProps } from "@components";
+import { FloatingPageComponent, FloatingPageProps, ButtonComponent, IconButtonComponent, TableColumnType, TableComponent, FormSupervisionComponent, FormType, ModalConfirmComponent, TypographyColumnComponent, ButtonProps, ModalConfirmProps, TableProps, ControlBarOptionType, BottomSheetComponent, SwipeActionType } from "@components";
 
 
 
@@ -34,7 +34,7 @@ export interface TableSupervisionFormProps {
 
 
 export type TableSupervisionProps = {
-  fetchControl     :  ApiType;
+  fetchControl     :  FetchControlType;
   title           ?:  string;
   id              ?:  string;
   accessCode      ?:  number;
@@ -57,8 +57,16 @@ export type TableSupervisionProps = {
       setDataSelected ?:  () => void
     ) => ReactNode[])
   )[];
-  block                ?: boolean,
-  actionBulkingControl ?: TableProps["actionBulking"],
+  block                ?:  boolean,
+  actionBulkingControl ?:  TableProps["actionBulking"],
+  controlBar           ?:  ControlBarOptionType[];
+  responsiveControl    ?:  {
+    mobile                 ?:  boolean | {
+      item                 ?:  (item: Record<string, any>, key: number) => ReactNode,
+      leftActionControl    ?:  Omit<SwipeActionType, "onAction"> & { onAction?: (item: Record<string, any>, key?: number) => void },
+      rightActionControl   ?:  Omit<SwipeActionType, "onAction"> & { onAction?: (item: Record<string, any>, key?: number) => void },
+    }
+  }
 };
 
 
@@ -74,12 +82,16 @@ export function TableSupervisionComponent({
   actionControl,
   actionBulkingControl,
   block,
+  controlBar,
+  responsiveControl,
   encodeParams,
 }: TableSupervisionProps) {
   const { tableKey, tableControl, data, selected, setSelected, checks, setChecks, reset }  =  useTable(fetchControl, id, title, encodeParams)
   const { setToggle, toggle }                                                              =  useToggleContext()
   const { isSm }                                                                           =  useResponsive();
 
+
+  const toggleKey = useMemo(() => conversion.strSnake(tableKey).toUpperCase(), [tableKey])
 
 
   // ============================
@@ -127,7 +139,7 @@ export function TableSupervisionComponent({
                   size={options?.size || "xs"}
                   rounded
                   onClick={() => {
-                    setToggle(`MODAL_FORM_${conversion.strSnake(tableKey).toUpperCase()}`);
+                    setToggle(`MODAL_FORM_${toggleKey}`);
                     item && setSelected?.(item);
                   }}
                 />
@@ -145,7 +157,7 @@ export function TableSupervisionComponent({
                   size={options?.size || "xs"}
                   rounded
                   onClick={() => {
-                    setToggle(`MODAL_DELETE_${conversion.strSnake(tableKey).toUpperCase()}`);
+                    setToggle(`MODAL_DELETE_${toggleKey}`);
                     item && setSelected?.(item);
                   }}
                 />
@@ -164,7 +176,7 @@ export function TableSupervisionComponent({
                   if (action?.button?.onClick) {
                     action?.button?.onClick(item)
                   } else {
-                    setToggle(`MODAL_${conversion.strSnake(action?.label).toUpperCase()}_${conversion.strSnake(tableKey).toUpperCase()}`);
+                    setToggle(`MODAL_${conversion.strSnake(action?.label).toUpperCase()}_${toggleKey}`);
                     item && setSelected?.(item);
                   }
                 }}
@@ -175,12 +187,12 @@ export function TableSupervisionComponent({
             if(typeof action == "function") {
               action(item || {}, (type: "EDIT" | "DELETE") => {
                 if(type == "EDIT") {
-                  setToggle(`MODAL_FORM_${conversion.strSnake(tableKey).toUpperCase()}`);
+                  setToggle(`MODAL_FORM_${toggleKey}`);
                   item && setSelected?.(item);
                 } 
                 
                 if (type == "DELETE") {
-                  setToggle(`MODAL_DELETE_${conversion.strSnake(tableKey).toUpperCase()}`);
+                  setToggle(`MODAL_DELETE_${toggleKey}`);
                   item && setSelected?.(item);
                 }
               })
@@ -205,6 +217,41 @@ export function TableSupervisionComponent({
       };
     });
   }, [actionControl, data]);
+
+
+
+  // ============================
+  // ## Render detail page 
+  // ============================
+  const detailPage = useMemo(() => {
+    return (
+      <div className="p-4">
+        <div className={cn(
+          "flex flex-col gap-y-4", 
+          typeof detailControl === "object" ? detailControl.className : undefined
+        )}>
+          {!!selected && (typeof detailControl === "object" && detailControl?.columns?.length 
+          ? detailControl?.columns?.map((column, key) => {
+            if (typeof column === "string") {
+              return (<TypographyColumnComponent
+                key={key}
+                title={columns?.find((c) => c.selector == column)?.label} 
+                content={selected[column]}
+              />)
+            } else {
+              return column?.(selected)
+            }
+          }) : columns?.map((column, key) => (
+            <TypographyColumnComponent
+              key={key}
+              title={column.label} 
+              content={selected[column.selector]}
+            />
+          )))}
+        </div>
+      </div>
+    )
+  }, [selected, detailControl]);
 
 
 
@@ -248,14 +295,58 @@ export function TableSupervisionComponent({
 
 
 
+  // ============================
+  // ## Render form page 
+  // ============================
+  const formPage = useMemo(() => {
+    return (
+      <FormSupervisionComponent
+        submitControl={fetchControl.path ? { 
+            path: `${fetchControl.path}/${(selected as { id: number })?.id || "" }`,
+            method: !(selected as { id: number })?.id ? "POST" : "PUT", 
+          } : { 
+            url: `${fetchControl.url}/${(selected as { id: number })?.id || ""}`,
+            method: !(selected as { id: number })?.id ? "POST" : "PUT", 
+          }
+        }
+        forms={forms as FormType[]}
+        defaultValue={formControl?.defaultValue ? formControl?.defaultValue(selected || null) : selected}
+        payload={formControl?.payload}
+        onSuccess={() => {
+          reset();
+          setToggle(`MODAL_FORM_${toggleKey}`, false);
+        }}
+      />
+    )
+  }, [selected, fetchControl, formControl]);
+
+
+
+  useEffect(() => {
+    if(toggle[`REFRESH_${toggleKey}`] != undefined) reset();
+  }, [toggle[`REFRESH_${toggleKey}`]]);
+
+
   return (
     <>
       {title && <h1 className="text-lg lg:text-xl font-bold mb-2 lg:mb-4">{title}</h1>}
 
       <TableComponent
         id={tableKey}
-        controlBar={[
-          ...(!isSm ? ["CREATE"] : []), 
+        controlBar={controlBar || [
+          ...(!isSm ? [
+            <div className="pl-1.5 pr-3 mr-2 border-r" key="button-add">
+              <ButtonComponent
+                icon={faPlus}
+                label="Tambah Data"
+                size="sm"
+                onClick={() => {
+                  setToggle(`MODAL_FORM_${toggleKey}`)
+                  setSelected(null)
+                }}
+              />
+            </div>
+          ] : []), 
           "SEARCH", 
           ...(columns?.filter((c) => !!(c as { filterable?: any }).filterable)?.length ? ["FILTER"] : []),
           ...(columns?.filter((c) => !!(c as { sortable?: any }).sortable)?.length ? ["SORT"] : []),
@@ -264,91 +355,97 @@ export function TableSupervisionComponent({
         columns={columns as TableColumnType[]}
         data={dataTables}
         onRowClick={onRowClick ? onRowClick : detailControl != false ? (e) => {
-          setToggle(`MODAL_SHOW_${conversion.strSnake(tableKey).toUpperCase()}`)
+          setToggle(`MODAL_SHOW_${toggleKey}`)
           setSelected(e)
         } : undefined}
         actionBulking={actionBulkingControl}
         checks={checks || []}
         onChangeChecks={(e) => setChecks(e)}
         block={block}
+        responsiveControl={responsiveControl ? {
+          mobile: responsiveControl?.mobile == true ? {
+            leftActionControl: (Array.isArray(actionControl) ? actionControl : (actionControl || actionControl == undefined) ? ['edit', "delete"] : []).includes('edit') ? {
+              icon: faEdit,
+              onAction: (item) => {
+                setToggle(`MODAL_FORM_${toggleKey}`);
+                item && setSelected?.(item);
+              }
+            } : undefined,
+            rightActionControl: (Array.isArray(actionControl) ? actionControl : (actionControl || actionControl == undefined) ? ['edit', "delete"] : []).includes('delete') ? {
+              icon: faTrash,
+              onAction: (item) => {
+                setToggle(`MODAL_DELETE_${toggleKey}`);
+                item && setSelected?.(item);
+              }
+            } : undefined
+          } : responsiveControl?.mobile || undefined,
+        } : undefined}
         {...tableControl}
       />
 
       <IconButtonComponent
         icon={faPlus}
-        className="fixed bottom-4 right-4 w-12 h-12 lg:hidden"
+        className="fixed bottom-2 left-2 w-12 h-12 md:hidden"
         size="lg"
-        onClick={() => setToggle(`MODAL_FORM_${conversion.strSnake(tableKey).toUpperCase()}`)}
+        rounded
+        onClick={() => {
+          setToggle(`MODAL_FORM_${toggleKey}`)
+          setSelected(null)
+        }}
       />
 
 
-      <FloatingPageComponent
-        show={!!toggle[`MODAL_SHOW_${conversion.strSnake(tableKey).toUpperCase()}`]}
-        onClose={() => setToggle(`MODAL_SHOW_${conversion.strSnake(tableKey).toUpperCase()}`, false)}
-        title="Detail"
-        className="bg-white"
-        footer={renderTableAction(actionControl, undefined, {className: "justify-end", size: "md"})}
-      >
-        <div className="p-4">
-          <div className={cn(
-            "flex flex-col gap-y-4", 
-            typeof detailControl === "object" ? detailControl.className : undefined
-          )}>
-            {!!selected && (typeof detailControl === "object" && detailControl?.columns?.length 
-            ? detailControl?.columns?.map((column, key) => {
-              if (typeof column === "string") {
-                return (<TypographyColumnComponent
-                  key={key}
-                  title={columns?.find((c) => c.selector == column)?.label} 
-                  content={selected[column]}
-                />)
-              } else {
-                return column?.(selected)
-              }
-            }) : columns?.map((column, key) => (
-              <TypographyColumnComponent
-                key={key}
-                title={column.label} 
-                content={selected[column.selector]}
-              />
-            )))}
+      {isSm ? (
+        <BottomSheetComponent
+          show={!!toggle[`MODAL_SHOW_${toggleKey}`]}
+          onClose={() => setToggle(`MODAL_SHOW_${toggleKey}`, false)}
+          className="bg-white"
+          footer={renderTableAction(actionControl, undefined, {className: isSm ? "justify-end p-2 bg-background" : "justify-end", size: isSm ? "sm" : "md"})}
+          size="98vh"
+        >
+          {detailPage}
+        </BottomSheetComponent>
+      ) : (
+        <FloatingPageComponent
+          show={!!toggle[`MODAL_SHOW_${toggleKey}`]}
+          onClose={() => setToggle(`MODAL_SHOW_${toggleKey}`, false)}
+          title="Detail"
+          className="bg-white"
+          footer={renderTableAction(actionControl, undefined, {className: isSm ? "justify-end p-2 bg-background" : "justify-end", size: isSm ? "sm" : "md"})}
+        >
+          {detailPage}
+        </FloatingPageComponent>
+      )}
+
+
+      {isSm ? (
+        <BottomSheetComponent
+          show={!!toggle[`MODAL_FORM_${toggleKey}`]}
+          onClose={() => setToggle(`MODAL_FORM_${toggleKey}`, false)}
+          className="bg-white"
+          size="98vh"
+        >
+          <div className="p-4 h-[110vh]">
+            {formPage}
           </div>
-        </div>
-      </FloatingPageComponent>
-
-
-      <FloatingPageComponent
-        show={!!toggle[`MODAL_FORM_${conversion.strSnake(tableKey).toUpperCase()}`]}
-        onClose={() => setToggle(`MODAL_FORM_${conversion.strSnake(tableKey).toUpperCase()}`, false)}
-        title="Tambah Data"
-        className="bg-white"
-      >
-        <div className="p-4">
-          <FormSupervisionComponent
-            submitControl={fetchControl.path ? { 
-                path: `${fetchControl.path}/${(selected as { id: number })?.id || "" }`,
-                method: !(selected as { id: number })?.id ? "POST" : "PUT", 
-              } : { 
-                url: `${fetchControl.url}/${(selected as { id: number })?.id || ""}`,
-                method: !(selected as { id: number })?.id ? "POST" : "PUT", 
-              }
-            }
-            forms={forms as FormType[]}
-            defaultValue={formControl?.defaultValue ? formControl?.defaultValue(selected || null) : selected}
-            payload={formControl?.payload}
-            onSuccess={() => {
-              reset();
-              setToggle(`MODAL_FORM_${conversion.strSnake(tableKey).toUpperCase()}`, false);
-              setSelected(null);
-            }}
-          />
-        </div>
-      </FloatingPageComponent>
+        </BottomSheetComponent>
+      ) : (
+        <FloatingPageComponent
+          show={!!toggle[`MODAL_FORM_${toggleKey}`]}
+          onClose={() => setToggle(`MODAL_FORM_${toggleKey}`, false)}
+          title={!!selected ? "Ubah Data" : "Tambah Data"}
+          className="bg-white"
+        >
+          <div className="p-4">
+            {formPage}
+          </div>
+        </FloatingPageComponent>
+      )}
 
 
       <ModalConfirmComponent
-        show={!!toggle[`MODAL_DELETE_${conversion.strSnake(tableKey).toUpperCase()}`]}
-        onClose={() => setToggle(`MODAL_DELETE_${conversion.strSnake(tableKey).toUpperCase()}`, false)}
+        show={!!toggle[`MODAL_DELETE_${toggleKey}`]}
+        onClose={() => setToggle(`MODAL_DELETE_${toggleKey}`, false)}
         icon={faQuestionCircle}
         title={`Menghapus Data?`}
         submitControl={{
@@ -361,7 +458,7 @@ export function TableSupervisionComponent({
           },
           onSuccess: () => {
             reset();
-            setToggle(`MODAL_DELETE_${conversion.strSnake(tableKey).toUpperCase()}`, false);
+            setToggle(`MODAL_DELETE_${toggleKey}`, false);
           },
         }}
       >
@@ -373,8 +470,8 @@ export function TableSupervisionComponent({
         return (
           <ModalConfirmComponent
             key={acKey}
-            show={!!toggle[`MODAL_${conversion.strSnake(ac.label).toUpperCase()}_${conversion.strSnake(tableKey).toUpperCase()}`]}
-            onClose={() => setToggle(`MODAL_${conversion.strSnake(ac.label).toUpperCase()}_${conversion.strSnake(tableKey).toUpperCase()}`, false)}
+            show={!!toggle[`MODAL_${conversion.strSnake(ac.label).toUpperCase()}_${toggleKey}`]}
+            onClose={() => setToggle(`MODAL_${conversion.strSnake(ac.label).toUpperCase()}_${toggleKey}`, false)}
             icon={ac?.modal?.icon || faQuestionCircle}
             title={ac?.modal?.title || ac.label}
             submitControl={{

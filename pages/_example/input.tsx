@@ -9,7 +9,7 @@ export default function Input() {
       <CardComponent>
         <p className="text-xl">Input</p>
 
-        <div className="grid grid-cols-12 gap-4 py-4">
+        <div className="grid grid-cols-4 md:grid-cols-12 gap-4 py-4">
           <div className="col-span-4">
             <InputComponent
               name=""
@@ -251,6 +251,7 @@ export default function Input() {
             <InputImageComponent
               name="input_image"
               label="Input Image"
+              
               // placeholder="Choice option..."
             />
           </div>

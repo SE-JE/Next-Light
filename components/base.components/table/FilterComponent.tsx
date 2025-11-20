@@ -1,33 +1,31 @@
 import React, { useState, useEffect } from "react";
 import { faChevronUp, faPlus, faRotate, faTimes } from "@fortawesome/free-solid-svg-icons";
-import { ApiFilterType, cn } from "@utils";
-import { useToggleContext } from "@contexts";
+import { ApiFilterType, cn, pcn, useResponsive } from "@utils";
 import {ButtonComponent, IconButtonComponent, InputComponent, InputCurrencyComponent, InputDateComponent, InputNumberComponent, SelectComponent} from "@components";
 
 
 
-export type FilterColumnOption = {
-    label: string;
-    selector: string;
-    type: "text" | "number" | "currency" | "date";
-  } | {
-    label: string;
-    selector: string;
-    type: "select";
-    options: { label: string; value: any }[];
-  };
+type CT = "base" | "title";
 
-// export interface FilterRule {
-//   column     :  string;
-//   type       :   "eq" | "ne" | "in" | "ni" | "bw";
-//   value     ?:  string | number | number[] | string[] | null;
-//   logic     ?:  "and" | "or";
-// }
+export type FilterColumnOption = {
+  label: string;
+  selector: string;
+  type: "text" | "number" | "currency" | "date";
+} | {
+  label: string;
+  selector: string;
+  type: "select";
+  options: { label: string; value: any }[];
+};
+
 
 export interface AdvancedFilterProps {
   columns     :  FilterColumnOption[];
   onChange   ?:  (filters: ApiFilterType[]) => void;
   value      ?:  ApiFilterType[];
+  onMinimize ?:  () => void;
+
+  /** Use custom class with: "title::". */
   className  ?:  string;
 }
 
@@ -51,9 +49,10 @@ export function FilterComponent({
   columns,
   onChange,
   value,
+  onMinimize,
   className = "",
 }: AdvancedFilterProps) {
-  const { setToggle }         =  useToggleContext()
+  const { isSm }              = useResponsive();
   const [filters, setFilters] = useState<ApiFilterType[]>([]);
 
   const handleChange = (index: number, key: keyof ApiFilterType, value: any) => {
@@ -89,9 +88,9 @@ export function FilterComponent({
 
   return (
     <>
-      <div className={cn("p-4 border rounded-sm", className)}>
+      <div className={cn("p-4 border rounded-sm", pcn<CT>(className, "base"))}>
         <div className="flex justify-between items-center mb-2">
-          <p className="">Filter</p>
+          <p className={cn(pcn<CT>(className, "title"))}>Filter</p>
           <div className="flex gap-2">
             <ButtonComponent
               icon={faRotate}
@@ -103,14 +102,16 @@ export function FilterComponent({
               onClick={() => setFilters([])}
             />
 
-            <IconButtonComponent
-              icon={faChevronUp}
-              variant="outline"
-              paint="primary"
-              className="text-slate-400 icon::text-slate-400"
-              size="xs"
-              onClick={() => setToggle("FILTER")}
-            />
+            {onMinimize && (
+              <IconButtonComponent
+                icon={faChevronUp}
+                variant="outline"
+                paint="primary"
+                className="text-slate-400 icon::text-slate-400"
+                size="xs"
+                onClick={onMinimize}
+              />
+            )}
           </div>
         </div>
 
@@ -118,9 +119,9 @@ export function FilterComponent({
           const column = columns.find((c) => c.selector === f.column);
 
           return (
-            <div key={i} className="flex items-center gap-2 mb-2">
+            <div key={i} className="flex flex-wrap  items-center gap-2 mb-2">
               {i > 0 && (
-                <div className="w-[90px]">
+                <div className="w-[20%] md:w-[10%]">
                   <SelectComponent
                     name={`filter_logic_${i}`}
                     options={LOGIC_OPTIONS}
@@ -132,7 +133,7 @@ export function FilterComponent({
                 </div>
               )}
 
-              <div className={i > 0 ? "w-64" : "w-[355px]"}>
+              <div className={i > 0 ? "w-[30%] md:w-[20%]" : "w-[52.5%] md:w-[30.7%]"}>
                 <SelectComponent
                   name={`filter_column_${i}`}
                   options={columns.map((c) => ({
@@ -146,7 +147,7 @@ export function FilterComponent({
                 />
               </div>
 
-              <div className="w-56">
+              <div className="w-[35%] md:w-[18%]">
                 <SelectComponent
                   name={`filter_operator_${i}`}
                   options={FILTER_OPERATORS}
@@ -157,26 +158,41 @@ export function FilterComponent({
                 />
               </div>
               
-              {column && (
-                <InputFilterValueComponent 
-                  name={`filter_value_${i}`}
-                  placeholder="..."
-                  value={f.value || ""}
-                  onChange={(e: any) => handleChange(i, "value", e)}
-                  options={column.type === "select" && column.options ? column.options : []}
-                  className="text-sm p-2 px-3"
-                  between={f.type === "bw"}
-                  multiple={["in", "ni"].includes(f.type || "")}
+              {isSm && (
+                <IconButtonComponent 
+                  icon={faTimes}
+                  paint="danger"
+                  variant="outline"
+                  onClick={() => removeFilter(i)}
+                  size="xs"
                 />
               )}
+              
+              {column && (
+                <div className="w-full md:w-[45%]">
+                  <InputFilterValueComponent 
+                    type={column.type}
+                    name={`filter_value_${i}`}
+                    placeholder="..."
+                    value={f.value || ""}
+                    onChange={(e: any) => handleChange(i, "value", e)}
+                    options={column.type === "select" && column.options ? column.options : []}
+                    className="text-sm p-2 px-3"
+                    between={f.type === "bw"}
+                    multiple={["in", "ni"].includes(f.type || "")}
+                  />
+                </div>
+              )}
 
-              <IconButtonComponent 
-                icon={faTimes}
-                paint="danger"
-                variant="outline"
-                onClick={() => removeFilter(i)}
-                size="xs"
-              />
+              {!isSm && (
+                <IconButtonComponent 
+                  icon={faTimes}
+                  paint="danger"
+                  variant="outline"
+                  onClick={() => removeFilter(i)}
+                  size="xs"
+                />
+              )}
             </div>
           );
         })}
@@ -186,9 +202,9 @@ export function FilterComponent({
           icon={faPlus}
           variant="outline"
           paint="primary"
-          size="sm"
+          size={isSm ? "xs" : "sm"}
           onClick={addFilter}
-          className="mt-4"
+          className="md:mt-4"
         />
       </div>
     </>
@@ -284,13 +300,12 @@ export function InputFilterValueComponent({
     }
   }
 
-  const val = Array.isArray(value) ? value : ["", ""];
-  const [from, to] = val;
+  const val         =  Array.isArray(value) ? value : ["", ""];
+  const [from, to]  =  val;
 
   const renderInput = (pos: "from" | "to") => {
-    const currentValue = pos === "from" ? from : to;
-    const handle = (v: any) =>
-      onChange(pos === "from" ? [v, to] : [from, v]);
+    const currentValue  =  pos  ===  "from" ? from : to;
+    const handle        =  (v: any) => onChange(pos === "from" ? [v, to] : [from, v]);
 
     switch (resolvedType) {
       case "number":

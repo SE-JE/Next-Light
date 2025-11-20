@@ -17,6 +17,15 @@
   --color-disable: #c4c3c3;
   --color-light-disable: #f4f4f4;
 
+  --animate-intro-fade: intro_fade 0.1s ease-in-out forwards;
+  @keyframes intro_fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
   --animate-intro-right: intro_right 0.1s ease-in-out;
   @keyframes intro_right {
     from {
@@ -189,25 +198,6 @@ body {
 }
 
 @layer utilities {
-  .skeleton-loading {
-    position: relative;
-    overflow: hidden;
-  }
-
-  .skeleton-loading::after {
-    content: "";
-    @apply absolute w-full h-full top-0 left-0 z-10 rounded-[6px];
-    background: linear-gradient(100deg, #f4f8ff 10%, #fff 20%, #f4f8ff 35%);
-    background-size: 200% 100%;
-    animation: 2s loading ease-out infinite;
-  }
-
-  @keyframes loading {
-    to {
-      background-position-x: -200%;
-    }
-  }
-
   body::-webkit-scrollbar,
   .scroll::-webkit-scrollbar {
     @apply w-[10px] h-[10px];

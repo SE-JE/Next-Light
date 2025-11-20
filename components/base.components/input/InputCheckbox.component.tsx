@@ -134,7 +134,7 @@ export function InputCheckboxComponent({
           )}
         >
           {loading && (vertical ? [1, 2, 3, 4, 5, 6, 7, 8, 9] : [1, 2, 3]).map((_, key) => {
-            return <div key={key} className="w-1/3 h-6 skeleton-loading rounded-lg"></div>;
+            return <div key={key} className="w-1/3 h-6 rounded-lg"></div>;
           })}
 
           {(options || dataOptions) && (options || dataOptions)?.map((option, key) => {

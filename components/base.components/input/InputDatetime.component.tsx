@@ -1,8 +1,7 @@
 import React, { InputHTMLAttributes, ReactNode, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCalendarAlt, faClock } from "@fortawesome/free-solid-svg-icons";
-import { cn, pcn, useInputHandler, useInputRandomId, useValidation, validation } from "@utils";
-import { OutsideClickComponent, InputDatePickerComponent, InputTimePickerComponent } from "@components";
+import { cn, pcn, useInputHandler, useInputRandomId, useResponsive, useValidation, validation } from "@utils";
+import { OutsideClickComponent, InputDatePickerComponent, InputTimePickerComponent, BottomSheetComponent, ButtonComponent, TabbarComponent } from "@components";
 
 
 
@@ -43,6 +42,8 @@ export function InputDatetimeComponent({
   className = "",
   ...props
 }: InputDateTimeProps) {
+  const { isSm }  =  useResponsive();
+
   const [pickerType, setPickerType]  =  useState<"date" | "time">("date");
   const [dateValue, setDateValue]    =  useState("");
   const [timeValue, setTimeValue]    =  useState("");
@@ -83,124 +84,173 @@ export function InputDatetimeComponent({
   };
 
 
-  const TypePickerOption = () => (
-    <div className="flex flex-col border-l !border-slate-200 pl-2 h-full">
-      <div 
-        className={cn(
-        "p-2 cursor-pointer hover:bg-light-primary text-sm rounded", 
-        pickerType == "date" && "bg-primary"
-        )} 
-        onClick={() => setPickerType("date")}
-      ><FontAwesomeIcon icon={faCalendarAlt} /></div>
-      <div 
-        className={cn(
-        "p-2 cursor-pointer hover:bg-light-primary text-sm rounded", 
-        pickerType == "time" && "bg-primary"
-        )} 
-        onClick={() => setPickerType("time")}
-      ><FontAwesomeIcon icon={faClock} /></div>
-    </div>
-  )
-
-
   return (
-    <div className="relative flex flex-col gap-y-0.5">
-      <label
-        htmlFor={randomId}
-        className={cn(
-          "input-label",
-          pcn<CT>(className, "label"),
-          props.disabled && "opacity-50",
-          inputHandler.focus && "text-primary",
-          !!invalidMessage && "text-danger"
-        )}
-      >
-        {label}
-        {validations && validation.hasRules(validations, "required") && <span className="text-danger">*</span>}
-      </label>
-
-      {tip && (
-        <small
+    <>
+      <div className="relative flex flex-col gap-y-0.5">
+        <label
+          htmlFor={randomId}
           className={cn(
-            "input-tip",
-            pcn<CT>(className, "tip"),
-            props.disabled && "opacity-60"
+            "input-label",
+            pcn<CT>(className, "label"),
+            props.disabled && "opacity-50",
+            inputHandler.focus && "text-primary",
+            !!invalidMessage && "text-danger"
           )}
-        >{tip}</small>
-      )}
+        >
+          {label}
+          {validations && validation.hasRules(validations, "required") && <span className="text-danger">*</span>}
+        </label>
 
-      <OutsideClickComponent onOutsideClick={() => inputHandler.setFocus(false)}>
-        <div className="relative">
-          <input
-            {...props}
-            id={randomId}
-            readOnly
+        {tip && (
+          <small
             className={cn(
-              "input",
-              leftIcon && "pl-12",
-              rightIcon && "pr-12",
-              pcn<CT>(className, "input"),
-              !!invalidMessage && "input-error"
+              "input-tip",
+              pcn<CT>(className, "tip"),
+              props.disabled && "opacity-60"
             )}
-            value={inputHandler.value}
-            onFocus={(e) => {
-              props.onFocus?.(e);
-              inputHandler.setFocus(true);
-            }}
-            autoComplete="off"
-          />
+          >{tip}</small>
+        )}
 
-          {leftIcon && (
-            <FontAwesomeIcon
+        <OutsideClickComponent onOutsideClick={!isSm ? () => inputHandler.setFocus(false) : undefined}>
+          <div className="relative">
+            <input
+              {...props}
+              id={randomId}
+              readOnly
               className={cn(
-                "left-4 input-icon",
-                pcn<CT>(className, "icon"),
-                props.disabled && "opacity-60",
-                inputHandler.focus && "text-primary"
+                "input",
+                leftIcon && "pl-12",
+                rightIcon && "pr-12",
+                pcn<CT>(className, "input"),
+                !!invalidMessage && "input-error"
               )}
-              icon={leftIcon}
+              value={inputHandler.value}
+              onFocus={(e) => {
+                props.onFocus?.(e);
+                inputHandler.setFocus(true);
+              }}
+              autoComplete="off"
+              inputMode={isSm ? "none" : undefined}
             />
-          )}
 
-          {rightIcon && (
-            <FontAwesomeIcon
-              className={cn(
-                "right-4 input-icon",
-                pcn<CT>(className, "icon"),
-                props.disabled && "opacity-60",
-                inputHandler.focus && "text-primary"
-              )}
-              icon={rightIcon}
+            {leftIcon && (
+              <FontAwesomeIcon
+                className={cn(
+                  "left-4 input-icon",
+                  pcn<CT>(className, "icon"),
+                  props.disabled && "opacity-60",
+                  inputHandler.focus && "text-primary"
+                )}
+                icon={leftIcon}
+              />
+            )}
+
+            {rightIcon && (
+              <FontAwesomeIcon
+                className={cn(
+                  "right-4 input-icon",
+                  pcn<CT>(className, "icon"),
+                  props.disabled && "opacity-60",
+                  inputHandler.focus && "text-primary"
+                )}
+                icon={rightIcon}
+              />
+            )}
+
+            {!isSm && inputHandler.focus && (
+              <>
+                <div className="absolute z-50 top-full right-0 mt-1 w-max bg-white border rounded-[6px] p-2 shadow min-w-[350]">
+                  <TabbarComponent 
+                    items={[
+                      {
+                        label: "Tanggal",
+                        value: 'date'
+                      },
+                      {
+                        label: "Jam",
+                        value: 'time'
+                      },
+                    ]}
+                    active={pickerType}
+                    onChange={(e) => setPickerType(e as "time" | "date")}
+                    className="mb-4"
+                  />
+                  {pickerType === "date" ? (
+                    <InputDatePickerComponent
+                      onChange={(e) => {
+                        setDateValue(e);
+                        handleChange(e, timeValue);
+                      }}
+                    />
+                  ) : (
+                    <InputTimePickerComponent
+                      onChange={(e) => {
+                        setTimeValue(e);
+                        handleChange(dateValue, e);
+                      }}
+                    />
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        </OutsideClickComponent>
+
+        {invalidMessage && (
+          <small className={cn("input-error-message", pcn<CT>(className, "error"))}>{invalidMessage}</small>
+        )}
+      </div>
+
+      {isSm && (
+        <BottomSheetComponent
+          show={inputHandler.focus}
+          onClose={() => inputHandler.setFocus(false)}
+          size={430}
+          footer={
+            <div className="p-4">
+              <ButtonComponent
+                label="Selesai"
+                variant="outline"
+                onClick={() => inputHandler.setFocus(false)}
+                block
+              />
+            </div>
+          }
+        >
+          <div className="p-4">
+            <TabbarComponent 
+              items={[
+                {
+                  label: "Tanggal",
+                  value: 'date'
+                },
+                {
+                  label: "Jam",
+                  value: 'time'
+                },
+              ]}
+              active={pickerType}
+              onChange={(e) => setPickerType(e as "time" | "date")}
+              className="mb-4"
             />
-          )}
-
-          {inputHandler.focus && (
-            <>
-              {pickerType === "date" ? (
-                <InputDatePickerComponent
-                  onChange={(e) => {
-                    setDateValue(e);
-                    handleChange(e, timeValue);
-                  }}
-                  rightElement={<TypePickerOption />}
-                />
-              ) : (
-                <InputTimePickerComponent
-                  onChange={(e) => {
-                    setTimeValue(e);
-                    handleChange(dateValue, e);
-                  }}
-                  rightElement={<TypePickerOption />}
-                />
-              )}
-            </>
-          )}
-        </div>
-      </OutsideClickComponent>
-
-      {invalidMessage && (
-        <small className={cn("input-error-message", pcn<CT>(className, "error"))}>{invalidMessage}</small>
+            {pickerType === "date" ? (
+              <InputDatePickerComponent
+                onChange={(e) => {
+                  setDateValue(e);
+                  handleChange(e, timeValue);
+                }}
+              />
+            ) : (
+              <InputTimePickerComponent
+                onChange={(e) => {
+                  setTimeValue(e);
+                  handleChange(dateValue, e);
+                }}
+              />
+            )}
+          </div>
+        </BottomSheetComponent>
       )}
-    </div>
+    </>
   );
 }

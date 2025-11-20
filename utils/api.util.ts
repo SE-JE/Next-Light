@@ -55,8 +55,8 @@ export type ApiType = {
   method         ?:  "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   params         ?:  ApiParamsType;
   payload        ?:  any;
-  includeParams  ?:  object;
-  headers        ?:  object;
+  includeParams  ?:  Record<string, any>;
+  headers        ?:  Record<string, any>;
   bearer         ?:  string;
 };
 
@@ -132,7 +132,7 @@ export const api = async ({
 // =========================>
 // ## Hook of get api 
 // =========================>
-export const useGetApi = (props: ApiType & { method?: "GET" | "OPTIONS", cacheName?: string; expired?: number }, sleep?: boolean) => {
+export const useGetApi = (props: ApiType & { method?: "GET", cacheName?: string; expired?: number }, sleep?: boolean) => {
   const [loading, setLoading]  =  useState<boolean>(true);
   const [code, setCode]        =  useState<number | null>(null);
   const [data, setData]        =  useState<any | null>(null);

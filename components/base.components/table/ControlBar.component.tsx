@@ -1,9 +1,9 @@
 import React, { ReactNode } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowDownZA, faArrowUpAZ, faEyeLowVision, faMagnifyingGlass, faPlus, faRefresh, faSearch, faSliders, faSort } from '@fortawesome/free-solid-svg-icons';
-import { cn, conversion } from '@utils';
+import { faArrowDownZA, faArrowUpAZ, faEllipsisV, faEyeLowVision, faMagnifyingGlass, faPlus, faRefresh, faSearch, faSliders, faSort } from '@fortawesome/free-solid-svg-icons';
+import { ApiFilterType, cn, conversion, useResponsive } from '@utils';
 import { useToggleContext } from '@contexts';
-import { IconButtonComponent, InputCheckboxComponent, InputComponent, SelectComponent, OutsideClickComponent, ButtonComponent } from '@components';
+import { IconButtonComponent, InputCheckboxComponent, InputComponent, SelectComponent, OutsideClickComponent, ButtonComponent, BottomSheetComponent, FilterComponent, FilterColumnOption } from '@components';
 
 
 
@@ -24,6 +24,9 @@ export interface ControlBarProps {
   sortableOptions    ?:  {label: string, selector: string}[]
   sort               ?:  string[],
   onSort             ?:  (sort: string[]) => void,
+  filterableColumns  ?:  FilterColumnOption[],
+  onFilter           ?:  (filters: ApiFilterType[]) => void,
+  filter             ?:  ApiFilterType[],
   onRefresh          ?:  () => void,
 }
 
@@ -44,9 +47,13 @@ export function ControlBarComponent({
   sortableOptions,
   sort,
   onSort,
+  filterableColumns,
+  onFilter,
+  filter,
   onRefresh
 }: ControlBarProps) {
-  const {toggle, setToggle} = useToggleContext()
+  const {toggle, setToggle}  =  useToggleContext()
+  const { isSm }             =  useResponsive();
 
   const onChangeSort = (item: string) => {
     if(!!sort?.find((s) => s.split(" ")?.at(0) == item)) {
@@ -66,8 +73,11 @@ export function ControlBarComponent({
   
   return (
     <>
-      <div className={cn("py-1 px-1.5 bg-white rounded-[6px] border flex items-center mb-2", className)}>
-        {options?.map((option: ControlBarOptionType, key: number) => {
+      <div className={cn("py-1 md:py-2 md:px-1.5 bg-white rounded-[6px] border flex items-center mb-2", className)}>
+        {(isSm ? [
+          ...(options?.filter((op, iop) => iop == 0 || op == "REFRESH") || []), 
+          ...(options && options?.length > 1 ? ['MOBILE_OPTION'] : [])
+        ] : options)?.map((option: ControlBarOptionType, key: number) => {
           {
             // =========================>
             // ## Create button 
@@ -141,7 +151,7 @@ export function ControlBarComponent({
           }
           if (option == "SELECTABLE") {
             return (
-              <div className="p-1.5 rounded-md relative" key={key}>
+              <div className="px-1.5 rounded-md relative" key={key}>
                 <IconButtonComponent
                   icon={faEyeLowVision}
                   variant="outline"
@@ -184,7 +194,7 @@ export function ControlBarComponent({
           }
           if (option == "SORT") {
             return sortableOptions?.length ? (
-              <div className="p-1.5 rounded-md relative" key={key}>
+              <div className="px-1.5 rounded-md relative" key={key}>
                 <IconButtonComponent
                   icon={faSort}
                   variant="outline"
@@ -206,13 +216,13 @@ export function ControlBarComponent({
                         return (
                           <div 
                             key={key}
-                            className='flex justify-between cursor-pointer text-sm px-4 py-2 hover:bg-light-primary' 
+                            className={cn('flex justify-between cursor-pointer text-sm px-4 py-2 hover:bg-light-primary', !!sortBy && "text-primary bg-primary/10")}
                             onClick={() => onChangeSort(option.selector)}
                           >
                             <p>{option.label}</p>
 
                             {sortBy && (
-                              <div className='text-light-foreground'>
+                              <div className='text-primary'>
                                 <FontAwesomeIcon icon={sortBy == "desc" ? faArrowDownZA : faArrowUpAZ} className='text-xs' /> 
                                 {sort?.length && sort?.length > 1 && <span className='text-[9px] ml-1'>{sort.findIndex((s) => s.split(" ")?.at(0) == option?.selector) + 1}</span>}
                               </div>
@@ -234,7 +244,7 @@ export function ControlBarComponent({
           }
           if (option == "REFRESH") {
             return (
-              <div className="p-1.5 relative" key={key}>
+              <div className="md:px-1.5 relative" key={key}>
                 <IconButtonComponent
                   icon={faRefresh}
                   variant="outline"
@@ -253,7 +263,7 @@ export function ControlBarComponent({
           }
           if (option == "FILTER") {
             return (
-              <div className="p-1.5 rounded-md relative" key={key}>
+              <div className="px-1.5 rounded-md relative" key={key}>
                 <ButtonComponent
                   icon={faSliders}
                   label="Filter"
@@ -266,9 +276,177 @@ export function ControlBarComponent({
             );
           }
 
+          {
+            // =========================>
+            // ## Mobile option button
+            // =========================>
+          }
+          if (option == "MOBILE_OPTION") {
+            return (
+              <div className="px-1.5 relative" key={key}>
+                <IconButtonComponent
+                  icon={faEllipsisV}
+                  variant="outline"
+                  className="!text-foreground p-4"
+                  onClick={() => setToggle("MOBILE_OPTION")}
+                  size="sm"
+                />
+              </div>
+            );
+          }
+
           return option;
         })}
       </div>
+
+      {filterableColumns && filterableColumns?.length && (
+        <FilterComponent 
+          className={cn("", !toggle.FILTER ? "p-0 h-0 hidden overflow-hidden" : "mb-2 animate-intro-down")}
+          columns={filterableColumns}
+          onChange={onFilter}
+          value={filter}
+          onMinimize={() => setToggle("FILTER")}
+        />
+      )}
+
+      {isSm && (
+        <BottomSheetComponent
+          show={!!toggle["MOBILE_OPTION"]}
+          onClose={() => setToggle("MOBILE_OPTION", false)}
+          maxSize="98vh"
+        >
+          <div className='flex flex-col gap-4 p-2'>
+            {options?.filter((op, iop) => (iop != 0 && op != "CREATE" && op != "REFRESH"))?.map((option: ControlBarOptionType, key: number) => {
+              {
+                // =========================>
+                // ## Search Field
+                // =========================>
+              }
+              if (option == "SEARCH") {
+                return (
+                  <div key={key}>
+                    <InputComponent
+                      name="search"
+                      placeholder="Cari disini..."
+                      rightIcon={faMagnifyingGlass}
+                      value={search}
+                      onChange={(e) => onSearch?.(e)}
+                    />
+                  </div>
+                );
+              }
+
+              {
+                // =========================>
+                // ## Searchable Field
+                // =========================>
+              }
+              if (option == "SEARCHABLE") {
+                return searchableOptions?.length ? (
+                  <div key={key}>
+                    <SelectComponent
+                      name="searchableColumn"
+                      leftIcon={faSearch}
+                      options={searchableOptions?.map((column) => {
+                        return {
+                          label: column.label,
+                          value: column.selector,
+                        };
+                      }) || []}
+                      value={searchable}
+                      onChange={(e) => onSearchable?.(e as string[])}
+                      multiple
+                    />
+                  </div>
+                ) : <></>;
+              }
+
+              {
+                // =========================>
+                // ## Selectable Button
+                // =========================>
+              }
+              if (option == "SELECTABLE") {
+                return (
+                  <div key={key}>
+                    <p className='input-label text-xs pb-2'>Kolom Ditampilkan</p>
+                    <InputCheckboxComponent
+                      vertical
+                      name="show_column"
+                      options={selectableOptions?.map((option) => {
+                        return {
+                          label: option.label,
+                          value: option.selector,
+                        };
+                      })}
+                      onChange={(e) => onSelectable?.(Array().concat(e).map((val) => String(val)))}
+                      value={selectable}
+                      className='px-2 border-0 gap-4 bg-transparent'
+                      classNameCheckbox='w-5 h-5 label::text-xs'
+                    />
+                  </div>
+                );
+              }
+
+              {
+                // =========================>
+                // ## Sort Button
+                // =========================>
+              }
+              if (option == "SORT") {
+                return sortableOptions?.length ? (
+                  <div key={key}>
+                    <p className='input-label text-xs pb-2'>Urut Berdasarkan</p>
+                    <div className='flex flex-col'>
+                      {sortableOptions?.map((option, key) => {
+                        const sortBy = sort?.find((s) => s.split(" ")?.at(0) == option?.selector)?.split(" ")?.at(1) || "";
+                        return (
+                          <div 
+                            key={key}
+                            className={cn('flex justify-between cursor-pointer text-sm p-2 hover:bg-light-primary active:scale-x-[102%]', !!sortBy && "text-primary bg-primary/10")}
+                            onClick={() => onChangeSort(option.selector)}
+                          >
+                            <p>{option.label}</p>
+
+                            {sortBy && (
+                              <div className='text-primary'>
+                                <FontAwesomeIcon icon={sortBy == "desc" ? faArrowDownZA : faArrowUpAZ} className='text-xs' /> 
+                                {sort?.length && sort?.length > 1 && <span className='text-[9px] ml-1'>{sort.findIndex((s) => s.split(" ")?.at(0) == option?.selector) + 1}</span>}
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                ) : <></>;
+              }
+
+              {
+                // =========================>
+                // ## Filter 
+                // =========================>
+              }
+              if (option == "FILTER") {
+                return (
+                  <div key={key}>
+                    {filterableColumns && filterableColumns?.length && (
+                      <FilterComponent
+                        className='border-0 p-0 mb-2 title::text-xs'
+                        columns={filterableColumns}
+                        onChange={onFilter}
+                        value={filter}
+                      />
+                    )}
+                  </div>
+                );
+              }
+
+              return option;
+            })}
+          </div>
+        </BottomSheetComponent>
+      )}
     </>
   )
 }

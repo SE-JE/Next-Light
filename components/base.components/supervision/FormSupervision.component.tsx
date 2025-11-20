@@ -29,6 +29,9 @@ import {
   InputDatetimeComponent,
   InputTimeComponent,
   IconButtonComponent,
+  InputImageComponent,
+  InputMapComponent,
+  InputMapProps,
 } from "@components";
 
 
@@ -76,6 +79,7 @@ type ConstructionMap = {
   select            :  SelectProps;
   "enter-password"  :  InputPasswordProps;
   otp               :  InputOtpProps;
+  map               :  InputMapProps;
   custom            :  formCustomConstructionProps;
 };
 
@@ -180,7 +184,8 @@ export function FormSupervisionComponent({
     select            :  SelectComponent,
     "enter-password"  :  InputPasswordComponent,
     otp               :  InputOtpComponent,
-    image             :  InputComponent,
+    image             :  InputImageComponent,
+    map               :  InputMapComponent,
     cluster           :  () => null,
     custom            :  () => null,
   };
@@ -277,7 +282,7 @@ export function FormSupervisionComponent({
         <Component
           {...(form.construction as any)}
           {...formControl(name)}
-          autoFocus={key === 0}
+          // autoFocus={key === 0}
         />
       </div>
     );

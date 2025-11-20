@@ -24,34 +24,15 @@ export function ScrollContainerComponent({
   scrollFloating = false,
   onScroll,
 }: ScrollContainerProps) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const floatingScrollbarRef = useRef<HTMLDivElement | null>(null);
-  const floatingScrollbarContainerRef = useRef<HTMLDivElement | null>(null);
-
-  // const [showLeftShadow, setShowLeftShadow] = useState(false);
-  // const [showRightShadow, setShowRightShadow] = useState(false);
-  // const [showTopShadow, setShowTopShadow] = useState(false);
-  // const [showBottomShadow, setShowBottomShadow] = useState(false);
-  // const [isScrollable, setIsScrollable] = useState(false);
-  const [containerWidth, setContainerWidth] = useState(0);
+  const containerRef                         =  useRef<HTMLDivElement | null>(null);
+  const floatingScrollbarRef                 =  useRef<HTMLDivElement | null>(null);
+  const floatingScrollbarContainerRef        =  useRef<HTMLDivElement | null>(null);
+  const [containerWidth, setContainerWidth]  =  useState(0);
 
   useEffect(() => {
     const handleScroll = () => {
       if (!containerRef.current) return;
       onScroll?.(containerRef.current);
-      // const {
-      //   scrollLeft,
-      //   scrollWidth,
-      //   clientWidth,
-      //   scrollTop,
-      //   scrollHeight,
-      //   clientHeight,
-      // } = containerRef.current;
-      // setShowLeftShadow(scrollLeft > 0);
-      // setShowRightShadow(scrollLeft + clientWidth < scrollWidth);
-      // setShowTopShadow(scrollTop > 0);
-      // setShowBottomShadow(scrollTop + clientHeight < scrollHeight);
-      // setIsScrollable(scrollWidth > clientWidth || scrollHeight > clientHeight);
     };
 
     const container = containerRef.current;
@@ -64,18 +45,13 @@ export function ScrollContainerComponent({
   }, []);
 
   useEffect(() => {
-    const scrollContainer = containerRef.current;
-    const floatingScrollbar = floatingScrollbarRef.current;
+    const scrollContainer    =  containerRef.current;
+    const floatingScrollbar  =  floatingScrollbarRef.current;
 
     if (!scrollContainer || !floatingScrollbar) return;
 
-    const syncScroll = () => {
-      floatingScrollbar.scrollLeft = scrollContainer.scrollLeft;
-    };
-
-    const syncScrollReverse = () => {
-      scrollContainer.scrollLeft = floatingScrollbar.scrollLeft;
-    };
+    const syncScroll         =  () => floatingScrollbar.scrollLeft  =  scrollContainer.scrollLeft;
+    const syncScrollReverse  =  () => scrollContainer.scrollLeft    =  floatingScrollbar.scrollLeft;
 
     scrollContainer.addEventListener("scroll", syncScroll);
     floatingScrollbar.addEventListener("scroll", syncScrollReverse);
@@ -87,9 +63,7 @@ export function ScrollContainerComponent({
   }, []);
 
   const handleResize = () => {
-    if (containerRef.current) {
-      setContainerWidth(containerRef.current.offsetWidth);
-    }
+    if (containerRef.current) setContainerWidth(containerRef.current.offsetWidth);
   };
 
   useEffect(() => {
@@ -100,25 +74,11 @@ export function ScrollContainerComponent({
   }, []);
 
   useEffect(() => {
-    if (floatingScrollbarContainerRef.current) {
-      floatingScrollbarContainerRef.current.style.width = `${containerWidth}px`;
-    }
+    if (floatingScrollbarContainerRef.current) floatingScrollbarContainerRef.current.style.width = `${containerWidth}px`;
   }, [containerWidth]);
 
   return (
     <div className={cn("relative", pcn<CT>(className, "base"))}>
-      {/* {isScrollable && showLeftShadow && (
-        <div className="absolute z-10 left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-foreground/15 to-transparent pointer-events-none" />
-      )}
-      {isScrollable && showRightShadow && (
-        <div className="absolute z-10 right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-foreground/15 to-transparent pointer-events-none" />
-      )}
-      {isScrollable && showTopShadow && (
-        <div className="absolute z-10 top-0 left-0 right-0 h-4 bg-gradient-to-b from-foreground/15 to-transparent pointer-events-none" />
-      )}
-      {isScrollable && showBottomShadow && (
-        <div className="absolute z-10 bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-foreground/15 to-transparent pointer-events-none" />
-      )} */}
       <div
         ref={containerRef}
         className={cn(
@@ -129,20 +89,14 @@ export function ScrollContainerComponent({
       >
         {children}
       </div>
-      {scrollFloating && (
-        <div
-          className="fixed bottom-0 py-1 bg-background"
-          ref={floatingScrollbarContainerRef}
-        >
-          <div
-            className="scroll overflow-x-auto overflow-y-hidden"
-            ref={floatingScrollbarRef}
-          >
-            <div className="h-0.5 opacity-0">{children}</div>
-          </div>
-          {footer}
+
+      <div className="fixed bottom-0 py-1 bg-background w-full" ref={floatingScrollbarContainerRef}>
+        <div ref={floatingScrollbarRef} className={cn(scrollFloating ? "scroll overflow-x-auto overflow-y-hidden" : "")}>
+          <div className="h-0.5 opacity-0">{children}</div>
         </div>
-      )}
+        
+        {footer}
+      </div>
     </div>
   );
 }

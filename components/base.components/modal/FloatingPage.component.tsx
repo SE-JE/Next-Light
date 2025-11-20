@@ -57,21 +57,22 @@ export function FloatingPageComponent({
           pcn<CT>(className, "base"),
         )}
       >
-        {title && (
-          <div className={cn("modal-header", pcn<CT>(className, "header"))}>
+        <div className={cn("modal-header", pcn<CT>(className, "header"))}>
+          {title && (
             <div>
               <h6 className="text-lg font-semibold text-foreground">{title}</h6>
               <p className="text-sm text-light-foreground leading-4 mt-1">{tip}</p>
             </div>
+          )}
 
-            <IconButtonComponent
-              icon={faTimes}
-              variant="simple"
-              paint="danger"
-              onClick={() => onClose()}
-            />
-          </div>
-        )}
+          <IconButtonComponent
+            icon={faTimes}
+            variant="simple"
+            paint="danger"
+            onClick={() => onClose()}
+          />
+        </div>
+        
 
         {show && children}
 

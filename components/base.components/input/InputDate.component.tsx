@@ -2,8 +2,8 @@ import React, { InputHTMLAttributes, ReactNode, useEffect, useMemo, useRef, useS
 import moment from "moment";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
-import { cn, pcn, useInputHandler, useInputRandomId, useValidation, validation } from "@utils";
-import { OutsideClickComponent } from "@components";
+import { cn, pcn, useInputHandler, useInputRandomId, useResponsive, useValidation, validation } from "@utils";
+import { BottomSheetComponent, ButtonComponent, OutsideClickComponent } from "@components";
 
 
 
@@ -44,6 +44,7 @@ export function InputDateComponent({
   className = "",
   ...props
 }: InputDateProps) {
+  const { isSm }  =  useResponsive();
 
   // =========================>
   // ## Initial
@@ -89,7 +90,7 @@ export function InputDateComponent({
           >{tip}</small>
         )}
 
-        <OutsideClickComponent onOutsideClick={() => inputHandler.setFocus(false)}>
+        <OutsideClickComponent onOutsideClick={!isSm ? () => inputHandler.setFocus(false) : undefined}>
           <div className="relative">
             <input
               {...props}
@@ -116,6 +117,7 @@ export function InputDateComponent({
                 props.onBlur?.(e);
               }}
               autoComplete="off"
+              inputMode={isSm ? "none" : undefined}
             />
 
             {leftIcon && (
@@ -146,13 +148,15 @@ export function InputDateComponent({
               />
             )}
 
-            {inputHandler.focus && (
-              <InputDatePickerComponent
-                onChange={(e) => {
-                  inputHandler.setValue(e);
-                  onChange?.(e);
-                }}
-              />
+            {!isSm && inputHandler.focus && (
+              <div className="w-max h-72 bg-white border p-2 rounded-[6px] absolute top-full right-0 mt-1 z-50">
+                <InputDatePickerComponent
+                  onChange={(e) => {
+                    inputHandler.setValue(e);
+                    onChange?.(e);
+                  }}
+                />
+              </div>
             )}
           </div>
         </OutsideClickComponent>
@@ -161,6 +165,33 @@ export function InputDateComponent({
           <small className={cn("input-error-message", pcn<CT>(className, "error"))}>{invalidMessage}</small>
         )}
       </div>
+
+      {isSm && (
+        <BottomSheetComponent 
+          show={inputHandler.focus}
+          onClose={() => inputHandler.setFocus(false)}
+          size={380}
+          footer={
+            <div className="p-4">
+              <ButtonComponent 
+                label="Selesai"
+                variant="outline"
+                onClick={() => inputHandler.setFocus(false)}
+                block
+              />
+            </div>
+          }
+        >
+          <div className="p-4">
+            <InputDatePickerComponent
+              onChange={(e) => {
+                inputHandler.setValue(e);
+                onChange?.(e);
+              }}
+            />
+          </div>
+        </BottomSheetComponent>
+      )}
     </>
   );
 }
@@ -267,53 +298,51 @@ export const InputDatePickerComponent: React.FC<InputDatePickerProps> = ({
   }, []);
 
   return (
-    <div className="w-max h-72 bg-white border p-2 rounded-[6px] absolute top-full left-0 mt-1 z-50">
-      <div className="flex gap-2">
-        <div
-          className="max-h-[260] overflow-y-auto input-scroll pr-1"
-          ref={containerYearRef}
-        >
-          <div className="flex flex-col">
-            {years?.map((item, key) => {
-              const isActive = currentDate?.year() === item;
+    <div className="w-full flex gap-2 max-h-[260]">
+      <div
+        className="w-1/5 overflow-y-auto input-scroll pr-1"
+        ref={containerYearRef}
+      >
+        <div className="flex flex-col">
+          {years?.map((item, key) => {
+            const isActive = currentDate?.year() === item;
 
-              return (
-                <>
-                  <div
-                    key={key}
-                    ref={isActive ? activeYearRef : null}
-                    className={`py-1 px-2 font-semibold rounded-[6px] cursor-pointer ${isActive && "bg-light-primary"}`}
-                    onClick={() => setCurrentDate(moment().set("year", item))}
-                  >
-                    {item}
-                  </div>
-                </>
-              );
-            })}
-          </div>
+            return (
+              <>
+                <div
+                  key={key}
+                  ref={isActive ? activeYearRef : null}
+                  className={`py-1 px-2 font-semibold rounded-[6px] cursor-pointer ${isActive && "bg-light-primary"}`}
+                  onClick={() => setCurrentDate(moment().set("year", item))}
+                >
+                  {item}
+                </div>
+              </>
+            );
+          })}
         </div>
-        <div>
-          <div className="flex justify-between items-center mb-2">
-            <button
-              onClick={handlePrevMonth}
-              className="w-8 text-sm aspect-square rounded-full cursor-pointer"
-            >
-              <FontAwesomeIcon icon={faChevronLeft} />
-            </button>
-            <h2 className="font-semibold">{currentDate.format("MMMM")}</h2>
-            <button
-              onClick={handleNextMonth}
-              className="w-8 text-sm aspect-square rounded-full cursor-pointer"
-            >
-              <FontAwesomeIcon icon={faChevronRight} />
-            </button>
-          </div>
-          <div className="grid grid-cols-7 gap-1 mb-2">{renderDays()}</div>
-          <div>{renderCells()}</div>
-        </div>
-
-        {rightElement && <div>{rightElement}</div>}
       </div>
+      <div className="w-4/5">
+        <div className="flex justify-between items-center mb-2">
+          <button
+            onClick={handlePrevMonth}
+            className="w-8 text-sm aspect-square rounded-full cursor-pointer"
+          >
+            <FontAwesomeIcon icon={faChevronLeft} />
+          </button>
+          <h2 className="font-semibold">{currentDate.format("MMMM")}</h2>
+          <button
+            onClick={handleNextMonth}
+            className="w-8 text-sm aspect-square rounded-full cursor-pointer"
+          >
+            <FontAwesomeIcon icon={faChevronRight} />
+          </button>
+        </div>
+        <div className="grid grid-cols-7 gap-1 mb-2">{renderDays()}</div>
+        <div>{renderCells()}</div>
+      </div>
+
+      {rightElement && <div>{rightElement}</div>}
     </div>
   );
 };

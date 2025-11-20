@@ -1,8 +1,8 @@
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useMemo, useState } from "react";
 import { faQuestion } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { api, ApiType, cn, pcn } from "@utils";
-import { ToastComponent, ButtonComponent, ButtonProps } from "@components";
+import { api, ApiType, cn, pcn, useResponsive } from "@utils";
+import { ToastComponent, ButtonComponent, ButtonProps, BottomSheetComponent } from "@components";
 
 
 
@@ -39,8 +39,9 @@ export function ModalConfirmComponent({
 
   className = "",
 }: ModalConfirmProps) {
-  const [toast, setToast] = useState<boolean | "success" | "failed">(false);
-  const [loading, setLoading] = useState(false);
+  const { isSm }               =  useResponsive();
+  const [toast, setToast]      =  useState<boolean | "success" | "failed">(false);
+  const [loading, setLoading]  =  useState(false);
 
   useEffect(() => {
     if (show) {
@@ -50,25 +51,9 @@ export function ModalConfirmComponent({
     }
   }, [show]);
 
-  return (
-    <>
-      <div
-        className={cn(
-          "modal-backdrop",
-          !show && "opacity-0 scale-0 -translate-y-full",
-          pcn<CT>(className, "backdrop")
-        )}
-        onClick={() => onClose()}
-      ></div>
-
-      <div
-        className={cn(
-          "modal rounded-[4px] border-t-4 !border-primary",
-          "w-[calc(100vw-2rem)] md:w-[50vw] max-w-[300px]",
-          !show && "-translate-y-full opacity-0 scale-y-0",
-          pcn<CT>(className, "base")
-        )}
-      >
+  const renderChildren = useMemo(() => {
+    return (
+      <>
         {title && (
           <div
             className={cn(
@@ -87,53 +72,100 @@ export function ModalConfirmComponent({
           </div>
         )}
 
-        {show && children}
+        {children}
 
         {footer && (
           <div className={cn("modal-footer", pcn<CT>(className, "footer"))}>
-            {show && footer}
+            {footer}
           </div>
         )}
+      </>
+    )
+  }, [title, footer, children])
 
-        <div className="flex justify-center pt-6">
-          <ButtonComponent
-            label="Batal"
-            variant="simple"
-            onClick={() => onClose()}
-            className="text-foreground bg-background rounded-none"
-            // size="sm"
-            block
-          />
-          <ButtonComponent
-            label={"Konfirmasi"}
-            loading={loading}
-            onClick={async () => {
-              if(!submitControl?.onSubmit) return;
 
-              setLoading(true);
-              if (typeof submitControl?.onSubmit == "function") {
-                submitControl?.onSubmit?.();
+  const renderAction = (size: ButtonProps["size"] = 'md') => {
+    return (
+      <div className="flex justify-center pt-6">
+        <ButtonComponent
+          label="Batal"
+          variant="simple"
+          onClick={() => onClose()}
+          className="text-foreground bg-background rounded-none"
+          block
+          size={size}
+        />
+        <ButtonComponent
+          label={"Konfirmasi"}
+          loading={loading}
+          onClick={async () => {
+            if(!submitControl?.onSubmit) return;
+
+            setLoading(true);
+            if (typeof submitControl?.onSubmit == "function") {
+              submitControl?.onSubmit?.();
+            } else {
+              const response = await api(submitControl?.onSubmit as ApiType);
+
+              if (response?.status == 200 || response?.status == 201) {
+                setToast("success");
+                submitControl?.onSuccess?.();
+                setLoading(false);
               } else {
-                const response = await api(submitControl?.onSubmit as ApiType);
-
-                if (response?.status == 200 || response?.status == 201) {
-                  setToast("success");
-                  submitControl?.onSuccess?.();
-                  setLoading(false);
-                } else {
-                  setToast("failed");
-                  submitControl?.onError?.();
-                  setLoading(false);
-                }
+                setToast("failed");
+                submitControl?.onError?.();
+                setLoading(false);
               }
-            }}
-            // size="sm"
-            className="rounded-none"
-            block
-            {...submitControl}
-          />
-        </div>
+            }
+          }}
+          className="rounded-none"
+          block
+          size={size}
+          {...submitControl}
+        />
       </div>
+    )
+  }
+
+  return (
+    <>
+      {!isSm  ? (
+        <>
+          <div
+            className={cn(
+              "modal-backdrop",
+              !show && "opacity-0 scale-0 -translate-y-full",
+              pcn<CT>(className, "backdrop")
+            )}
+            onClick={() => onClose()}
+          ></div>
+
+          <div
+            className={cn(
+              "modal rounded-[4px] border-t-4 !border-primary",
+              "w-[calc(100vw-2rem)] md:w-[50vw] max-w-[300px]",
+              !show && "-translate-y-full opacity-0 scale-y-0",
+              pcn<CT>(className, "base")
+            )}
+          >
+            {renderChildren}
+
+            {renderAction()}
+          </div>
+        </>
+      ) : (
+        <>
+          <BottomSheetComponent 
+            show={show}
+            onClose={onClose}
+            size={220}
+            footer={renderAction('lg')}
+          >
+            {renderChildren}
+          </BottomSheetComponent>
+        </>
+      )}
+      
 
       <ToastComponent
         show={toast == "failed"}

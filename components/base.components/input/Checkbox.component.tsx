@@ -55,7 +55,7 @@ export function CheckboxComponent({
 
 
   return (
-    <div className={`flex flex-col gap-1 `}>
+    <div className={`flex flex-col gap-1`}>
       <input
         type="checkbox"
         className="hidden"
@@ -70,7 +70,7 @@ export function CheckboxComponent({
       <label
         htmlFor={randomId}
         className={cn(
-        "flex gap-2 items-center cursor-pointer",
+        "flex gap-2 items-center cursor-pointer active:scale-x-[102%]",
         disabled && "pointer-events-none opacity-60"
         )}
       >

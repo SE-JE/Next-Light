@@ -1,7 +1,7 @@
 import React, { InputHTMLAttributes, ReactNode, useEffect, useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { cn, pcn, useInputHandler, useInputRandomId, useValidation, validation } from "@utils";
-import { OutsideClickComponent } from "@components";
+import { cn, pcn, useInputHandler, useInputRandomId, useResponsive, useValidation, validation } from "@utils";
+import { BottomSheetComponent, ButtonComponent, OutsideClickComponent } from "@components";
 
 
 
@@ -42,6 +42,7 @@ export function InputTimeComponent({
   className = "",
   ...props
 }: InputTimeProps) {
+  const { isSm }  =  useResponsive();
 
   // =========================>
   // ## Initial
@@ -57,95 +58,127 @@ export function InputTimeComponent({
 
 
   return (
-    <div className="relative flex flex-col gap-y-0.5">
-      <label
-        htmlFor={randomId}
-        className={cn(
-          "input-label",
-          pcn<CT>(className, "label"),
-          props.disabled && "opacity-50",
-          inputHandler.focus && "text-primary",
-          !!invalidMessage && "text-danger"
-        )}
-      >
-        {label}
-        {validations && validation.hasRules(validations, "required") && <span className="text-danger">*</span>}
-      </label>
-
-      {tip && (
-        <small
+    <>
+      <div className="relative flex flex-col gap-y-0.5">
+        <label
+          htmlFor={randomId}
           className={cn(
-            "input-tip",
-            pcn<CT>(className, "tip"),
-            props.disabled && "opacity-60"
+            "input-label",
+            pcn<CT>(className, "label"),
+            props.disabled && "opacity-50",
+            inputHandler.focus && "text-primary",
+            !!invalidMessage && "text-danger"
           )}
-        >{tip}</small>
-      )}
+        >
+          {label}
+          {validations && validation.hasRules(validations, "required") && <span className="text-danger">*</span>}
+        </label>
 
-      <OutsideClickComponent onOutsideClick={() => inputHandler.setFocus(false)}>
-        <div className="relative">
-          <input
-            {...props}
-            id={randomId}
+        {tip && (
+          <small
             className={cn(
-              "input",
-              leftIcon && "pl-12",
-              rightIcon && "pr-12",
-              pcn<CT>(className, "input"),
-              !!invalidMessage && "input-error"
+              "input-tip",
+              pcn<CT>(className, "tip"),
+              props.disabled && "opacity-60"
             )}
-            value={inputHandler.value}
-            onChange={(e) => {
-              inputHandler.setValue(e.target.value);
-              inputHandler.setIdle(false);
-              onChange?.(e.target.value);
-            }}
-            onFocus={(e) => {
-              props.onFocus?.(e);
-              inputHandler.setFocus(true);
-            }}
-            autoComplete="off"
-          />
+          >{tip}</small>
+        )}
 
-          {leftIcon && (
-            <FontAwesomeIcon
+        <OutsideClickComponent onOutsideClick={!isSm ? () => inputHandler.setFocus(false) : undefined}>
+          <div className="relative">
+            <input
+              {...props}
+              id={randomId}
               className={cn(
-                "left-4 input-icon",
-                pcn<CT>(className, "icon"),
-                props.disabled && "opacity-60",
-                inputHandler.focus && "text-primary"
+                "input",
+                leftIcon && "pl-12",
+                rightIcon && "pr-12",
+                pcn<CT>(className, "input"),
+                !!invalidMessage && "input-error"
               )}
-              icon={leftIcon}
+              value={inputHandler.value}
+              onChange={(e) => {
+                inputHandler.setValue(e.target.value);
+                inputHandler.setIdle(false);
+                onChange?.(e.target.value);
+              }}
+              onFocus={(e) => {
+                props.onFocus?.(e);
+                inputHandler.setFocus(true);
+              }}
+              autoComplete="off"
+              inputMode={isSm ? "none" : undefined}
             />
-          )}
 
-          {rightIcon && (
-            <FontAwesomeIcon
-              className={cn(
-                "right-4 input-icon",
-                pcn<CT>(className, "icon"),
-                props.disabled && "opacity-60",
-                inputHandler.focus && "text-primary"
-              )}
-              icon={rightIcon}
-            />
-          )}
+            {leftIcon && (
+              <FontAwesomeIcon
+                className={cn(
+                  "left-4 input-icon",
+                  pcn<CT>(className, "icon"),
+                  props.disabled && "opacity-60",
+                  inputHandler.focus && "text-primary"
+                )}
+                icon={leftIcon}
+              />
+            )}
 
-          {inputHandler.focus && (
+            {rightIcon && (
+              <FontAwesomeIcon
+                className={cn(
+                  "right-4 input-icon",
+                  pcn<CT>(className, "icon"),
+                  props.disabled && "opacity-60",
+                  inputHandler.focus && "text-primary"
+                )}
+                icon={rightIcon}
+              />
+            )}
+
+            {!isSm && inputHandler.focus && (
+              <div className="absolute z-50 top-full right-0 mt-1 w-max bg-white border rounded-[6px] p-2 shadow min-w-[300]">
+                <InputTimePickerComponent
+                  onChange={(time) => {
+                    inputHandler.setValue(time);
+                    onChange?.(time);
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        </OutsideClickComponent>
+
+        {invalidMessage && (
+          <small className={cn("input-error-message", pcn<CT>(className, "error"))}>{invalidMessage}</small>
+        )}
+      </div>
+
+      {isSm && (
+        <BottomSheetComponent 
+          show={inputHandler.focus}
+          onClose={() => inputHandler.setFocus(false)}
+          size={380}
+          footer={
+            <div className="p-4">
+              <ButtonComponent
+                label="Selesai"
+                variant="outline"
+                onClick={() => inputHandler.setFocus(false)}
+                block
+              />
+            </div>
+          }
+        >
+          <div className="p-4">
             <InputTimePickerComponent
               onChange={(time) => {
                 inputHandler.setValue(time);
                 onChange?.(time);
               }}
             />
-          )}
-        </div>
-      </OutsideClickComponent>
-
-      {invalidMessage && (
-        <small className={cn("input-error-message", pcn<CT>(className, "error"))}>{invalidMessage}</small>
+          </div>
+        </BottomSheetComponent>
       )}
-    </div>
+    </>
   );
 }
 
@@ -183,7 +216,7 @@ export const InputTimePickerComponent: React.FC<InputTimePickerProps> = ({
   }, [hour, minute, second]);
 
   const renderColumn = (items: string[], type: "h" | "m" | "s", activeValue: number) => (
-    <div className="flex-1 overflow-y-auto max-h-40 text-center input-scroll">
+    <div className="flex-1 overflow-y-auto text-center input-scroll">
       {items.map((item) => {
         const active = Number(item) === activeValue;
 
@@ -216,18 +249,18 @@ export const InputTimePickerComponent: React.FC<InputTimePickerProps> = ({
   }, [])
 
   return (
-    <div className="absolute z-50 top-full left-0 mt-1 w-max bg-white border rounded-[6px] p-2 shadow flex gap-2">
-      <div className="max-h-40 overflow-y-auto bg-white rounded-[6px] input-scroll">
+    <div className="w-full max-h-[260] flex gap-2">
+      <div className="w-1/3 overflow-y-auto bg-white rounded-[6px] input-scroll">
         {timeSlots.map((time) => (
           <div
             key={time}
-            className="p-2 text-sm rounded cursor-pointer hover:bg-light-primary"
+            className="p-2 text-sm rounded cursor-pointer hover:bg-light-primary text-center"
             onClick={() => onChange?.(time)}
           >{time}</div>
         ))}
       </div>
 
-      <div className="flex gap-2">
+      <div className="w-2/3 flex gap-2">
         {renderColumn(hours, "h", hour)}
         {renderColumn(minutes, "m", minute)}
         {renderColumn(seconds, "s", second)}

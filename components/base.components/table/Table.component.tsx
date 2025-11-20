@@ -1,9 +1,8 @@
 import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowDownZA, faArrowUpAZ, faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
-import { ApiFilterType, cn, pcn, useLazySearch } from "@utils";
-import { useToggleContext } from "@contexts";
-import { ControlBarComponent, ControlBarOptionType, PaginationComponent, PaginationProps, ScrollContainerComponent, FilterComponent, FilterColumnOption, CheckboxComponent } from "@components";
+import { ApiFilterType, cn, pcn, useLazySearch, useResponsive } from "@utils";
+import { ControlBarComponent, ControlBarOptionType, PaginationComponent, PaginationProps, ScrollContainerComponent, FilterColumnOption, CheckboxComponent, SwipeComponent, SwipeActionType } from "@components";
 
 
 
@@ -48,10 +47,17 @@ export interface TableProps {
   onChangeChecks            ?:  (checks: (string | number)[]) => void;
   actionBulking             ?:  ((checks: (string | number)[]) => ReactNode) | false
 
-  onRowClick                ?:  (data: object, key: number) => void;
+  onRowClick                ?:  (data: Record<string, any>, key: number) => void;
   onRefresh                 ?:  () => void;
 
   block                     ?: boolean;
+  responsiveControl         ?: {
+    mobile                ?: {
+      item                ?:  (item: Record<string, any>, key: number) => ReactNode,
+      leftActionControl   ?:  Omit<SwipeActionType, "onAction"> & { onAction?: (item: Record<string, any>, key?: number) => void },
+      rightActionControl  ?:  Omit<SwipeActionType, "onAction"> & { onAction?: (item: Record<string, any>, key?: number) => void },
+    }
+  }
 
   /** Use custom class with: "controller-bar::", "head-column::", "column::", "floating-action::", "row::". */
   className?: string;
@@ -83,15 +89,16 @@ export function TableComponent({
   onRefresh,
   
   block,
+  responsiveControl,
   
   className = "",
 }: TableProps) {
-  const { toggle }                                       =  useToggleContext()
   const [displayColumns, setDisplayColumns]              =  useState<string[]>([]);
   const [showFloatingAction, setShowFloatingAction]      =  useState(false);
   const [floatingActionActive, setFloatingActionActive]  =  useState<false | number>(false);
   const [keyword, setKeyword]                            =  useState<string>("");
   const [keywordSearch]                                  =  useLazySearch(keyword);
+  const { isSm }                                         =  useResponsive ();
 
   const actionColumnRef = useRef<HTMLDivElement>(null);
 
@@ -118,50 +125,12 @@ export function TableComponent({
   const styles = {
     head            :  "px-4 py-2.5 font-bold w-full flex justify-between gap-2 items-center text-sm text-foreground capitalize",
     column          :  cn("px-4 py-4 font-medium", pcn<CT>(className, "column")),
-    row             :  "flex items-center gap-4 rounded-[4px] relative animate-intro-right border-b hover:bg-light-primary/30",
+    row             :  "flex items-center gap-4 rounded-[4px] relative opacity-0 animate-intro-fade border-b hover:bg-light-primary/30",
     floatingAction  :  cn("sticky bg-background -right-5 z-30 cursor-pointer flex items-center shadow rounded-l-lg", pcn<CT>(className, "floating-action")),
   };
 
 
   const numberOfRow = (key: number) => pagination && (pagination?.page || 1) != 1 ? pagination?.paginate * ((pagination?.page || 1) - 1) + key + 1 : key + 1;
-
-
-
-  function renderItem(item: object) {
-    const itemMapping = columnMapping.map((column) => column?.item 
-      ? column?.item(item) : (typeof item[column.selector as keyof object] == "object" ? JSON.stringify(item[column.selector as keyof object]) 
-      : item[column.selector as keyof object]) || "-"
-    );
-
-    return (
-      <>
-        {itemMapping?.map((one, key) => {
-          const column = columnMapping?.[key];
-        
-          let title = one as string;
-          if (column?.tip) {
-            if (typeof column.tip === "string") {
-              title = (item[column.tip as keyof object] as any)?.toString() || "-";
-            } else if (typeof column.tip === "function") {
-              title = column.tip(item);
-            }
-          }
-          return (
-            <div
-              key={key}
-              className={cn(styles.column, onRowClick && "cursor-pointer")}
-              style={{ width: columnMapping?.at(key)?.width || 200 }}
-              onClick={() => onRowClick?.(item, key) }
-              title={title}
-            >
-              {one}
-            </div>
-          );
-        })}
-      </>
-    );
-  }
-
 
 
   function renderHead() {
@@ -198,6 +167,76 @@ export function TableComponent({
   }
 
 
+  function renderItem(item: object, itemKey: number) {
+    const itemMapping = columnMapping.map((column) => column?.item 
+      ? column?.item(item) : (typeof item[column.selector as keyof object] == "object" ? JSON.stringify(item[column.selector as keyof object]) 
+      : item[column.selector as keyof object]) || "-"
+    );
+
+    if(!isSm || !responsiveControl?.mobile) {
+      return (
+        <>
+          {itemMapping?.map((one, key) => {
+            const column = columnMapping?.[key];
+          
+            let title = one as string;
+            if (column?.tip) {
+              if (typeof column.tip === "string") {
+                title = (item[column.tip as keyof object] as any)?.toString() || "-";
+              } else if (typeof column.tip === "function") {
+                title = column.tip(item);
+              }
+            }
+            return (
+              <div
+                key={key}
+                className={cn(styles.column, onRowClick && "cursor-pointer")}
+                style={{ width: columnMapping?.at(key)?.width || 200 }}
+                onClick={() => onRowClick?.(item, itemKey) }
+                title={title}
+              >
+                {one}
+              </div>
+            );
+          })}
+        </>
+      );
+    } else {
+
+      const { onAction: onLeftAction, ...restLeftAction } = responsiveControl?.mobile?.leftActionControl || {};
+      const { onAction: onRightAction, ...restRightAction } = responsiveControl?.mobile?.rightActionControl || {};
+      
+      return (
+        <SwipeComponent 
+          className="border-b py-2 px-2 bg-white"
+          leftActionControl={!!responsiveControl?.mobile?.leftActionControl ? {
+            ...restLeftAction,
+            ...(onLeftAction ? { onAction: () => onLeftAction?.(item, itemKey)} : {})
+          } : undefined}
+          rightActionControl={!!responsiveControl?.mobile?.rightActionControl ? {
+            ...restRightAction,
+            ...(onRightAction ? { onAction: () => onRightAction?.(item, itemKey)} : {})
+          } : undefined}
+        >
+          {responsiveControl?.mobile?.item ? responsiveControl?.mobile?.item(item, itemKey) : (
+            <div onClick={() => onRowClick?.(item, itemKey) }>
+              <p className="font-semibold">{Object.values(itemMapping)[0]}</p>
+              <p className="text-sm">{Object.values(itemMapping)[1]}</p>
+            </div>
+          )}
+        </SwipeComponent>
+      )
+    }
+  }
+
+
+
+  
+
+
+  
+
+
 
 
   return (
@@ -218,25 +257,21 @@ export function TableComponent({
           sort={sortBy}
           onSort={(sort) => onChangeSortBy?.(sort)}
           onRefresh={() => onRefresh?.()}
+          filterableColumns={columns?.filter((c) => !!c?.filterable)?.map((c) => ({
+            label: c.label, 
+            selector: c.selector, 
+            type: typeof c?.filterable == "object" ? c?.filterable?.type : "text",
+            options: typeof c?.filterable == "object" &&  c?.filterable?.type == "select" ? c?.filterable?.options : undefined
+          })) as FilterColumnOption[]}
+          onFilter={(filters) => onChangeFilter?.(filters)}
+          filter={filter}
           className={pcn<CT>(className, "controller-bar") || ""}
         />
       )}
 
-      <FilterComponent 
-        className={cn("", !toggle.FILTER ? "p-0 h-0 hidden overflow-hidden" : "mb-2 animate-intro-down")}
-        columns={columns?.filter((c) => !!c?.filterable)?.map((c) => ({
-          label: c.label, 
-          selector: c.selector, 
-          type: typeof c?.filterable == "object" ? c?.filterable?.type : "text",
-          options: typeof c?.filterable == "object" &&  c?.filterable?.type == "select" ? c?.filterable?.options : undefined
-        })) as FilterColumnOption[]}
-        onChange={(filters) => onChangeFilter?.(filters)}
-        value={filter}
-      />
-
       <div className="relative">
         <ScrollContainerComponent
-          scrollFloating
+          scrollFloating={!isSm && block}
           className="w-full"
           onScroll={(e) => {
             actionColumnRef.current?.clientWidth &&  e.scrollLeft &&
@@ -254,145 +289,134 @@ export function TableComponent({
               )}
             </>
           }
-
         >
-          {
-            // =========================>
-            // ## When Loading
-            // =========================>
-          }
           {loading ? (
             <>
+              {
+                // =========================>
+                // ## When Loading
+                // =========================>
+              }
               <div className="w-max min-w-full">
-                <div className="flex gap-4 mb-2 px-3 py-2">
-                  <div className="w-16 px-4 py-2.5 font-bold skeleton-loading"></div>
-                  {[1, 2, 3, 4, 5, 6, 7].map((_, key) => {
-                    return (
-                      <div
-                        key={key}
-                        className={`px-6 py-3 skeleton-loading`}
-                        style={{ width: "200px" }}
-                      ></div>
-                    );
-                  })}
+                <div className="flex flex-col items-center justify-center gap-8 p-20">
+                  <h1 className="text-lg text-light-foreground animate-pulse">
+                    Memuat data...
+                  </h1>
                 </div>
-                <div className="flex flex-col gap-y-1.5">
-                  {[1, 2, 3, 4, 5, 6].map((_, key) => {
-                    return (
-                      <div
-                        style={{ animationDelay: `${0.25 + key * 0.05}s` }}
-                        className="flex items-center gap-4 bg-white rounded-lg shadow-sm relative p-2.5"
-                        key={key}
-                      >
-                        <div className="w-16 px-4 py-2.5 font-medium skeleton-loading"></div>
-                        {[1, 2, 3, 4, 5, 6, 7].map((_, key) => {
-                          return (
-                            <div
-                              key={key}
-                              className="px-4 py-2.5 text-lg font-medium skeleton-loading"
-                              style={{ width: "200px" }}
-                            ></div>
-                          );
-                        })}
-                      </div>
-                    );
-                  })}
-                </div>
+              </div>
+            </>
+          ) : !data || !data.length ? (
+            <>
+              {
+                // =========================>
+                // ## When Empty
+                // =========================>
+              }
+              <div className="flex flex-col items-center justify-center gap-8 p-20 opacity-50">
+                <h1 className="text-lg text-light-foreground">
+                  Belum Ada Data
+                </h1>
               </div>
             </>
           ) : (
             <>
-              <div className="w-max min-w-full">
-                {
-                  // =========================>
-                  // ## Head Column
-                  // =========================>
-                }
-                <div className="flex gap-4">
-                  {!!actionBulking && (
-                    <div className={cn(styles.head, "w-max")}>
-                      <CheckboxComponent
-                        name="selected_table"
-                        className="w-5 h-5"
-                        checked={data.length > 0 && checks?.length === data.length}
-                        onChange={() => data.length > 0 && checks?.length === data.length ? onChangeChecks?.([]) : onChangeChecks?.(data.map((d) => d.id))}
-                      />
+              {!isSm || !responsiveControl?.mobile ? (
+                <>
+                  <div className="w-max min-w-full">
+                    {
+                      // =========================>
+                      // ## Head Column
+                      // =========================>
+                    }
+                    <div className="flex gap-4">
+                      {!!actionBulking && (
+                        <div className={cn(styles.head, "w-max")}>
+                          <CheckboxComponent
+                            name="selected_table"
+                            className="w-5 h-5"
+                            checked={data.length > 0 && checks?.length === data.length}
+                            onChange={() => data.length > 0 && checks?.length === data.length ? onChangeChecks?.([]) : onChangeChecks?.(data.map((d) => d.id))}
+                          />
+                        </div>
+                      )}
+                      <div className={cn(styles.head, "w-8", pcn<CT>(className, "head-column"))}>#</div>
+                      {renderHead()}
                     </div>
-                  )}
-                  <div className={cn(styles.head, "w-8", pcn<CT>(className, "head-column"))}>#</div>
-                  {renderHead()}
-                </div>
-                {
-                  // =========================>
-                  // ## Body Column
-                  // =========================>
-                }
-                <div className={`flex flex-col gap-y-0.5`}>
-                  {data && data.length ? (
-                    data.map((item: Record<string, any>, key) => {
+
+                    {
+                      // =========================>
+                      // ## Body Column
+                      // =========================>
+                    }
+                    <div className={`flex flex-col gap-y-0.5`}>
+                      {data.map((item: Record<string, any>, key) => {
+                        return (
+                          <div
+                            style={{ animationDelay: `${(key + 1) * 0.05}s` }}
+                            className={cn(
+                              styles.row,
+                              key % 2 ? "bg-light-primary/10" : "bg-white",
+                              pcn<CT>(className, "row")
+                            )}
+                            key={key}
+                          >
+                            {!!actionBulking && (
+                              <div className={cn("w-max", styles.column)}>
+                                <CheckboxComponent
+                                  name="selected_table"
+                                  className="w-5 h-5"
+                                  checked={checks?.includes(item?.id)}
+                                  onChange={() => checks?.includes(item?.id) ? onChangeChecks?.(checks.filter((i) => i !== item?.id)) : onChangeChecks?.([...(checks || []), item?.id])}
+                                />
+                              </div>
+                            )}
+                            <div className={cn("w-8", styles?.column)}>{numberOfRow(key)}</div>
+                            {renderItem(item, key)}
+                            <div ref={actionColumnRef} className={cn(`flex-1 flex justify-end gap-2 px-4 py-2`)}>
+                              {item["action" as keyof object]}
+                            </div>
+
+                            {item["action" as keyof object] &&
+                              showFloatingAction && (
+                                <div
+                                  className={styles.floatingAction}
+                                  onClick={() =>
+                                    floatingActionActive !== false &&
+                                    floatingActionActive == key ? setFloatingActionActive(false) : setFloatingActionActive(key)
+                                  }
+                                >
+                                  <div className="pl-4 pr-7 py-2">
+                                    <FontAwesomeIcon icon={floatingActionActive === false || floatingActionActive != key ? faChevronLeft : faChevronRight}/>
+                                  </div>
+
+                                  <div className={`py-1 flex gap-2 ${floatingActionActive !== false && floatingActionActive == key ? "w-max pl-2 pr-8" : "w-0"}`}>
+                                    {item["action" as keyof object]}
+                                  </div>
+                                </div>
+                              )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className={`w-full flex flex-col gap-y-0.5`}>
+                    {data.map((item: Record<string, any>, key) => {
                       return (
                         <div
                           style={{ animationDelay: `${(key + 1) * 0.05}s` }}
-                          className={cn(
-                            styles.row,
-                            key % 2 ? "bg-light-primary/10" : "bg-white",
-                            pcn<CT>(className, "row")
-                          )}
                           key={key}
                         >
-                          {!!actionBulking && (
-                            <div className={cn("w-max", styles.column)}>
-                              <CheckboxComponent
-                                name="selected_table"
-                                className="w-5 h-5"
-                                checked={checks?.includes(item?.id)}
-                                onChange={() => checks?.includes(item?.id) ? onChangeChecks?.(checks.filter((i) => i !== item?.id)) : onChangeChecks?.([...(checks || []), item?.id])}
-                              />
-                            </div>
-                          )}
-                          <div className={cn("w-8", styles?.column)}>{numberOfRow(key)}</div>
-                          {renderItem(item)}
-                          <div ref={actionColumnRef} className={cn(`flex-1 flex justify-end gap-2 px-4 py-2`)}>
-                            {item["action" as keyof object]}
-                          </div>
-
-                          {item["action" as keyof object] &&
-                            showFloatingAction && (
-                              <div
-                                className={styles.floatingAction}
-                                onClick={() =>
-                                  floatingActionActive !== false &&
-                                  floatingActionActive == key ? setFloatingActionActive(false) : setFloatingActionActive(key)
-                                }
-                              >
-                                <div className="pl-4 pr-7 py-2">
-                                  <FontAwesomeIcon icon={floatingActionActive === false || floatingActionActive != key ? faChevronLeft : faChevronRight}/>
-                                </div>
-
-                                <div className={`py-1 flex gap-2 ${floatingActionActive !== false && floatingActionActive == key ? "w-max pl-2 pr-8" : "w-0"}`}>
-                                  {item["action" as keyof object]}
-                                </div>
-                              </div>
-                            )}
+                          {renderItem(item, key)}
                         </div>
-                      );
-                    })
-                  ) : (
-                    <>
-                      {
-                        // =========================>
-                        // ## When Empty
-                        // =========================>
-                      }
-                      <div className="flex flex-col items-center justify-center gap-8 p-20 opacity-50">
-                        <h1 className="text-lg text-foreground">
-                          Belum Ada Data
-                        </h1>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
+                      )
+                    })}
+                  </div>
+                </>
+              )}
+              
             </>
           )}
         </ScrollContainerComponent>
