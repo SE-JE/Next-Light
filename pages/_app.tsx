@@ -8,7 +8,6 @@ import 'moment/locale/id';
 import "@styles/globals.css";
 import { ContextAppProvider } from "@contexts/AppProvider";
 
-
 moment.locale('id');
 config.autoAddCss  =  false;
 

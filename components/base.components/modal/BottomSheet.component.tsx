@@ -50,10 +50,10 @@ const BottomSheet = ({
   const lastY     =  useRef(0);
   const dragging  =  useRef(false);
 
-  const [offset, setOffset]              =  useState(0);
-  const [isExpanded, setIsExpanded]      =  useState(false);
-  const [scrollLocked, setScrollLocked]  =  useState(false);
-  const [contentScrollable, setContentScrollable] = useState(false);
+  const [offset, setOffset]                        =  useState(0);
+  const [isExpanded, setIsExpanded]                =  useState(false);
+  const [scrollLocked, setScrollLocked]            =  useState(false);
+  const [contentScrollable, setContentScrollable]  =  useState(false);
 
   const realMaxSize = maxSize ?? size;
 
