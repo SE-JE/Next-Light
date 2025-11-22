@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "light:blueprint": "node utils/commands/blueprint.ts"
+    "light": "bun utils/commands/light.ts"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
@@ -45,6 +45,7 @@
     "@types/react-dom": "^19",
     "@types/validator": "^13.15.4",
     "barrelsby": "^2.8.1",
+    "commander": "^14.0.2",
     "concurrently": "^9.2.1",
     "eslint": "^9.19.0",
     "eslint-config-next": "^15.1.6",
