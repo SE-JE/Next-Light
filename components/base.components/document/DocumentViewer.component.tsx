@@ -1,4 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+"use client"
+
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilePdf, faFileImage, faFileWord, faFileExcel, faFile } from "@fortawesome/free-solid-svg-icons";
@@ -57,7 +59,7 @@ export function DocumentViewerComponent({ file, width, height, mode = "full" }: 
     return () => URL.revokeObjectURL(objectUrl);
   }, [file]);
 
-  const extension = React.useMemo(() => {
+  const extension = useMemo(() => {
     if (!file) return null;
     if (typeof file === "string") {
       const clean = file.split("?")[0].split("#")[0];

@@ -1,8 +1,9 @@
-import React from "react";
-import { useRouter } from "next/router";
+"use client"
+
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { auth } from "@utils";
-import { useAuthContext } from "@contexts/.";
+import { useAuthContext } from "@contexts";
 import { ButtonComponent, CardComponent } from "@components";
 
 export default function Login() {

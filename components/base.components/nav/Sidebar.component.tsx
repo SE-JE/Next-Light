@@ -1,5 +1,7 @@
-import React, { Fragment, ReactNode, useEffect, useState } from "react";
-import { useRouter } from "next/router";
+"use client"
+
+import { Fragment, ReactNode, useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
@@ -74,7 +76,8 @@ export function SidebarComponent({
   // hasAccess,
   className = "",
 } : sidebarProps) {
-  const router             =  useRouter();
+  const pathName           =  usePathname();
+
   const [shows, setShows]  =  useState<string[]>([]);
 
   const setShow = (key: string) => {
@@ -95,7 +98,7 @@ export function SidebarComponent({
 
   const cekActive = (path: string) => {
     const activePath =
-      router.asPath?.split("?")[0]?.replace(`${basePath || ""}`, "") || "/";
+      pathName?.split("?")[0]?.replace(`${basePath || ""}`, "") || "/";
 
     const currentPath = `${path ? `${path}` : ""}`;
 

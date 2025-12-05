@@ -1,4 +1,6 @@
-import React, { ReactNode } from 'react'
+"use client"
+
+import { ReactNode } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowDownZA, faArrowUpAZ, faEllipsisV, faEyeLowVision, faMagnifyingGlass, faPlus, faRefresh, faSearch, faSliders, faSort } from '@fortawesome/free-solid-svg-icons';
 import { ApiFilterType, cn, conversion, useResponsive } from '@utils';
@@ -299,7 +301,7 @@ export function ControlBarComponent({
         })}
       </div>
 
-      {filterableColumns && filterableColumns?.length && (
+      {!!filterableColumns && !!filterableColumns?.length && (
         <FilterComponent 
           className={cn("", !toggle.FILTER ? "p-0 h-0 hidden overflow-hidden" : "mb-2 animate-intro-down")}
           columns={filterableColumns}

@@ -13,7 +13,6 @@
 # testing
 /coverage
 /pages/user/*
-/archive
 
 # next.js
 /.next/
@@ -41,3 +40,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# public
+pdf.worker.min.js

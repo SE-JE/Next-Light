@@ -1,4 +1,6 @@
-import React, { InputHTMLAttributes, ReactNode } from "react";
+"use client"
+
+import { InputHTMLAttributes, ReactNode } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { cn, conversion, pcn, useInputHandler, useInputRandomId, useValidation, validation } from "@utils";
 

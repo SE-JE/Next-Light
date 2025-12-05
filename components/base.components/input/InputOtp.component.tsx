@@ -1,4 +1,6 @@
-import React, { ReactNode, useEffect, useRef, useState } from "react";
+"use client"
+
+import { ClipboardEvent, FC, KeyboardEvent, ReactNode, useEffect, useRef, useState } from "react";
 import { cn, pcn } from "@utils";
 
 
@@ -23,7 +25,7 @@ export interface InputOtpProps {
 
 
 
-export const InputOtpComponent: React.FC<InputOtpProps> = ({
+export const InputOtpComponent: FC<InputOtpProps> = ({
   label,
   tip,
   name,
@@ -76,7 +78,7 @@ export const InputOtpComponent: React.FC<InputOtpProps> = ({
   };
 
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>, index: number) => {
     if (e.key === "Backspace") {
       if (otp[index]) {
         const newOtp = [...otp];
@@ -90,7 +92,7 @@ export const InputOtpComponent: React.FC<InputOtpProps> = ({
   };
 
 
-  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+  const handlePaste = (e: ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
     const paste = e.clipboardData.getData("text").trim();
     if (!/^[0-9]+$/.test(paste)) return;

@@ -1,5 +1,7 @@
-import { api, auth } from "@/utils";
-import React, { createContext, useContext, useEffect, useState } from "react";
+"use client";
+
+import { api, auth } from "@utils";
+import { createContext, FC, ReactNode, useContext, useEffect, useState } from "react";
 
 interface AuthContextInterface {
   registerToken     :  string | null;
@@ -12,7 +14,7 @@ interface AuthContextInterface {
 
 const AuthContext = createContext<AuthContextInterface | undefined>(undefined);
 
-export const AuthContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [accessToken, setAccessToken]      =  useState<string | null>(null);
   const [registerToken, setRegisterToken]  =  useState<string | null>(null);
   const [user, setUser]                    =  useState<Record<string, any> | null>(null);

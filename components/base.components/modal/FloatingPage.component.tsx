@@ -1,3 +1,5 @@
+"use client"
+
 import { ReactNode, useEffect } from "react";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { IconButtonComponent } from "@components";

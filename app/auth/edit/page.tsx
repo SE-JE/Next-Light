@@ -1,11 +1,12 @@
-import { useAuthContext } from "@contexts/Auth.context";
+"use client"
+
+import { useRouter } from "next/navigation";
+import { useAuthContext } from "@contexts";
 import { ButtonComponent, CardComponent, FormSupervisionComponent } from "@components";
-import { useRouter } from "next/router";
-import React from "react";
 
 export default function EditProfile() {
-  const { user } = useAuthContext();
-  const router = useRouter();
+  const router    =  useRouter();
+  const { user }  =  useAuthContext();
 
   return (
     <>

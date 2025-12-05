@@ -1,5 +1,7 @@
-import { cn, pcn, useInputRandomId } from "@/utils";
+"use client"
+
 import { useEffect, useState } from "react";
+import { cn, pcn, useInputRandomId } from "@utils";
 
 
 

@@ -1,3 +1,5 @@
+"use client"
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { cn, pcn } from "@utils";
 import { buttonVariant, buttonRadius, iconButtonContainer } from "./button.decorate";

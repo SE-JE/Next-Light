@@ -1,4 +1,6 @@
-import { cn, pcn } from "@/utils";
+"use client"
+
+import { cn, pcn } from "@utils";
 import { useRef, useState, useEffect, ReactNode } from "react";
 
 

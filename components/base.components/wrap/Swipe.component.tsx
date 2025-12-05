@@ -1,4 +1,6 @@
-import React, { ReactNode, useRef, useState } from 'react'
+"use client"
+
+import { ReactNode, useRef, useState } from 'react'
 import { cn } from '@/utils';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
@@ -63,8 +65,6 @@ export function SwipeComponent({
 
     setOffset(0);
   }
-
-  // console.log(leftActionControl);
   
   return (
     <div className="relative w-full overflow-hidden select-none">

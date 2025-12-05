@@ -1,5 +1,7 @@
-import React, { ReactNode, useState } from "react";
-import { useRouter } from "next/router";
+"use client"
+
+import { ReactNode, useState } from "react";
+import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell, faHistory, faPowerOff, faUser, faUserCog } from "@fortawesome/free-solid-svg-icons";
 import { OutsideClickComponent } from "@components";

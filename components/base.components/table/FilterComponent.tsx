@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from "react";
+"use client"
+
+import { useState, useEffect } from "react";
 import { faChevronUp, faPlus, faRotate, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { ApiFilterType, cn, pcn, useResponsive } from "@utils";
 import {ButtonComponent, IconButtonComponent, InputComponent, InputCurrencyComponent, InputDateComponent, InputNumberComponent, SelectComponent} from "@components";

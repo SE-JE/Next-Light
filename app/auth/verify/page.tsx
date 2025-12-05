@@ -1,6 +1,7 @@
-import React from "react";
+"use client"
+
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { ButtonComponent, CardComponent, FormSupervisionComponent } from "@components";
 import { useAuthContext } from "@contexts/.";
 

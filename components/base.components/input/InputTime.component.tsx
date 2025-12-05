@@ -1,4 +1,6 @@
-import React, { InputHTMLAttributes, ReactNode, useEffect, useMemo, useState } from "react";
+"use client"
+
+import { FC, InputHTMLAttributes, ReactNode, useEffect, useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { cn, pcn, useInputHandler, useInputRandomId, useResponsive, useValidation, validation } from "@utils";
 import { BottomSheetComponent, ButtonComponent, OutsideClickComponent } from "@components";
@@ -192,7 +194,7 @@ interface InputTimePickerProps {
 
 
 
-export const InputTimePickerComponent: React.FC<InputTimePickerProps> = ({
+export const InputTimePickerComponent: FC<InputTimePickerProps> = ({
   onChange,
   rightElement,
 }) => {

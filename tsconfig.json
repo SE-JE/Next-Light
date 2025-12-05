@@ -1,31 +1,71 @@
 {
-  "include"              :  ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude"              :  ["node_modules"],
-  "compilerOptions"      :  {
-    "target"             :  "ES2017",
-    "lib"                :  ["dom", "dom.iterable", "esnext"],
-    "allowJs"            :  true,
-    "skipLibCheck"       :  true,
-    "strict"             :  true,
-    "noEmit"             :  true,
-    "esModuleInterop"    :  true,
-    "module"             :  "esnext",
-    "moduleResolution"   :  "bundler",
-    "resolveJsonModule"  :  true,
-    "isolatedModules"    :  true,
-    "jsx"                :  "preserve",
-    "incremental"        :  true,
-    "paths"              :  {
-      "@/*"              :  ["./*"],
-      "@utils"           :  ["./utils/index.ts"],
-      "@utils/*"         :  ["./utils/*"],
-      "@components"      :  ["./components/index.ts"],
-      "@components/*"    :  ["./components/*", "./components/base.components/*", "./components/construct.components/*", "./components/structure.components/*"],
-      "@contexts"        :  ["./contexts/index.ts"],
-      "@contexts/*"      :  ["./contexts/*"],
-      "@pages/*"         :  ["./pages/*"],
-      "@styles/*"        :  ["./styles/*"],
-      "@public/*"        :  ["./public/*"],
-    }
-  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "paths": {
+      "@/*": [
+        "./*"
+      ],
+      "@utils": [
+        "./utils/index.ts"
+      ],
+      "@utils/*": [
+        "./utils/*"
+      ],
+      "@components": [
+        "./components/index.ts"
+      ],
+      "@components/*": [
+        "./components/*",
+        "./components/base.components/*",
+        "./components/construct.components/*",
+        "./components/structure.components/*"
+      ],
+      "@contexts": [
+        "./contexts/index.ts"
+      ],
+      "@contexts/*": [
+        "./contexts/*"
+      ],
+      "@app/*": [
+        "./app/*"
+      ],
+      "@styles/*": [
+        "./styles/*"
+      ],
+      "@public/*": [
+        "./public/*"
+      ]
+    },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
+  }
 }

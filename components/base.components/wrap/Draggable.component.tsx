@@ -1,45 +1,39 @@
-import React, {
-  useRef,
-  useEffect,
-  useState,
-  ReactNode,
-  forwardRef,
-  useImperativeHandle,
-} from 'react';
+"use client"
 
-// -----------------------------------------------------
-// Tipe
-// -----------------------------------------------------
+import { useRef, useEffect, useState, ReactNode, forwardRef, useImperativeHandle, CSSProperties } from 'react';
+
+
+
 type SpringConfig = {
-  stiffness?: number;
-  damping?: number;
-  mass?: number;
-  stopThreshold?: number;
+  stiffness      ?:  number;
+  damping        ?:  number;
+  mass           ?:  number;
+  stopThreshold  ?:  number;
 };
 
 type Bounds = {
-  left?: number;
-  top?: number;
-  right?: number;
-  bottom?: number;
+  left    ?:  number;
+  top     ?:  number;
+  right   ?:  number;
+  bottom  ?:  number;
 };
 
 type DragState = {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
+  x   :  number;
+  y   :  number;
+  vx  :  number;
+  vy  :  number;
 };
 
 type DraggableProps = {
-  children?: ReactNode;
-  className?: string;
-  style?: React.CSSProperties;
-  initial?: { x?: number; y?: number };
-  bounds?: Bounds;
-  spring?: SpringConfig;
-  onDrag?: (state: { x: number; y: number; vx: number; vy: number; dragging: boolean }) => void;
-  useTranslate3d?: boolean;
+  children        ?:  ReactNode;
+  className       ?:  string;
+  style           ?:  CSSProperties;
+  initial         ?:  { x?: number; y?: number };
+  bounds          ?:  Bounds;
+  spring          ?:  SpringConfig;
+  onDrag          ?:  (state: { x: number; y: number; vx: number; vy: number; dragging: boolean }) => void;
+  useTranslate3d  ?:  boolean;
 };
 
 // -----------------------------------------------------
@@ -58,21 +52,20 @@ export const DraggableComponent = forwardRef(function DraggableComponent(
   }: DraggableProps,
   ref
 ) {
-  const elRef = useRef<HTMLDivElement | null>(null);
-  const frameRef = useRef<number | null>(null);
-  const draggingRef = useRef(false);
-  const pointerIdRef = useRef<number | null>(null);
+  const elRef         =  useRef<HTMLDivElement | null>(null);
+  const frameRef      =  useRef<number | null>(null);
+  const draggingRef   =  useRef(false);
+  const pointerIdRef  =  useRef<number | null>(null);
+  const stateRef      =  useRef<DragState>({ x: initial.x || 0, y: initial.y || 0, vx: 0, vy: 0 });
+  const targetRef     =  useRef<{ x: number; y: number }>({ x: initial.x || 0, y: initial.y || 0 });
 
-  const stateRef = useRef<DragState>({ x: initial.x || 0, y: initial.y || 0, vx: 0, vy: 0 });
-  const targetRef = useRef<{ x: number; y: number }>({ x: initial.x || 0, y: initial.y || 0 });
-
-  const historyRef = useRef<Array<{ t: number; x: number; y: number }>>([]);
+  const historyRef    =  useRef<Array<{ t: number; x: number; y: number }>>([]);
 
   const cfg: Required<SpringConfig> = {
-    stiffness: spring?.stiffness ?? 180,
-    damping: spring?.damping ?? 24,
-    mass: spring?.mass ?? 1,
-    stopThreshold: spring?.stopThreshold ?? 0.02,
+    stiffness      :  spring?.stiffness ?? 180,
+    damping        :  spring?.damping ?? 24,
+    mass           :  spring?.mass ?? 1,
+    stopThreshold  :  spring?.stopThreshold ?? 0.02,
   };
 
   const [, setTick] = useState(0);
@@ -82,9 +75,7 @@ export const DraggableComponent = forwardRef(function DraggableComponent(
   function applyStyle(x: number, y: number) {
     const el = elRef.current;
     if (!el) return;
-    const transform = useTranslate3d
-      ? `translate3d(${x}px, ${y}px, 0)`
-      : `translate(${x}px, ${y}px)`;
+    const transform = useTranslate3d ? `translate3d(${x}px, ${y}px, 0)` : `translate(${x}px, ${y}px)`;
     el.style.transform = transform;
   }
 
@@ -121,9 +112,9 @@ export const DraggableComponent = forwardRef(function DraggableComponent(
   function startSpringAnimation(initVX = 0, initVY = 0) {
     cancelFrame();
 
-    const mass = cfg.mass;
-    const k = cfg.stiffness;
-    const c = cfg.damping;
+    const mass  =  cfg.mass;
+    const k     =  cfg.stiffness;
+    const c     =  cfg.damping;
 
     stateRef.current.vx = initVX;
     stateRef.current.vy = initVY;
@@ -197,9 +188,6 @@ export const DraggableComponent = forwardRef(function DraggableComponent(
     },
   }));
 
-  // -------------------------------------------------------------------
-  // Pointer events
-  // -------------------------------------------------------------------
   useEffect(() => {
     const el = elRef.current;
     if (!el) return;

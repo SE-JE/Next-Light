@@ -1,4 +1,4 @@
-import React from 'react'
+import { CSSProperties } from 'react';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { cn } from '@utils';
@@ -16,7 +16,7 @@ export function InputValues({
   onDelete?: (val: string | number, index: string | number) => void;
   isFocus?: boolean,
   onFocus?: () => void;
-  style?: React.CSSProperties
+  style?: CSSProperties
 }) {
   if(isFocus) {
     return (

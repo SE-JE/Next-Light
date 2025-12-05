@@ -1,5 +1,5 @@
 {
-  "directory": ["components/base.components", "components/construct.components", "components/structure.components", "contexts"],
+  "directory": ["components/base.components", "components/construct.components", "components/structure.components", "contexts", "app"],
   "delete": true,
   "exclude": ["index.ts"],
   "structure": "flat"

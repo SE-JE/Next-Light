@@ -1,4 +1,6 @@
-import React, { InputHTMLAttributes, ReactNode, useEffect, useMemo, useRef, useState } from "react";
+"use client"
+
+import { InputHTMLAttributes, ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import moment from "moment";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
@@ -304,13 +306,13 @@ export const InputDatePickerComponent: React.FC<InputDatePickerProps> = ({
         ref={containerYearRef}
       >
         <div className="flex flex-col">
-          {years?.map((item, key) => {
+          {years?.map((item) => {
             const isActive = currentDate?.year() === item;
 
             return (
               <>
                 <div
-                  key={key}
+                  key={item}
                   ref={isActive ? activeYearRef : null}
                   className={`py-1 px-2 font-semibold rounded-[6px] cursor-pointer ${isActive && "bg-light-primary"}`}
                   onClick={() => setCurrentDate(moment().set("year", item))}

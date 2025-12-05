@@ -1,4 +1,6 @@
-import React, { ReactNode, useEffect, useRef, useState } from "react";
+"use client"
+
+import { MouseEvent, ReactNode, TouchEvent, useEffect, useRef, useState } from "react";
 import dynamic from 'next/dynamic';
 import { cn, pcn } from "@utils";
 
@@ -6,7 +8,7 @@ type CT = "base" | "backdrop" | "footer";
 
 export type BottomSheetProps = {
   show       :  boolean;
-  children   :  React.ReactNode;
+  children   :  ReactNode;
   onClose    :  () => void;
   size      ?:  string | number;
   maxSize   ?:  string | number;
@@ -150,14 +152,14 @@ const BottomSheet = ({
   const topPx = isExpanded ? window.innerHeight - expandedPx : window.innerHeight - collapsedPx;
 
   const bindTouch = {
-    onTouchStart : (e: React.TouchEvent) => onStart(e.touches[0].clientY),
-    onTouchMove  : (e: React.TouchEvent) => onMove(e.touches[0].clientY),
+    onTouchStart : (e: TouchEvent) => onStart(e.touches[0].clientY),
+    onTouchMove  : (e: TouchEvent) => onMove(e.touches[0].clientY),
     onTouchEnd   :  () => onEnd(),
   };
 
   const bindMouse = {
-    onMouseDown   :  (e: React.MouseEvent) => onStart(e.clientY),
-    onMouseMove   :  (e: React.MouseEvent) => dragging.current && onMove(e.clientY),
+    onMouseDown   :  (e: MouseEvent) => onStart(e.clientY),
+    onMouseMove   :  (e: MouseEvent) => dragging.current && onMove(e.clientY),
     onMouseUp     :  () => onEnd(),
     onMouseLeave  :  () => onEnd(),
   };

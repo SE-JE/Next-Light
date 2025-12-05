@@ -1,7 +1,9 @@
+"use client"
+
 import { useEffect, useState } from "react";
 import axios, { AxiosResponse } from "axios";
-import Router from "next/router";
-import { auth, cavity } from "@/utils";
+import { redirect } from "next/navigation";
+import { auth, cavity } from "@utils";
 
 // =========================>
 // ## Build auth bearer
@@ -15,8 +17,8 @@ export const authBearer = (bearer?: string): string | null => {
 // ## Api error handler
 // =========================>
 const handleErrors = (fetch: AxiosResponse) => {
-  if (fetch?.status === 401) Router.push(auth.PATH_LOGIN);
-  if (fetch?.status === 403) Router.push(auth.PATH_BASE);
+  if (fetch?.status === 401) redirect(auth.PATH_LOGIN);
+  if (fetch?.status === 403) redirect(auth.PATH_BASE);
   return fetch;
 };
 

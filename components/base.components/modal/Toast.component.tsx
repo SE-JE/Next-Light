@@ -1,3 +1,5 @@
+"use client"
+
 import { ReactNode, useEffect, useState } from "react";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { cn, pcn } from "@utils";

@@ -1,6 +1,6 @@
-import Router from 'next/router';
+import { redirect } from 'next/navigation';
 import Cookies from 'js-cookie';
-import { encryption } from '@/utils';
+import { encryption } from '@utils';
 
 export const auth = {
   // ==============================>
@@ -41,6 +41,6 @@ export const auth = {
   // ==============================>
   // ## Check auth
   // ==============================>
-  check                         :  () => (!Cookies.get(auth.ACCESS_TOKEN_NAME)) && Router.push(auth.PATH_LOGIN),
+  check                         :  () => (!Cookies.get(auth.ACCESS_TOKEN_NAME)) && redirect(auth.PATH_LOGIN),
 }
 

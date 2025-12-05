@@ -1,3 +1,5 @@
+"use client"
+
 import { useEffect, useState } from "react"
 import validator from "validator"
 import { validationLangs } from "../langs"

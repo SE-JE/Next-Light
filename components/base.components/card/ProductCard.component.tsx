@@ -1,4 +1,5 @@
-import React from "react";
+"use client"
+
 import Image from "next/image";
 import { cn, pcn } from "@utils";
 

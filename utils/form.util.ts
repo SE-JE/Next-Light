@@ -1,3 +1,5 @@
+"use client"
+
 import { useReducer, useEffect, useState } from "react";
 import { api, ApiType } from "./api.util";
 import { validation } from "@/utils";

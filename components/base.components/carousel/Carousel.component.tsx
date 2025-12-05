@@ -1,3 +1,5 @@
+"use client"
+
 import { useState, useRef, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
@@ -29,20 +31,14 @@ export function CarouselComponent({
   noButton,
   noNavigation,
 }: CarouselProps) {
-  const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const touchStartX = useRef<number | null>(null);
-  const touchEndX = useRef<number | null>(null);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [currentIndex, setCurrentIndex]  =  useState<number>(0);
+  const touchStartX                      =  useRef<number | null>(null);
+  const touchEndX                        =  useRef<number | null>(null);
+  const intervalRef                      =  useRef<NodeJS.Timeout | null>(null);
 
-  const handlePrev = (): void => {
-    setCurrentIndex(
-      (prevIndex) => (prevIndex - 1 + items.length) % items.length,
-    );
-  };
+  const handlePrev = (): void => setCurrentIndex((prevIndex) => (prevIndex - 1 + items.length) % items.length);
 
-  const handleNext = (): void => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % items.length);
-  };
+  const handleNext = (): void => setCurrentIndex((prevIndex) => (prevIndex + 1) % items.length);
 
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>): void => {
     touchStartX.current = e.touches[0].clientX;
@@ -64,26 +60,11 @@ export function CarouselComponent({
   }, []);
 
   const styles = {
-    base: cn(
-      "relative w-full overflow-hidden rounded-[6px]",
-      pcn<CT>(className, "base"),
-    ),
-    item: cn(
-      "flex-shrink-0 w-full aspect-[16/6] flex items-center justify-center bg-cover bg-center",
-      pcn<CT>(className, "item"),
-    ),
-    prevButton: cn(
-      "absolute top-1/2 left-4 transform -translate-y-1/2 bg-light-foreground/40 text-white p-2 rounded-[6px] cursor-pointer",
-      pcn<CT>(className, "prev-button"),
-    ),
-    nextButton: cn(
-      "absolute top-1/2 right-4 transform -translate-y-1/2 bg-light-foreground/40 text-white p-2 rounded-[6px] cursor-pointer",
-      pcn<CT>(className, "next-button"),
-    ),
-    navigation: cn(
-      "absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2",
-      pcn<CT>(className, "navigation"),
-    ),
+    base        :  cn("relative w-full overflow-hidden rounded-[6px]", pcn<CT>(className, "base")),
+    item        :  cn("flex-shrink-0 w-full aspect-[16/6] flex items-center justify-center bg-cover bg-center", pcn<CT>(className, "item")),
+    prevButton  :  cn("absolute top-1/2 left-4 transform -translate-y-1/2 bg-light-foreground/40 text-white p-2 rounded-[6px] cursor-pointer",pcn<CT>(className, "prev-button")),
+    nextButton  :  cn("absolute top-1/2 right-4 transform -translate-y-1/2 bg-light-foreground/40 text-white p-2 rounded-[6px] cursor-pointer",pcn<CT>(className, "next-button")),
+    navigation  :  cn("absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2",pcn<CT>(className, "navigation")),
   };
 
   return (
@@ -110,9 +91,7 @@ export function CarouselComponent({
           {items.map((_, index) => (
             <button
               key={index}
-              className={`w-8 h-1 rounded-full ${
-                currentIndex === index ? "bg-primary" : "bg-light-foreground/40"
-              }`}
+              className={`w-8 h-1 rounded-full ${currentIndex === index ? "bg-primary" : "bg-light-foreground/40"}`}
               onClick={() => setCurrentIndex(index)}
             ></button>
           ))}

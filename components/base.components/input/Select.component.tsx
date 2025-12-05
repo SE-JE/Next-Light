@@ -1,4 +1,6 @@
-import React, { ReactNode, useEffect, useState } from "react";
+"use client"
+
+import { ReactNode, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faChevronDown, faTimes,} from "@fortawesome/free-solid-svg-icons";
 import { api, ApiType, cavity, cn, pcn, useInputHandler, useInputRandomId, useLazySearch, useValidation, validation,} from "@utils";

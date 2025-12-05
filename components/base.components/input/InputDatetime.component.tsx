@@ -1,4 +1,6 @@
-import React, { InputHTMLAttributes, ReactNode, useEffect, useState } from "react";
+"use client"
+
+import { InputHTMLAttributes, ReactNode, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { cn, pcn, useInputHandler, useInputRandomId, useResponsive, useValidation, validation } from "@utils";
 import { OutsideClickComponent, InputDatePickerComponent, InputTimePickerComponent, BottomSheetComponent, ButtonComponent, TabbarComponent } from "@components";

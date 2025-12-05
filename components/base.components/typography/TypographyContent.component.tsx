@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react'
+import { ReactNode } from 'react'
 
 export interface TypographyContentProps {
   title     :  string | ReactNode;

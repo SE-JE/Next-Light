@@ -1,4 +1,6 @@
-import React, { ReactNode } from "react";
+"use client"
+
+import { Fragment, ReactNode } from "react";
 import Link from "next/link";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -42,7 +44,7 @@ export function BreadcrumbComponent({
           const isActive = index === items.length - 1;
 
           return (
-            <React.Fragment key={item.path}>
+            <Fragment key={item.path}>
               <li>
                 <Link
                   href={item.path}
@@ -69,7 +71,7 @@ export function BreadcrumbComponent({
                   )}
                 </li>
               )}
-            </React.Fragment>
+            </Fragment>
           );
         })}
       </ol>

@@ -1,4 +1,6 @@
-import React, { ReactNode, useEffect, useState } from "react";
+"use client"
+
+import { ReactNode, useEffect, useState } from "react";
 import { api, ApiType, cn, pcn, useInputHandler, useValidation, validation } from "@utils";
 import { CheckboxComponent } from "@components";
 

@@ -1,3 +1,5 @@
+"use client"
+
 import React, { ReactNode, useEffect, useState } from "react";
 import { faSave, faQuestionCircle, faPlus, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { ApiType, cn, pcn, FormErrorType, FormRegisterType, FormValueType, useForm } from "@utils";

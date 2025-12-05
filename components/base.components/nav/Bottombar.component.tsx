@@ -1,6 +1,7 @@
-import React from "react";
+"use client"
+
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { usePathname } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClipboard, faCrosshairs, faHome, faSackDollar, faUserCircle } from "@fortawesome/free-solid-svg-icons";
 import { cn, pcn, useKeyboardOpen } from "@utils";
@@ -18,7 +19,7 @@ export function BottombarComponent({
   className = "",
   active,
 }: BottombarProps) {
-  const router          =  useRouter();
+  const pathname = usePathname();
   const isKeyboardOpen  =  useKeyboardOpen();
 
   const styles = {
@@ -38,10 +39,10 @@ export function BottombarComponent({
             <div
               className={cn(
                 styles.item,
-                (router.asPath == "/_example/bottombar" || active == "home") &&
+                (pathname == "/_example/bottombar" || active == "home") &&
                   "border-b bg-background text-primary",
                 pcn(className, "item"),
-                (router.asPath == "/_example/bottombar" || active == "home") &&
+                (pathname == "/_example/bottombar" || active == "home") &&
                   pcn(className, "active"),
               )}
             >
@@ -53,10 +54,10 @@ export function BottombarComponent({
             <div
               className={cn(
                 styles.item,
-                (router.asPath == "" || active == "home") &&
+                (pathname == "" || active == "home") &&
                   "border-b bg-background text-primary",
                 pcn(className, "item"),
-                (router.asPath == "" || active == "home") &&
+                (pathname == "" || active == "home") &&
                   pcn(className, "active"),
               )}
             >
@@ -68,10 +69,10 @@ export function BottombarComponent({
             <div
               className={cn(
                 styles.item,
-                (router.asPath == "" || active == "home") &&
+                (pathname == "" || active == "home") &&
                   "border-b bg-background text-primary",
                 pcn(className, "item"),
-                (router.asPath == "" || active == "home") &&
+                (pathname == "" || active == "home") &&
                   pcn(className, "active"),
               )}
             >
@@ -83,10 +84,10 @@ export function BottombarComponent({
             <div
               className={cn(
                 styles.item,
-                (router.asPath == "" || active == "home") &&
+                (pathname == "" || active == "home") &&
                   "border-b bg-background text-primary",
                 pcn(className, "item"),
-                (router.asPath == "" || active == "home") &&
+                (pathname == "" || active == "home") &&
                   pcn(className, "active"),
               )}
             >
@@ -98,10 +99,10 @@ export function BottombarComponent({
             <div
               className={cn(
                 styles.item,
-                (router.asPath == "" || active == "home") &&
+                (pathname == "" || active == "home") &&
                   "border-b bg-background text-primary",
                 pcn(className, "item"),
-                (router.asPath == "" || active == "home") &&
+                (pathname == "" || active == "home") &&
                   pcn(className, "active"),
               )}
             >

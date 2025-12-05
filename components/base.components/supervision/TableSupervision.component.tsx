@@ -1,4 +1,6 @@
-import React, { ReactNode, useEffect, useMemo } from "react";
+"use client"
+
+import { ReactNode, useEffect, useMemo } from "react";
 import { faQuestionCircle } from "@fortawesome/free-regular-svg-icons";
 import { faEdit, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { ApiType, cn, conversion, FetchControlType, useResponsive, useTable } from "@utils";

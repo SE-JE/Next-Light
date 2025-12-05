@@ -1,4 +1,6 @@
-import React, { ReactNode, useEffect, useRef } from "react";
+"use client"
+
+import { FC, ReactNode, useEffect, useRef } from "react";
 
 
 
@@ -9,7 +11,7 @@ export interface OutsideClickHandlerProps {
 
 
 
-export const OutsideClickComponent: React.FC<OutsideClickHandlerProps> = ({
+export const OutsideClickComponent: FC<OutsideClickHandlerProps> = ({
   children,
   onOutsideClick,
 }) => {
