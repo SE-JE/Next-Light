@@ -1,8 +1,8 @@
 "use client"
-/* eslint-disable no-console */
 
 import { useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
+import { logger } from "./commands/logger";
 
 const host = process.env.NEXT_PUBLIC_SOCKET_URL;
 let s: Socket | null = null;
@@ -21,15 +21,15 @@ export const socket = {
         });
   
         s.on("connect", () => {
-          console.log("✅ Socket connected:", s?.id);
+          logger.socket("WS connected:", s?.id)
         });
   
         s.on("disconnect", (reason) => {
-          console.warn("⚠️ Socket disconnected:", reason);
+          logger.socketError("WS disconnected:", reason)
         });
   
         s.on("connect_error", (err) => {
-          console.error("❌ Socket connection error:", err.message);
+          logger.socketError("WS connection error:", err.message)
         });
       } else if (s.disconnected) {
         s.connect();

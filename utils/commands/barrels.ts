@@ -1,8 +1,7 @@
-/* eslint-disable no-console */
-
 import path from "path";
 import fs from "fs";
 import { exec } from "child_process";
+import { logger } from "./logger";
 
 const rootDir = path.resolve();
 const configText = fs.readFileSync("barrels.json", "utf8");
@@ -14,16 +13,16 @@ directories.forEach((dir) => {
   const absoluteDir = path.join(rootDir, dir);
 
   if (!fs.existsSync(absoluteDir)) {
-    console.warn(`⚠️ Barrels: Directory not found: ${absoluteDir}`);
+    logger.error(`Barrels error: ${absoluteDir} directory not found`)
     return;
   }
 
   fs.watch(absoluteDir, { recursive: true }, (_, filename) => {
     if (filename && (filename.endsWith(".ts") || filename.endsWith(".tsx")) && filename !== "index.ts") {
       exec("npx barrelsby -c barrels.json", { cwd: rootDir })
-      console.log("✅ Barrels: watched " + absoluteDir)
+      logger.info("Barrels updated " + absoluteDir + "/index.ts")
     }
   });
 });
 
-console.log("🚀 Barrels watched " + directories.join(", "))
+logger.start("Barrels watched " + directories.join(", "))

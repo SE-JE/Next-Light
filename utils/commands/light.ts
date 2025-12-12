@@ -1,4 +1,3 @@
-#!/usr/bin/env tsx
 import { Command } from "commander";
 import { usePdf } from "./use-pdf";
 import { blueprint } from "./blueprint";

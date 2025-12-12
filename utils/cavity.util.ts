@@ -1,7 +1,5 @@
-/* eslint-disable no-console */
-
-
 import { socket as s } from "@utils";
+import { logger } from "./commands/logger";
 
 const name           =  String(process.env.NEXT_PUBLIC_APP_NAME || "").toLowerCase().trim().replace(/[^\w\s-]/g, "").replace(/[\s_-]+/g, "-").replace(/^-+|-+$/g, "") + ".cavity";
 const storeName      =  "cache";
@@ -106,12 +104,12 @@ export const cavity = {
       });
 
       socket?.on("connect", () => {
-        console.log("[Cavity] Socket connected:", socket.id);
+        logger.cavity("WS connected:", socket.id)
         subscriptions.forEach((key) => cavity.socket.subscribe(key));
       });
 
       socket?.on("disconnect", (reason) => {
-        console.warn("[Cavity] Socket disconnected:", reason);
+        logger.cavityError("WS disconnected:", reason)
       });
     },
 

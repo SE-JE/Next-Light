@@ -1,10 +1,10 @@
-/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { baseBlueprints } from "@/blueprints/.";
+import { logger } from "./logger";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -12,11 +12,7 @@ const __dirname = path.dirname(__filename);
 export function blueprint() {
   baseBlueprints.forEach(({ schema, controllers }: any) => {
     const controllerKey = Object.keys(controllers)[0];
-    const title =
-      controllers[controllerKey]
-        ?.split("/")
-        ?.pop()
-        ?.replace("Controller", "") || "Title";
+    const title = controllers[controllerKey]?.split("/")?.pop()?.replace("Controller", "") || "Title";
 
     const fetchUrl = controllerKey;
 
@@ -55,6 +51,6 @@ export function blueprint() {
 
     fs.writeFileSync(outputFile, content);
 
-    console.log(`Generated page: pages/${title}/index.tsx`);
+    logger.info(`Generated page: pages/${title}/index.tsx`)
   });
 }
