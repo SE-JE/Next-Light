@@ -3,7 +3,7 @@
 import { ReactNode, useEffect, useMemo } from "react";
 import { faQuestionCircle } from "@fortawesome/free-regular-svg-icons";
 import { faEdit, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { ApiType, cn, conversion, FetchControlType, useResponsive, useTable } from "@utils";
+import { ApiType, cn, conversion, FetchControlType, shortcut, ShortcutHandler, useResponsive, useTable } from "@utils";
 import { useToggleContext } from "@contexts";
 import { FloatingPageComponent, FloatingPageProps, ButtonComponent, IconButtonComponent, TableColumnType, TableComponent, FormSupervisionComponent, FormType, ModalConfirmComponent, TypographyColumnComponent, ButtonProps, ModalConfirmProps, TableProps, ControlBarOptionType, BottomSheetComponent, SwipeActionType } from "@components";
 
@@ -53,10 +53,12 @@ export type TableSupervisionProps = {
       label           :  string,
       modal          ?:  ModalConfirmProps,
       button         ?:  ButtonProps,
+      shortcut       ?:  { key: string, description: string },
     } | ((
       row              :  object,
       setModal         :  (type: "EDIT" | "DELETE") => void,
-      setDataSelected ?:  () => void
+      setDataSelected ?:  () => void,
+      setShortcut     ?:  (key: string, handler: ShortcutHandler, description?: string) => void
     ) => ReactNode[])
   )[];
   block                ?:  boolean,
@@ -88,13 +90,57 @@ export function TableSupervisionComponent({
   responsiveControl,
   encodeParams,
 }: TableSupervisionProps) {
-  const { tableKey, tableControl, data, selected, setSelected, checks, setChecks, reset }  =  useTable(fetchControl, id, title, encodeParams)
+  const { tableKey, tableControl, data, selected, setSelected, checks, setChecks, reset, focus, setFocus }  =  useTable(fetchControl, id, title, encodeParams)
   const { setToggle, toggle }                                                              =  useToggleContext()
   const { isSm }                                                                           =  useResponsive();
 
 
   const toggleKey = useMemo(() => conversion.strSnake(tableKey).toUpperCase(), [tableKey])
 
+
+  useEffect(() => {
+    if(data?.data?.length && !toggle[`MODAL_DELETE_${toggleKey}`] && !toggle[`MODAL_DELETE_${toggleKey}`] && !toggle[`MODAL_SHOW_${toggleKey}`]) {
+      shortcut.register("arrowdown", () => {
+        const max = data?.data?.length - 1;
+        setFocus(focus == null ? 0 : focus >= max ? max : (focus + 1))
+      }, "Pilih data kebawah")
+
+      shortcut.register("arrowup", () => {
+        setFocus(focus == null ? 0 : focus <= 0 ? 0 : (focus - 1))
+      }, "Pilih data keatas")
+
+      if(focus != null) {
+        shortcut.register("delete", () => {
+          setSelected(data?.data?.at(focus))
+          setToggle(`MODAL_DELETE_${toggleKey}`)
+        }, "Delete data yang dipilih")
+
+        shortcut.register(" ", () => {
+          setSelected(data?.data?.at(focus))
+          setToggle(`MODAL_FORM_${toggleKey}`)
+        }, "Edit data yang dipilih")
+  
+        shortcut.register("enter", () => {
+          setSelected(data?.data?.at(focus))
+          setToggle(`MODAL_SHOW_${toggleKey}`)
+        }, "Detail data yang dipilih")
+
+        shortcut.register("escape", () => {
+          setFocus(null)
+        }, "Kembali")
+      }
+    }
+
+    return () => {
+      shortcut.unregister("arrowdown")
+      shortcut.unregister("arrowup")
+      shortcut.unregister("delete")
+      shortcut.unregister(" ")
+      shortcut.unregister("enter")
+      shortcut.unregister("escape")
+    }
+  }, [data?.data, actionControl, focus, toggle[`MODAL_DELETE_${toggleKey}`], toggle[`MODAL_DELETE_${toggleKey}`], toggle[`MODAL_SHOW_${toggleKey}`]])
+  
 
   // ============================
   // ## Column preparation
@@ -364,6 +410,7 @@ export function TableSupervisionComponent({
         checks={checks || []}
         onChangeChecks={(e) => setChecks(e)}
         block={block}
+        focus={focus}
         responsiveControl={responsiveControl ? {
           mobile: responsiveControl?.mobile == true ? {
             leftActionControl: (Array.isArray(actionControl) ? actionControl : (actionControl || actionControl == undefined) ? ['edit', "delete"] : []).includes('edit') ? {
@@ -464,7 +511,11 @@ export function TableSupervisionComponent({
           },
         }}
       >
-        <p className="px-2 pb-2 text-sm text-center">Yakin yang dihapus sudah benar?</p>
+        {columns?.at(0)?.selector && selected ? (
+          <p className="px-2 pb-2 text-sm text-center">Yakin menghapus <span className="font-semibold">&quot;{selected[columns?.at(0)?.selector || ""]}&quot;</span>?</p>
+        ) : (
+          <p className="px-2 pb-2 text-sm text-center">Yakin yang dihapus sudah benar?</p>
+        )}
       </ModalConfirmComponent>
 
       {actionControl && Array.isArray(actionControl) && actionControl.filter((ac) => typeof ac == "object")?.map((ac, acKey) => {

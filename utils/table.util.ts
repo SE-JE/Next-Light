@@ -12,6 +12,7 @@ export type TableStateType = {
   data      ?:  Record<string, any>[];
   selected  ?:  Record<string, any> | null;
   checks    ?:  (string | number)[] | null;
+  focus    ?:  number | null;
 };
 
 export type FetchControlType = {
@@ -140,6 +141,8 @@ export const useTable = (
   
   const setChecks = (checks: (string | number)[] | null) => setState((prev) => ({ ...prev, checks }))
 
+  const setFocus = (focus: number | null) => setState((prev) => ({ ...prev, focus }))
+
 
   // ==========================
   // ## Table Control
@@ -171,6 +174,8 @@ export const useTable = (
     loading,
     params: state.params,
     setParam,
+    focus: state.focus,
+    setFocus,
     selected: state.selected,
     setSelected: setSelected,
     checks: state.checks,

@@ -1,6 +1,6 @@
 "use client"
 
-import { InputHTMLAttributes, ReactNode, useEffect, useState } from "react";
+import { InputHTMLAttributes, ReactNode, Ref, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { cn, pcn, useInputHandler, useInputRandomId, useValidation, validation } from "@utils";
 import { InputValues } from "./InputValues.component";
@@ -28,6 +28,8 @@ export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
   onChange  ?:  (value: any) => any;
   register  ?:  (name: string, validations?: string) => void;
 
+  ref       ?:  Ref<HTMLInputElement>,
+
   /** Use custom class with: "label::", "tip::", "error::", "icon::", "suggest::", "suggest-item::". */
   className  ?:  string;
 }
@@ -54,6 +56,7 @@ export function InputComponent({
   register,
   onChange,
 
+  ref,
   ...props
 }: InputProps) {
 
@@ -182,6 +185,7 @@ export function InputComponent({
         <div className="relative">
           <input
             {...props}
+            ref={ref}
             id={randomId}
             placeholder={!multiple || (multiple && !inputHandler.value?.length) ? props.placeholder : ""}
             className={cn(

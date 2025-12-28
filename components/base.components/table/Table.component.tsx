@@ -48,6 +48,8 @@ export interface TableProps {
   checks                    ?:  (string | number)[];
   onChangeChecks            ?:  (checks: (string | number)[]) => void;
   actionBulking             ?:  ((checks: (string | number)[]) => ReactNode) | false
+  focus                     ?:  number | null,
+  setFocus                  ?:  (focus: number | null) => void, 
 
   onRowClick                ?:  (data: Record<string, any>, key: number) => void;
   onRefresh                 ?:  () => void;
@@ -86,6 +88,7 @@ export function TableComponent({
   checks,
   onChangeChecks,
   actionBulking,
+  focus,
 
   onRowClick,
   onRefresh,
@@ -192,7 +195,7 @@ export function TableComponent({
             return (
               <div
                 key={key}
-                className={cn(styles.column, onRowClick && "cursor-pointer")}
+                className={cn(styles.column , onRowClick && "cursor-pointer")}
                 style={{ width: columnMapping?.at(key)?.width || 200 }}
                 onClick={() => onRowClick?.(item, itemKey) }
                 title={title}
@@ -358,6 +361,7 @@ export function TableComponent({
                             className={cn(
                               styles.row,
                               key % 2 ? "bg-light-primary/10" : "bg-white",
+                              focus == key && "bg-light-primary/30",
                               pcn<CT>(className, "row")
                             )}
                             key={key}

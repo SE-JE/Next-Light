@@ -1,9 +1,9 @@
 "use client"
 
-import { ReactNode } from 'react'
+import { ReactNode, useEffect, useRef } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowDownZA, faArrowUpAZ, faEllipsisV, faEyeLowVision, faMagnifyingGlass, faPlus, faRefresh, faSearch, faSliders, faSort } from '@fortawesome/free-solid-svg-icons';
-import { ApiFilterType, cn, conversion, useResponsive } from '@utils';
+import { ApiFilterType, cn, conversion, shortcut, useResponsive } from '@utils';
 import { useToggleContext } from '@contexts';
 import { IconButtonComponent, InputCheckboxComponent, InputComponent, SelectComponent, OutsideClickComponent, ButtonComponent, BottomSheetComponent, FilterComponent, FilterColumnOption } from '@components';
 
@@ -57,6 +57,48 @@ export function ControlBarComponent({
   const {toggle, setToggle}  =  useToggleContext()
   const { isSm }             =  useResponsive();
 
+  const searchRef             =  useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (options?.includes("SEARCH")) {
+      shortcut.register("ctrl+s", () => {
+        searchRef.current?.focus()
+      }, "Cari")
+    }
+
+    if (options?.includes("FILTER")) {
+      shortcut.register("ctrl+f", () => {
+        setToggle("FILTER")
+      }, "Filter")
+    }
+
+    if (options?.includes("SORT")) {
+      shortcut.register("ctrl+o", () => {
+        setToggle("SORT")
+      }, "Urutkan")
+    }
+
+    if (options?.includes("SELECTABLE")) {
+      shortcut.register("ctrl+l", () => {
+        setToggle("SELECTABLE")
+      }, "Kolom Ditampilkan")
+    }
+
+    if (options?.includes("REFRESH")) {
+      shortcut.register("ctrl+shift+r", () => {
+        onRefresh?.()
+      }, "Refresh Tabel")
+    }
+
+    return () => {
+      options?.includes("SEARCH") && shortcut.unregister("ctrl+s")
+      options?.includes("FILTER") && shortcut.unregister("ctrl+f")
+      options?.includes("SORT") && shortcut.unregister("ctrl+o")
+      options?.includes("SELECTABLE") && shortcut.unregister("ctrl+l")
+      options?.includes("REFRESH") && shortcut.unregister("ctrl+shift+r")
+    }
+  }, [options])
+
   const onChangeSort = (item: string) => {
     if(!!sort?.find((s) => s.split(" ")?.at(0) == item)) {
       const findSort = sort.find((s) => s.split(" ")?.at(0) == item);
@@ -109,6 +151,7 @@ export function ControlBarComponent({
             return (
               <div className={cn("w-full min-w-[150px]", searchable ? "pr-1.5" : "px-1.5")} key={key}>
                 <InputComponent
+                  ref={searchRef}
                   name="search"
                   placeholder="Cari disini..."
                   rightIcon={faMagnifyingGlass}

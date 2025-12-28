@@ -3,7 +3,7 @@
 import { ReactNode, useEffect, useMemo, useState } from "react";
 import { faQuestion } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { api, ApiType, cn, pcn, useResponsive } from "@utils";
+import { api, ApiType, cn, pcn, shortcut, useResponsive } from "@utils";
 import { ToastComponent, ButtonComponent, ButtonProps, BottomSheetComponent } from "@components";
 
 
@@ -48,8 +48,16 @@ export function ModalConfirmComponent({
   useEffect(() => {
     if (show) {
       document.getElementsByTagName("body")[0].style.overflow = "hidden";
+
+      shortcut.register("escape", () => {
+        onClose?.()
+      }, "Kembali")
     } else {
       document.getElementsByTagName("body")[0].style.removeProperty("overflow");
+    }
+
+    return () => {
+      shortcut.unregister("escape")
     }
   }, [show]);
 

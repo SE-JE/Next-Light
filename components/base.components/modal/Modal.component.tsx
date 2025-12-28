@@ -2,7 +2,7 @@
 
 import { ReactNode, useEffect } from "react";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
-import { cn, pcn } from "@utils";
+import { cn, pcn, shortcut } from "@utils";
 import { IconButtonComponent } from "@components";
 
 
@@ -35,8 +35,16 @@ export function ModalComponent({
   useEffect(() => {
     if (show) {
       document.getElementsByTagName("body")[0].style.overflow = "hidden";
+
+      shortcut.register("escape", () => {
+        onClose?.()
+      }, "Kembali")
     } else {
       document.getElementsByTagName("body")[0].style.removeProperty("overflow");
+    }
+
+    return () => {
+      shortcut.unregister("escape")
     }
   }, [show]);
 

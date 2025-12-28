@@ -17,6 +17,7 @@ export * from "./socket.util";
 export * from "./table.util";
 export * from "./validation.util";
 export * from "./conversion.util";
+export * from "./shortcut.util";
 
 
 

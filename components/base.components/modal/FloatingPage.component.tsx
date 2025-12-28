@@ -3,7 +3,7 @@
 import { ReactNode, useEffect } from "react";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { IconButtonComponent } from "@components";
-import { cn, pcn } from "@utils";
+import { cn, pcn, shortcut } from "@utils";
 
 
 
@@ -32,11 +32,21 @@ export function FloatingPageComponent({
   footer,
   className = "",
 }: FloatingPageProps) {
+
   useEffect(() => {
     if (show) {
       document.getElementsByTagName("body")[0].style.overflow = "hidden";
+
+      shortcut.register("escape", () => {
+        onClose?.()
+      }, "Kembali")
+
     } else {
       document.getElementsByTagName("body")[0].style.removeProperty("overflow");
+    }
+
+    return () => {
+      shortcut.unregister("escape")
     }
   }, [show]);
 

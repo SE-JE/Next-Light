@@ -10,6 +10,7 @@ import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 
 import { ContextAppProvider } from "@contexts/AppProvider";
+import { ShortcutProvider } from "@components";
 
 moment.locale("id");
 config.autoAddCss = false;
@@ -26,6 +27,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     <html lang="id" className={font.className}>
       <body className="antialiased">
         <ContextAppProvider>
+        <ShortcutProvider />
           {children}
         </ContextAppProvider>
       </body>

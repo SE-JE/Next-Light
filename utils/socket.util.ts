@@ -21,15 +21,15 @@ export const socket = {
         });
   
         s.on("connect", () => {
-          logger.socket("WS connected:", s?.id)
+          logger.socket("server connected:", s?.id)
         });
   
         s.on("disconnect", (reason) => {
-          logger.socketError("WS disconnected:", reason)
+          logger.socketError("server disconnected:", reason)
         });
   
         s.on("connect_error", (err) => {
-          logger.socketError("WS connection error:", err.message)
+          logger.socketError("server connection error:", err.message)
         });
       } else if (s.disconnected) {
         s.connect();
