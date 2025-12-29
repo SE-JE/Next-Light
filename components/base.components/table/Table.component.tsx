@@ -333,7 +333,7 @@ export function TableComponent({
                       // ## Head Column
                       // =========================>
                     }
-                    <div className="flex gap-4">
+                    <div className={cn("flex gap-4", pcn<CT>(className, "row"))}>
                       {!!actionBulking && (
                         <div className={cn(styles.head, "w-max")}>
                           <CheckboxComponent
