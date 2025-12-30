@@ -60,7 +60,7 @@ export default function Table() {
               },
             ],
           }}
-          controlBar={["CREATE", "SEARCH", "SORT", "SELECTABLE", "IMPORT", "EXPORT", "PRINT", "REFRESH"]}
+          controlBar={["CREATE", "FILTER", "SEARCH", "SORT", "SELECTABLE", "IMPORT", "EXPORT", "PRINT", "REFRESH"]}
           responsiveControl={{
             mobile: true,
           }}

@@ -14,6 +14,7 @@ export * from "./card/GalleryCard.component";
 export * from "./card/ProductCard.component";
 export * from "./card/ProfileCard.component";
 export * from "./carousel/Carousel.component";
+export * from "./chip/Chip.component";
 export * from "./document/DocumentViewer.component";
 export * from "./document/ExportExcel.component";
 export * from "./document/ImportExcel.component";
