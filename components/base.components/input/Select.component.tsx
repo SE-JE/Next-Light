@@ -10,7 +10,7 @@ import { api, ApiType, cavity, cn, pcn, useInputHandler, useInputRandomId, useLa
 type CT = "label" | "tip" | "error" | "input" | "icon" | "suggest" | "suggest-item";
 
 export interface SelectOptionProps {
-  label         :  string;
+  label         :  string | ReactNode;
   value         :  string | number;
   searchable   ?:  string[];
   customLabel  ?:  ReactNode;
@@ -86,7 +86,7 @@ export function SelectComponent({
 
   className = "",
 }: SelectProps) {
-  const [inputShowValue, setInputShowValue]    =  useState<string>("");
+  const [inputShowValue, setInputShowValue]    =  useState<string | ReactNode>("");
   const [keydown, setKeydown]                  =  useState(false);
   const [useTemp, setUseTemp]                  =  useState(true);
   const [dataOptions, setDataOptions]          =  useState<SelectOptionProps[]>([]);
@@ -140,7 +140,7 @@ export function SelectComponent({
 
       if (searchable && !serverSearchable) {
         if (e.target.value) {
-          newFilteredOptions = dataOptions.filter((Option) => Option.label?.toLowerCase().indexOf(e.target.value.toLowerCase()) > -1).slice(0, maxShowOption);
+          newFilteredOptions = dataOptions.filter((Option) => (Option.label as string)?.toLowerCase().indexOf(e.target.value.toLowerCase()) > -1).slice(0, maxShowOption);
         } else {
           newFilteredOptions = dataOptions.slice(0, maxShowOption);
         }
@@ -165,11 +165,11 @@ export function SelectComponent({
         if (!multiple) {
           setInputShowValue(resultValue?.label || inputShowValue);
           inputHandler.setValue(resultValue?.value || inputShowValue);
-          serverSearchable && setKeyword(resultValue?.label || keyword);
+          serverSearchable && setKeyword((resultValue?.label as string) || keyword);
         } else {
           if (resultValue?.value) {
             searchable ? setInputShowValue(resultValue.label) : searchable && setInputShowValue("");
-            serverSearchable && setKeyword(resultValue.label);
+            serverSearchable && setKeyword(resultValue.label as string);
 
             const values: string[] = Array.isArray(inputHandler.value) ? Array().concat(inputHandler.value)?.filter((val: string | number) => val != resultValue?.value) : [];
 
@@ -296,7 +296,7 @@ export function SelectComponent({
               invalidMessage && "input-error",
               invalidMessage && pcn<CT>(className, "input", "error")
             )}
-            value={useTemp && tempOptions ? tempOptions.at(0)?.label : serverSearchable ? keyword : inputShowValue}
+            value={(useTemp && tempOptions ? tempOptions.at(0)?.label : serverSearchable ? keyword : inputShowValue) as string}
             onChange={(e) => {
               setUseTemp(false);
               searchable && setInputShowValue(e.target.value);
@@ -314,7 +314,7 @@ export function SelectComponent({
             onBlur={(e) => {
               setUseTemp(false);
               const value = e.target.value;
-              const valueOption = dataOptions?.find((option) => option.label?.toLowerCase() == value?.toLowerCase());
+              const valueOption = dataOptions?.find((option) => (option.label as string)?.toLowerCase() == value?.toLowerCase());
 
               if (!keydown) {
                 if (!multiple) {
@@ -322,7 +322,7 @@ export function SelectComponent({
                     if (valueOption?.value) {
                       setInputShowValue(valueOption.label);
                       inputHandler.setValue(valueOption.value);
-                      serverSearchable && setKeyword(valueOption.label);
+                      serverSearchable && setKeyword(valueOption.label as string);
                       onChange?.(valueOption.value, valueOption);
                     } else {
                       setInputShowValue("");
@@ -456,7 +456,7 @@ export function SelectComponent({
 
                         if (!multiple) {
                           setInputShowValue(option.label);
-                          serverSearchable && setKeyword(option.label);
+                          serverSearchable && setKeyword(option.label as string);
                           inputHandler.setValue(option.value);
                           onChange?.(option.value, option);
                         } else {
