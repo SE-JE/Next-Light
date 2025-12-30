@@ -30,7 +30,9 @@ export const useTable = (
   fetchControl  :  FetchControlType,
   id            :  string = "",
   title         :  string = "",
-  compressed    :  boolean = false
+  urlParam     :  boolean | {
+    compressed ?:  boolean
+  }
 ) => {
   const [state, setState]  =  useState<TableStateType>({});
   const router             =  useRouter();
@@ -46,7 +48,7 @@ export const useTable = (
   // ## Parse state url
   // ======================
   const getParamsFromUrl = (): ApiParamsType => {
-    if (compressed) {
+    if (typeof urlParam == "object" && urlParam?.compressed) {
       const t = searchParams.get(tableKey ? `${tableKey}.t` : "t");
       if (!t) return {};
       
@@ -77,7 +79,7 @@ export const useTable = (
   const updateUrlParams = (params: ApiParamsType) => {
     const url = new URL(window.location.href);
 
-    if (compressed) {
+    if (typeof urlParam == "object" && urlParam?.compressed) {
       const encoded = LZString.compressToEncodedURIComponent(JSON.stringify(params));
       url.searchParams.set(tableKey ? `${tableKey}.t` : "t", encoded);
     } else {
@@ -103,7 +105,7 @@ export const useTable = (
   };
 
   useEffect(() => {
-    if (state.params) updateUrlParams(state.params);
+    if (state.params && urlParam) updateUrlParams(state.params);
   }, [state.params]);
 
 
@@ -112,8 +114,10 @@ export const useTable = (
   // ## get url state
   // ===========================
   useEffect(() => {
-    const params = getParamsFromUrl();
-    setState((prev) => ({ ...prev, params }));
+    if(urlParam) {
+      const params = getParamsFromUrl();
+      setState((prev) => ({ ...prev, params }));
+    }
   }, []);
 
 

@@ -2,10 +2,10 @@
 
 import { ReactNode, useEffect, useMemo } from "react";
 import { faQuestionCircle } from "@fortawesome/free-regular-svg-icons";
-import { faEdit, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faFileExcel, faFilePdf, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { ApiType, cn, conversion, FetchControlType, shortcut, ShortcutHandler, useResponsive, useTable } from "@utils";
 import { useToggleContext } from "@contexts";
-import { FloatingPageComponent, FloatingPageProps, ButtonComponent, IconButtonComponent, TableColumnType, TableComponent, FormSupervisionComponent, FormType, ModalConfirmComponent, TypographyColumnComponent, ButtonProps, ModalConfirmProps, TableProps, ControlBarOptionType, BottomSheetComponent, SwipeActionType } from "@components";
+import { FloatingPageComponent, FloatingPageProps, ButtonComponent, IconButtonComponent, TableColumnType, TableComponent, FormSupervisionComponent, FormType, ModalConfirmComponent, TypographyColumnComponent, ButtonProps, ModalConfirmProps, TableProps, ControlBarOptionType, BottomSheetComponent, SwipeActionType, ExportExcel, ImportExcel, PrintTable } from "@components";
 
 
 
@@ -40,7 +40,7 @@ export type TableSupervisionProps = {
   title           ?:  string;
   id              ?:  string;
   accessCode      ?:  number;
-  encodeParams    ?:  boolean;
+  urlParam        ?:  boolean | { compressed    ?:  boolean }
   onRowClick      ?:  (data: Record<string, any>) => void;
   columnControl   ?:  string[] | TableSupervisionColumnProps[];
   formControl     ?:  TableSupervisionFormProps;
@@ -62,8 +62,9 @@ export type TableSupervisionProps = {
     ) => ReactNode[])
   )[];
   block                ?:  boolean,
+  noIndex              ?: boolean;
   actionBulkingControl ?:  TableProps["actionBulking"],
-  controlBar           ?:  ControlBarOptionType[];
+  controlBar           ?:  (ControlBarOptionType | "CREATE" | "IMPORT" | "EXPORT" | "PRINT")[];
   responsiveControl    ?:  {
     mobile                 ?:  boolean | {
       item                 ?:  (item: Record<string, any>, key: number) => ReactNode,
@@ -87,12 +88,13 @@ export function TableSupervisionComponent({
   actionBulkingControl,
   block,
   controlBar,
+  noIndex,
   responsiveControl,
-  encodeParams,
+  urlParam,
 }: TableSupervisionProps) {
-  const { tableKey, tableControl, data, selected, setSelected, checks, setChecks, reset, focus, setFocus }  =  useTable(fetchControl, id, title, encodeParams)
-  const { setToggle, toggle }                                                              =  useToggleContext()
-  const { isSm }                                                                           =  useResponsive();
+  const { tableKey, tableControl, data, selected, setSelected, checks, setChecks, reset, focus, setFocus }  =  useTable(fetchControl, id, title, (urlParam || true))
+  const { setToggle, toggle }                                                                               =  useToggleContext()
+  const { isSm }                                                                                            =  useResponsive();
 
 
   const toggleKey = useMemo(() => conversion.strSnake(tableKey).toUpperCase(), [tableKey])
@@ -381,7 +383,71 @@ export function TableSupervisionComponent({
 
       <TableComponent
         id={tableKey}
-        controlBar={controlBar || [
+        controlBar={controlBar?.map((cb) => {
+            if (cb == "CREATE") {
+              if (isSm) return 
+              return (
+                <div className="pl-1.5 pr-3 mr-2 border-r" key="button-add">
+                  <ButtonComponent
+                    icon={faPlus}
+                    label="Tambah Data"
+                    size="sm"
+                    onClick={() => {
+                      setToggle(`MODAL_FORM_${toggleKey}`)
+                      setSelected(null)
+                    }}
+                  />
+                </div>
+              )
+            }
+
+            if (cb == "IMPORT") {
+              return (
+                <div className="px-1.5 rounded-md relative" key={"import"}>
+                  <ButtonComponent
+                    icon={faFileExcel}
+                    label="Import"
+                    variant="outline"
+                    className="!text-foreground"
+                    onClick={() => setToggle(`MODAL_IMPORT_${toggleKey}`)}
+                    size="sm"
+                  />
+                </div>
+              )
+            }
+
+            if (cb == "EXPORT") {
+              return (
+                <div className="px-1.5 rounded-md relative" key={"export-excel"}>
+                  <ButtonComponent
+                    icon={faFileExcel}
+                    label="Export"
+                    variant="outline"
+                    className="!text-foreground"
+                    onClick={() => setToggle(`MODAL_EXPORT_${toggleKey}`)}
+                    size="sm"
+                  />
+                </div>
+              )
+            }
+
+            if (cb == "PRINT") {
+              return (
+                <div className="px-1.5 rounded-md relative" key={"export-pdf"}>
+                  <ButtonComponent
+                    icon={faFilePdf}
+                    label="Cetak"
+                    variant="outline"
+                    className="!text-foreground"
+                    onClick={() => setToggle(`MODAL_PRINT_${toggleKey}`)}
+                    size="sm"
+                  />
+                </div>
+              )
+            }
+
+            return cb
+          }) || [
           ...(!isSm ? [
             <div className="pl-1.5 pr-3 mr-2 border-r" key="button-add">
               <ButtonComponent
@@ -398,7 +464,7 @@ export function TableSupervisionComponent({
           "SEARCH", 
           ...(columns?.filter((c) => !!(c as { filterable?: any }).filterable)?.length ? ["FILTER"] : []),
           ...(columns?.filter((c) => !!(c as { sortable?: any }).sortable)?.length ? ["SORT"] : []),
-          "SELECTABLE", "REFRESH"
+          "SELECTABLE", "REFRESH",
         ]}
         columns={columns as TableColumnType[]}
         data={dataTables}
@@ -411,6 +477,7 @@ export function TableSupervisionComponent({
         onChangeChecks={(e) => setChecks(e)}
         block={block}
         focus={focus}
+        noIndex={noIndex}
         responsiveControl={responsiveControl ? {
           mobile: responsiveControl?.mobile == true ? {
             leftActionControl: (Array.isArray(actionControl) ? actionControl : (actionControl || actionControl == undefined) ? ['edit', "delete"] : []).includes('edit') ? {
@@ -490,6 +557,56 @@ export function TableSupervisionComponent({
           </div>
         </FloatingPageComponent>
       )}
+
+
+      <FloatingPageComponent
+        show={!!toggle[`MODAL_EXPORT_${toggleKey}`]}
+        onClose={() => setToggle(`MODAL_EXPORT_${toggleKey}`, false)}
+        title="Export Ke Excel"
+        className="bg-white md:w-[1200px] max-w-[1200px]"
+      >
+        <ExportExcel 
+          fetchControl={fetchControl} 
+          filename={"Export - " + title}
+          columnControl={columns?.map((cc) => ({
+            label: cc.label || "",
+            selector: cc.selector || "",
+          }))} 
+        />
+      </FloatingPageComponent>
+
+
+      <FloatingPageComponent
+        show={!!toggle[`MODAL_IMPORT_${toggleKey}`]}
+        onClose={() => setToggle(`MODAL_IMPORT_${toggleKey}`, false)}
+        title="Import Dari Excel"
+        className="bg-white md:w-[1200px] max-w-[1200px]"
+      >
+        <ImportExcel 
+          onSubmit={() => {}}
+          columnControl={columns?.map((cc) => ({
+            label: cc.label || "",
+            selector: cc.selector || "",
+          }))} 
+        />
+      </FloatingPageComponent>
+
+
+      <FloatingPageComponent
+        show={!!toggle[`MODAL_PRINT_${toggleKey}`]}
+        onClose={() => setToggle(`MODAL_PRINT_${toggleKey}`, false)}
+        title="Print PDF"
+        className="bg-white md:w-[1200px] max-w-[1200px]"
+      >
+        <PrintTable 
+          fetchControl={fetchControl} 
+          columnControl={columns?.map((cc) => ({
+            label: cc.label || "",
+            selector: cc.selector || "",
+          }))} 
+          title={"Print - " + title}
+        />
+      </FloatingPageComponent>
 
 
       <ModalConfirmComponent
