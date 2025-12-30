@@ -1,4 +1,7 @@
+"use client"
+
 import { PDFDocument, StandardFonts, PDFPage } from 'pdf-lib'
+import { useEffect, useRef } from 'react'
 
 export const PaperSize = {
   LETTER: { width: 612, height: 792 },
@@ -23,7 +26,8 @@ export type Style = {
   padding?: number
   marginBottom?: number
   fontSize?: number
-  fontWeight?: 'normal' | 'bold'
+  fontWeight?: 'normal' | 'bold',
+  border?: string
 }
 
 export type NodeSchema =
@@ -61,7 +65,7 @@ async function embedImage(pdf: PDFDocument, bytes: Uint8Array | ArrayBuffer) {
 
 export async function RenderPDF({ content }: RenderPDFProps): Promise<Uint8Array> {
   const pdf = await PDFDocument.create()
-  const font = await pdf.embedFont(StandardFonts.Helvetica)
+  const font = await pdf.embedFont(StandardFonts.Courier)
 
   for (const p of content) {
     const size = typeof p.page.size === 'string'
@@ -139,4 +143,53 @@ export async function RenderPDF({ content }: RenderPDFProps): Promise<Uint8Array
   }
 
   return await pdf.save()
+}
+
+
+export function RenderPDFPreview({ schema, className }: { schema: PageSchema[], className?: string }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      const bytes = await RenderPDF({ content: schema });
+      const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
+      pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
+
+      const pdf = await pdfjs.getDocument({ data: bytes }).promise;
+      if (cancelled) return;
+
+      const page = await pdf.getPage(1);
+      const dpr = 1;
+      const viewport = page.getViewport({ scale: 1 });
+
+      const canvas = canvasRef.current!;
+      const ctx = canvas.getContext("2d")!;
+      canvas.style.width = `${viewport.width}px`;
+      canvas.style.height = `${viewport.height}px`
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+
+      const scaledViewport = page.getViewport({ scale: dpr });
+
+      const renderTask = page.render({
+        canvas,
+        canvasContext: ctx,
+        viewport: scaledViewport,
+      });
+
+      await renderTask.promise;
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [schema]);
+
+  return <>
+    <div className={className}>
+      <canvas ref={canvasRef} className="w-full border" />
+    </div>
+  </>
 }

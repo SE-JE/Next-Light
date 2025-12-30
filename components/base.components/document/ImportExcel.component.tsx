@@ -1,113 +1,231 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import ExcelJS from "exceljs";
+import { faEdit } from "@fortawesome/free-solid-svg-icons";
+import { TableComponent, ButtonComponent, SelectComponent, ModalComponent, IconButtonComponent } from "@components";
+import { useToggleContext } from "@contexts";
 
-type FieldOption = {
-  key: string;
+
+
+export type ImportExcelColumnControlType = {
   label: string;
+  selector: string;
 };
 
-const FIELD_OPTIONS: FieldOption[] = [
-  { key: "name", label: "Nama" },
-  { key: "email", label: "Email" },
-  { key: "phone", label: "No HP" },
-];
+type ImportColumn = {
+  selector  :  string;
+  label     :  string;
+  source    :  string | null;
+};
 
-export default function ExcelImportMapper() {
-  const [headers, setHeaders] = useState<string[]>([]);
-  const [rows, setRows] = useState<any[]>([]);
-  const [mapping, setMapping] = useState<Record<string, string>>({});
+type ImportExcelProps = {
+  columnControl   :  ImportExcelColumnControlType[];
+  onSubmit       ?:  (rows: any[]) => void;
+};
 
-  const handleFile = async (file: File) => {
-    const wb = new ExcelJS.Workbook();
-    await wb.xlsx.load(await file.arrayBuffer());
 
-    const sheet = wb.worksheets[0];
 
-    const headerRow = sheet.getRow(1).values as string[];
-    const cleanHeaders = headerRow.slice(1); // skip index 0
+function numberToExcelColumn(index: number): string {
+  let column = "";
+  let n = index;
 
-    const dataRows: any[] = [];
-    sheet.eachRow((row, idx) => {
-      if (idx === 1) return;
-      const obj: any = {};
-      cleanHeaders.forEach((h, i) => {
-        obj[h] = row.getCell(i + 1).value;
+  while (n >= 0) {
+    column = String.fromCharCode((n % 26) + 65) + column;
+    n = Math.floor(n / 26) - 1;
+  }
+
+  return column;
+}
+
+
+
+export function ImportExcel({ columnControl, onSubmit }: ImportExcelProps) {
+  const { toggle, setToggle }  =  useToggleContext()
+
+  const [columns, setColumns]  =  useState<ImportColumn[]>([]);
+  const [rows, setRows]        =  useState<Record<string, any>[]>([]);
+  const [loaded, setLoaded]    =  useState(false);
+
+
+  const handleImportFile = async (file: File) => {
+    const workbook  =  new ExcelJS.Workbook();
+    const buffer    =  await file.arrayBuffer();
+
+    await workbook.xlsx.load(buffer);
+    const sheet = workbook.worksheets[0];
+
+    const excelColumns: ImportColumn[] = [];
+    sheet.getRow(1).eachCell((_, colIndex) => {
+      const label = numberToExcelColumn(colIndex - 1);
+
+      excelColumns.push({
+        selector  :  label,
+        label     :  label,
+        source    :  null,
       });
-      dataRows.push(obj);
     });
 
-    setHeaders(cleanHeaders);
-    setRows(dataRows);
+    const excelRows: Record<string, any>[] = [];
+    sheet.eachRow((row, rowIndex) => {
+      if (rowIndex === 1) return;
+
+      const item: Record<string, any> = {};
+      excelColumns.forEach((col, i) => {
+        item[col.selector] = row.getCell(i + 1).value;
+      });
+
+      excelRows.push(item);
+    });
+
+    setColumns(excelColumns);
+    setRows(excelRows);
+    setLoaded(true);
   };
 
-  const buildPayload = () => {
-    return rows.map((row) => {
-      const obj: any = {};
-      Object.entries(mapping).forEach(([excelCol, field]) => {
-        if (field) obj[field] = row[excelCol];
+  const getColumnLabel = (source: string | null) => {
+    if (!source) return "";
+
+    const found = columnControl?.find(c => c.selector === source);
+
+    return found?.label ?? source;
+  };
+
+
+  const tableColumns = useMemo(() => {
+    return columns?.map((c => ({
+      ...c,
+      label: <div className="w-full text-center">{c.label}</div>
+    })));
+  }, [columns]);
+
+
+  const tableData = useMemo(() => {
+    if (!loaded) return [];
+
+    const mappingRow: Record<string, any> = {};
+
+    columns.forEach(col => {
+      mappingRow[col.selector] = (
+        <>
+          <div className="flex justify-between">
+            <p>{getColumnLabel(col.source) || <p className="text-light-foreground">-- PILIH KOLOM --</p>}</p>
+
+            <IconButtonComponent
+              icon={faEdit}
+              size="xs"
+              paint="warning"
+              variant="outline"
+              disabled={columns.length <= 1}
+              onClick={() => setToggle("MODAL_FIELD_IMPORT", {selector: col.selector, value: col.source})}
+            />
+          </div>
+        </>
+      );
+    });
+
+    return [mappingRow, ...rows];
+  }, [columns, rows, loaded, columnControl]);
+
+
+  const generatePayload = () => {
+    return rows.map(row => {
+      const payload: Record<string, any> = {};
+
+      columns.forEach(col => {
+        if (col.source) {
+          payload[col.source] = row[col.selector];
+        }
       });
-      return obj;
+
+      return payload;
     });
   };
 
-  const handleSubmit = async () => {
-    const payload = buildPayload();
-
-    await fetch("/api/import", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+  const handleSubmit = () => {
+    const payload = generatePayload();
+    onSubmit?.(payload);
   };
 
   return (
-    <div className="p-4">
-      <h2 className="font-bold mb-3">Import Excel</h2>
+    <>
+      
+        {!loaded && (
+          <div className="p-4 relative">
+            <input
+              type="file"
+              accept=".xlsx"
+              onChange={e => {
+                const file = e.target.files?.[0];
+                if (file) handleImportFile(file);
+              }}
+              className="text-transparent bg-background w-full aspect-video border border-dashed relative file:hidden placeholder:hidden rounded-md cursor-pointer"
+            />
 
-      <input
-        type="file"
-        accept=".xlsx"
-        onChange={(e) => e.target.files && handleFile(e.target.files[0])}
-      />
-
-      {headers.length > 0 && (
-        <>
-          <h3 className="mt-4 font-semibold">Mapping Kolom</h3>
-
-          {headers.map((h) => (
-            <div key={h} className="flex gap-2 items-center mb-2">
-              <span className="w-48">{h}</span>
-              <select
-                className="border p-1"
-                onChange={(e) =>
-                  setMapping((m) => ({ ...m, [h]: e.target.value }))
-                }
-              >
-                <option value="">-- Abaikan --</option>
-                {FIELD_OPTIONS.map((f) => (
-                  <option key={f.key} value={f.key}>
-                    {f.label}
-                  </option>
-                ))}
-              </select>
+            <div className="absolute top-1/2 left-1/2 -translate-1/2 text-light-foreground">
+              Pilih atau tarik file excel di sini
             </div>
-          ))}
+          </div>
+        )}
 
-          <h3 className="mt-4 font-semibold">Preview</h3>
-          <pre className="bg-gray-100 p-2 text-xs max-h-40 overflow-auto">
-            {JSON.stringify(buildPayload().slice(0, 3), null, 2)}
-          </pre>
+        {loaded && (
+          <TableComponent
+            controlBar={false}
+            columns={tableColumns}
+            data={tableData}
+            pagination={false}
+            noIndex
+            className="p-4 bg-background row::bg-white row::border-0 row::gap-0 row::!hover:bg-white column::p-2 column::border head-column::p-2 head-column::border"
+          />
+        )}
 
-          <button
-            className="mt-4 bg-blue-500 text-white px-3 py-1 rounded"
-            onClick={handleSubmit}
-          >
-            Kirim ke Backend
-          </button>
-        </>
-      )}
-    </div>
+        {loaded && (
+          <div className="px-4 mt-8">
+            <ButtonComponent
+              label="Import Data"
+              block
+              onClick={handleSubmit}
+            />
+          </div>
+        )}
+      
+
+      <ModalComponent
+        show={!!toggle["MODAL_FIELD_IMPORT"]}
+        onClose={() => setToggle("MODAL_FIELD_IMPORT", false)}
+        title="Pilih Kolom"
+        footer={
+          <div className="flex justify-end">
+            <ButtonComponent 
+              label="Terapkan"
+              onClick={() => {
+                if(!!(toggle["MODAL_FIELD_IMPORT"] as { value: string })?.value) {
+                  setColumns(prev =>
+                    prev.map(c => c.selector === (toggle["MODAL_FIELD_IMPORT"] as { selector: string })?.selector
+                        ? { ...c, source: String((toggle["MODAL_FIELD_IMPORT"] as { value: string })?.value) }
+                        : c
+                    )
+                  )
+                }
+                setToggle("MODAL_FIELD_IMPORT", false)
+              }}
+            />
+          </div>
+        }
+      >
+        <div className="p-4">
+          <SelectComponent
+            name={`column_${(toggle["MODAL_FIELD_IMPORT"] as { selector: string })?.selector}`}
+            placeholder="Pilih kolom data..."
+            value={(toggle["MODAL_FIELD_IMPORT"] as { value: string })?.value ?? ""}
+            onChange={e => setToggle("MODAL_FIELD_IMPORT", {...(toggle["MODAL_FIELD_IMPORT"] as object), value: e})}
+            options={columnControl.map(c => ({
+              label: c.label,
+              value: c.selector,
+            }))}
+          />
+        </div>
+      </ModalComponent>
+    </>
   );
 }

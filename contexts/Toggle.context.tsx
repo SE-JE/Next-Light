@@ -3,7 +3,7 @@
 import { createContext, FC, ReactNode, useContext, useState } from "react";
 
 interface ToggleContextInterface {
-  toggle: Record<string, string | number | object | boolean>;
+  toggle: Record<string, string | number | Record<string,any> | boolean>;
   setToggle: (key: string, value?: string | number | object | boolean) => void;
 }
 

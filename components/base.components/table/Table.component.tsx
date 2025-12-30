@@ -1,6 +1,6 @@
 "use client"
 
-import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { isValidElement, ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowDownZA, faArrowUpAZ, faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { ApiFilterType, cn, pcn, useLazySearch, useResponsive } from "@utils";
@@ -12,7 +12,7 @@ type CT = "controller-bar" | "head-column" | "column" | "row" | "floating-action
 
 export interface TableColumnType {
   selector    :  string;
-  label       :  string;
+  label       :  string | ReactNode;
   width      ?:  string;
   sortable   ?:  boolean;
   searchable ?:  boolean;
@@ -34,7 +34,7 @@ export interface TableProps {
 
   columns                    :  TableColumnType[];
   data                       :  Record<string, any>[];
-  pagination                ?:  PaginationProps;
+  pagination                ?:  PaginationProps | false;
 
   loading                   ?:  boolean;
   sortBy                    ?:  string[];
@@ -55,6 +55,7 @@ export interface TableProps {
   onRefresh                 ?:  () => void;
 
   block                     ?: boolean;
+  noIndex                   ?: boolean;
   responsiveControl         ?: {
     mobile                ?: {
       item                ?:  (item: Record<string, any>, key: number) => ReactNode,
@@ -94,6 +95,7 @@ export function TableComponent({
   onRefresh,
   
   block,
+  noIndex,
   responsiveControl,
   
   className = "",
@@ -118,7 +120,10 @@ export function TableComponent({
 
   useEffect(() => {
     keywordSearch ? onChangeSearch?.(keywordSearch) : onChangeSearch?.("");
-    pagination?.onChange?.(pagination.totalRow, pagination.paginate, 1);
+    
+    if(pagination != false) {
+      pagination?.onChange?.(pagination.totalRow, pagination.paginate, 1);
+    }
   }, [keywordSearch]);
 
   const columnMapping = useMemo(() => {
@@ -172,11 +177,28 @@ export function TableComponent({
   }
 
 
-  function renderItem(item: object, itemKey: number) {
-    const itemMapping = columnMapping.map((column) => column?.item 
-      ? column?.item(item) : (typeof item[column.selector as keyof object] == "object" ? JSON.stringify(item[column.selector as keyof object]) 
-      : item[column.selector as keyof object]) || "-"
-    );
+  function renderItem(item: Record<string, any>, itemKey: number) {
+    const itemMapping = columnMapping.map((column) => {
+      if (column?.item) {
+        return column.item(item);
+      }
+
+      const value = item[column.selector];
+
+      if (isValidElement(value)) {
+        return value;
+      }
+
+      if (value === null || value === undefined) {
+        return "-";
+      }
+
+      if (typeof value === "object") {
+        return JSON.stringify(value);
+      }
+
+      return value;
+    });
 
     if(!isSm || !responsiveControl?.mobile) {
       return (
@@ -344,7 +366,7 @@ export function TableComponent({
                           />
                         </div>
                       )}
-                      <div className={cn(styles.head, "w-8", pcn<CT>(className, "head-column"))}>#</div>
+                      {!noIndex && <div className={cn(styles.head, "w-8", pcn<CT>(className, "head-column"))}>#</div>}
                       {renderHead()}
                     </div>
 
@@ -376,7 +398,7 @@ export function TableComponent({
                                 />
                               </div>
                             )}
-                            <div className={cn("w-8", styles?.column)}>{numberOfRow(key)}</div>
+                            {!noIndex && <div className={cn("w-8", styles?.column)}>{numberOfRow(key)}</div>}
                             {renderItem(item, key)}
                             <div ref={actionColumnRef} className={cn(`flex-1 flex justify-end gap-2 px-4 py-2`)}>
                               {item["action" as keyof object]}

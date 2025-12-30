@@ -17,7 +17,7 @@ export function usePdf() {
     "pdf.worker.min.mjs"
   );
 
-  const target = path.join(projectRoot, "public", "pdf.worker.min.js");
+  const target = path.join(projectRoot, "public", "pdf.worker.min.mjs");
 
   if (!fs.existsSync(source)) {
     logger.error(`Gagal: pdf.worker.min.mjs tidak ditemukan.`)
@@ -25,5 +25,5 @@ export function usePdf() {
   }
 
   fs.copyFileSync(source, target);
-  logger.info("Berhasil memindahkan worker ke public/pdf.worker.min.js")
+  logger.info("Berhasil memindahkan worker ke public/pdf.worker.min.mjs")
 }

@@ -17,13 +17,13 @@ export interface ControlBarProps {
   className          ?:  string
   search             ?:  string,
   onSearch           ?:  (searchable: string) => void,
-  searchableOptions  ?:  {label: string, selector: string}[]
+  searchableOptions  ?:  {label: string | ReactNode, selector: string}[]
   searchable         ?:  string[],
   onSearchable       ?:  (searchable: string[]) => void,
-  selectableOptions  ?:  {label: string, selector: string}[]
+  selectableOptions  ?:  {label: string | ReactNode, selector: string}[]
   selectable         ?:  string[],
   onSelectable       ?:  (searchable: string[]) => void,
-  sortableOptions    ?:  {label: string, selector: string}[]
+  sortableOptions    ?:  {label: string | ReactNode, selector: string}[]
   sort               ?:  string[],
   onSort             ?:  (sort: string[]) => void,
   filterableColumns  ?:  FilterColumnOption[],
@@ -217,7 +217,7 @@ export function ControlBarComponent({
                       name="show_column"
                       options={selectableOptions?.map((option) => {
                         return {
-                          label: option.label,
+                          label: option.label as string,
                           value: option.selector,
                         };
                       })}
@@ -420,7 +420,7 @@ export function ControlBarComponent({
                       name="show_column"
                       options={selectableOptions?.map((option) => {
                         return {
-                          label: option.label,
+                          label: option.label as string,
                           value: option.selector,
                         };
                       })}

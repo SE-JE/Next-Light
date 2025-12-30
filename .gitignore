@@ -42,4 +42,5 @@ yarn-error.log*
 next-env.d.ts
 
 # public
+pdf.worker.min.mjs
 pdf.worker.min.js
