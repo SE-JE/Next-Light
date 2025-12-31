@@ -2,7 +2,7 @@
 
 import { useReducer, useEffect, useState } from "react";
 import { api, ApiType } from "./api.util";
-import { validation } from "@/utils";
+import { validation, ValidationRules } from "@utils";
 
 export interface FormRegisterType { 
   name         : string; 
@@ -158,7 +158,7 @@ export const useForm = (
   // ## FormControl handler
   // ==============================>
   const formControl  =  (name: string)  =>  ({
-    register  : (regName: string, regValidations?: string) => dispatch({
+    register  : (regName: string, regValidations?: ValidationRules) => dispatch({
       type    : "SET_REGISTER",
       payload : { name: regName, validations: regValidations },
     }),
@@ -351,8 +351,8 @@ export const useInputRandomId = () => {
 export const useInputHandler = (
   name?: string, 
   value?: any, 
-  validations?: string,
-  register?: (name: string, validations?: string) => void,
+  validations?: ValidationRules,
+  register?: (name: string, validations?: ValidationRules) => void,
   isFile?: boolean,
   // multiple?: boolean,
 ) => {

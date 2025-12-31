@@ -5,7 +5,7 @@ import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot, faLocationCrosshairs } from "@fortawesome/free-solid-svg-icons";
 import { GoogleMap, LoadScript } from "@react-google-maps/api";
-import { cn, pcn, useInputHandler, useInputRandomId, useResponsive, useValidation, validation } from "@utils";
+import { cn, pcn, useInputHandler, useInputRandomId, useResponsive, useValidation, validation, ValidationRules } from "@utils";
 import { BottomSheetComponent, ButtonComponent, OutsideClickComponent } from "@components";
 
 
@@ -26,10 +26,10 @@ export interface InputMapProps extends Omit<React.InputHTMLAttributes<HTMLInputE
 
   value        ?:  any;
   invalid      ?:  string;
-  validations  ?:  string;
+  validations  ?:  ValidationRules;
 
   onChange  ?:  (value: any) => any;
-  register  ?:  (name: string, validations?: string) => void;
+  register  ?:  (name: string, validations?: ValidationRules) => void;
 
   className  ?:  string;
 }

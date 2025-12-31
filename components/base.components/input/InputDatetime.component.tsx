@@ -2,7 +2,7 @@
 
 import { InputHTMLAttributes, ReactNode, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { cn, pcn, useInputHandler, useInputRandomId, useResponsive, useValidation, validation } from "@utils";
+import { cn, pcn, useInputHandler, useInputRandomId, useResponsive, useValidation, validation, ValidationRules } from "@utils";
 import { OutsideClickComponent, InputDatePickerComponent, InputTimePickerComponent, BottomSheetComponent, ButtonComponent, TabbarComponent } from "@components";
 
 
@@ -17,10 +17,10 @@ export interface InputDateTimeProps extends Omit<InputHTMLAttributes<HTMLInputEl
 
   value        ?:  string;
   invalid      ?:  string;
-  validations  ?:  string;
+  validations  ?: ValidationRules;
   
   onChange  ?:  (value: string) => any;
-  register  ?:  (name: string, validations?: string) => void;
+  register  ?:  (name: string, validations?: ValidationRules) => void;
 
   /** Use custom class with: "label::", "tip::", "error::", "icon::", "suggest::", "suggest-item::". */
   className  ?:  string;

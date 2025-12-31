@@ -2,7 +2,7 @@
 
 import { InputHTMLAttributes, ReactNode } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { cn, conversion, pcn, useInputHandler, useInputRandomId, useValidation, validation } from "@utils";
+import { cn, conversion, pcn, useInputHandler, useInputRandomId, useValidation, validation, ValidationRules } from "@utils";
 
 
 
@@ -16,14 +16,14 @@ export interface InputCurrencyProps extends Omit<InputHTMLAttributes<HTMLInputEl
 
   value        ?:  number;
   invalid      ?:  string;
-  validations  ?:  string;
+  validations  ?: ValidationRules;
   format       ?:  {
     locale     ?:  string;
     currency   ?:  string;
   };
 
   onChange  ?:  (value: number) => any;
-  register  ?:  (name: string, validations?: string) => void;
+  register  ?:  (name: string, validations?: ValidationRules) => void;
 
   /** Use custom class with: "label::", "tip::", "error::", "icon::". */
   className  ?:  string;

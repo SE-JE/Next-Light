@@ -2,7 +2,7 @@
 
 import { InputHTMLAttributes, ReactNode, Ref, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { cn, pcn, useInputHandler, useInputRandomId, useValidation, validation } from "@utils";
+import { cn, pcn, useInputHandler, useInputRandomId, useValidation, validation, ValidationRules } from "@utils";
 import { InputValues } from "./InputValues.component";
 
 
@@ -19,14 +19,14 @@ export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
   invalid      ?:  string;
   suggestions  ?:  string[];
 
-  validations   ?:  string;
+  validations   ?:  ValidationRules;
   onlyAlphabet  ?:  boolean;
   uppercase     ?:  boolean;
   lowercase     ?:  boolean;
   multiple      ?:  boolean;
 
   onChange  ?:  (value: any) => any;
-  register  ?:  (name: string, validations?: string) => void;
+  register  ?:  (name: string, validations?: ValidationRules) => void;
 
   ref       ?:  Ref<HTMLInputElement>,
 

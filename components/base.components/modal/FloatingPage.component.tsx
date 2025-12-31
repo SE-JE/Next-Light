@@ -65,7 +65,7 @@ export function FloatingPageComponent({
         className={cn(
           "floating-page",
           "w-[100vw] md:w-[50vw] max-w-[700px]",
-          !show && "top-[200vh] md:top-0 md:-right-[100vw]",
+          !show && "top-[200vh] md:top-0 md:-right-[200vw]",
           pcn<CT>(className, "base"),
         )}
       >

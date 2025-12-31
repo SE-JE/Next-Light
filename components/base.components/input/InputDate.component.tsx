@@ -4,7 +4,7 @@ import { InputHTMLAttributes, ReactNode, useEffect, useMemo, useRef, useState } 
 import moment from "moment";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
-import { cn, pcn, useInputHandler, useInputRandomId, useResponsive, useValidation, validation } from "@utils";
+import { cn, pcn, useInputHandler, useInputRandomId, useResponsive, useValidation, validation, ValidationRules } from "@utils";
 import { BottomSheetComponent, ButtonComponent, OutsideClickComponent } from "@components";
 
 
@@ -19,10 +19,10 @@ export interface InputDateProps extends Omit<InputHTMLAttributes<HTMLInputElemen
 
   value        ?:  string;
   invalid      ?:  string;
-  validations  ?:  string;
+  validations  ?: ValidationRules;
   
   onChange  ?:  (value: string) => any;
-  register  ?:  (name: string, validations?: string) => void;
+  register  ?:  (name: string, validations?: ValidationRules) => void;
 
   /** Use custom class with: "label::", "tip::", "error::", "icon::". */
   className  ?:  string;

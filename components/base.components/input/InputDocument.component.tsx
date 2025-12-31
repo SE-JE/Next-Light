@@ -3,7 +3,7 @@
 import { useState, useRef, InputHTMLAttributes, ReactNode } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faTimes } from "@fortawesome/free-solid-svg-icons";
-import { cn, pcn, useInputHandler, useInputRandomId, useResponsive, useValidation, validation } from "@utils";
+import { cn, pcn, useInputHandler, useInputRandomId, useResponsive, useValidation, validation, ValidationRules } from "@utils";
 import { DocumentViewerComponent, IconButtonComponent, ButtonComponent, FloatingPageComponent, DocumentViewerIcon, BottomSheetComponent } from "@components";
 
 
@@ -26,10 +26,10 @@ export interface InputDocumentProps extends Omit<InputHTMLAttributes<HTMLInputEl
   value        ?:  any;
   invalid      ?:  string;
 
-  validations   ?:  string;
+  validations   ?:  ValidationRules;
 
   onChange  ?:  (value: any) => any;
-  register  ?:  (name: string, validations?: string) => void;
+  register  ?:  (name: string, validations  ?: ValidationRules) => void;
 
   /** Use custom class with: "label::", "tip::", "error::", "icon::", "suggest::", "suggest-item::". */
   className  ?:  string;

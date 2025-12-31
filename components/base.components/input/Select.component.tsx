@@ -3,7 +3,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faChevronDown, faTimes,} from "@fortawesome/free-solid-svg-icons";
-import { api, ApiType, cavity, cn, pcn, useInputHandler, useInputRandomId, useLazySearch, useValidation, validation,} from "@utils";
+import { api, ApiType, cavity, cn, pcn, useInputHandler, useInputRandomId, useLazySearch, useValidation, validation, ValidationRules,} from "@utils";
 
 
 
@@ -27,7 +27,7 @@ export interface SelectProps {
   value        ?:  string | number | (string | number)[];
   invalid      ?:  string;
   disabled     ?:  boolean;
-  validations  ?:  string;
+  validations  ?:  ValidationRules;
   multiple     ?:  boolean;
   autoFocus    ?:  boolean;
   clearable    ?:  boolean;
@@ -43,7 +43,7 @@ export interface SelectProps {
   maxShowOption        ?:  number;
 
   onChange  ?:  (value: string | number | (string | number)[], data?: any) => any;
-  register  ?:  (name: string, validations?: string) => void;
+  register  ?:  (name: string, validations?: ValidationRules) => void;
   onFocus   ?:  () => void;
   onBlur    ?:  () => void;
 

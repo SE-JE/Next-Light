@@ -1,7 +1,7 @@
 "use client"
 
 import { ReactNode, useEffect, useState } from "react";
-import { api, ApiType, cn, pcn, useInputHandler, useValidation, validation } from "@utils";
+import { api, ApiType, cn, pcn, useInputHandler, useValidation, validation, ValidationRules } from "@utils";
 import { RadioComponent } from "@components";
 
 
@@ -25,10 +25,10 @@ export type InputRadioProps = {
   options              ?:  InputRadioOptionProps[];
   serverOptionControl  ?:  ApiType;
   customOptions        ?:  any;
-  validations          ?:  string;
+  validations          ?:  ValidationRules;
 
   onChange  ?:  (value: string | number) => any;
-  register  ?:  (name: string, validations?: string) => void;
+  register  ?:  (name: string, validations?: ValidationRules) => void;
 
   /** Use custom class with: "label::", "tip::", "error::", "icon::", "suggest::", "suggest-item::". */
   className            ?: string;

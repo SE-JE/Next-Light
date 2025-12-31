@@ -34,7 +34,7 @@ export default function Table() {
                   name: "email",
                   label: "E-mail",
                   placeholder: "Ex: example@mail.com",
-                  validations: "required|max:200",
+                  validations: "required",
                 },
               },
               {

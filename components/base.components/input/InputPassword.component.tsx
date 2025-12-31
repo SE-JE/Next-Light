@@ -2,7 +2,7 @@
 
 import { InputHTMLAttributes, ReactNode, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { cn, pcn, useInputHandler, useInputRandomId, useValidation, validation } from "@utils";
+import { cn, pcn, useInputHandler, useInputRandomId, useValidation, validation, ValidationRules } from "@utils";
 
 
 
@@ -16,10 +16,10 @@ export interface InputPasswordProps extends Omit<InputHTMLAttributes<HTMLInputEl
 
   value        ?:  string;
   invalid      ?:  string;
-  validations  ?:  string;
+  validations  ?:  ValidationRules;
 
   onChange  ?:  (value: string, confirm?: string) => any;
-  register  ?:  (name: string, validations?: string) => void;
+  register  ?:  (name: string, validations?: ValidationRules) => void;
 
   /** Use custom class with: "label::", "tip::", "error::", "icon::". */
   className  ?:  string;

@@ -137,7 +137,7 @@ export function SidebarComponent({
       pcn<CT>(className, "backdrop"),
     ),
     base: cn(
-      "flex flex-col fixed w-64 h-screen px-2 py-4 overflow-y-auto bg-white z-20 rounded-r-[8px] border-r scroll-sm",
+      "flex flex-col fixed w-full sm:w-64 h-screen px-2 py-4 overflow-y-auto bg-white z-20 rounded-r-[8px] border-r scroll-sm",
       toggle ? "scale-x-100 md:scale-x-0" : "scale-x-0 md:scale-x-100",
       pcn<CT>(className, "base"),
     ),

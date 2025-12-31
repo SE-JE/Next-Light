@@ -3,25 +3,25 @@
 import { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHandHolding, faImages, faTimes } from "@fortawesome/free-solid-svg-icons";
-import { cn, pcn, useInputHandler, useInputRandomId, useResponsive, useValidation, validation } from "@utils";
+import { cn, pcn, useInputHandler, useInputRandomId, useResponsive, useValidation, validation, ValidationRules } from "@utils";
 import { BottomSheetComponent, ButtonComponent, IconButtonComponent, ModalComponent } from "@components";
 
 
 type CT = "label" | "error" | "input" | "tip";
 
 export interface InputImageProps {
-  name: string;
-  label?: string;
-  tip?: string;
+  name    :  string;
+  label  ?:  string;
+  tip    ?:  string;
 
-  value?: string | File;
-  aspect?: string;
-  invalid?: string;
-  disabled?: boolean;
-  validations?: string;
+  value        ?:  string | File;
+  aspect       ?:  string;
+  invalid      ?:  string;
+  disabled     ?:  boolean;
+  validations  ?:  ValidationRules;
 
   onChange?: (file?: File | null) => void;
-  register?: (name: string, rules?: string) => void;
+  register?: (name: string, validations?: ValidationRules) => void;
 
   className?: string;
 }

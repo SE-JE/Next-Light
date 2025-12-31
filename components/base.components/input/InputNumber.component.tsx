@@ -3,7 +3,7 @@
 import React, { InputHTMLAttributes, ReactNode } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSortDown, faSortUp } from "@fortawesome/free-solid-svg-icons";
-import { cn, pcn, useInputHandler, useInputRandomId, useValidation, validation } from "@utils";
+import { cn, pcn, useInputHandler, useInputRandomId, useValidation, validation, ValidationRules } from "@utils";
 
 
 
@@ -17,12 +17,12 @@ export interface InputNumberProps extends Omit<InputHTMLAttributes<HTMLInputElem
 
   value        ?:  number;
   invalid      ?:  string;
-  validations  ?:  string;
+  validations  ?:  ValidationRules;
   min          ?:  number;
   max          ?:  number;
   
   onChange  ?:  (value: number) => any;
-  register  ?:  (name: string, validations?: string) => void;
+  register  ?:  (name: string, validations?: ValidationRules) => void;
   
   /** Use custom class with: "label::", "tip::", "error::", "icon::", "suggest::", "suggest-item::". */
   className  ?:  string;
