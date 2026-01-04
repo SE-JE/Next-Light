@@ -17,7 +17,7 @@ export default function Verify() {
 
         <CardComponent className="mt-4 p-6 w-[400px] rounded-2xl">
           <FormSupervisionComponent
-            forms={[
+            fields={[
               {
                 type: "otp",
                 construction: {

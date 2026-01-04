@@ -4,6 +4,7 @@
 
 export * from "./layout";
 export * from "./page";
+export * from "./0/page";
 export * from "./auth/edit/page";
 export * from "./auth/login/page";
 export * from "./auth/me/page";

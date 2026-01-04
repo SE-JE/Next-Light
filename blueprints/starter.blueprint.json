@@ -33,13 +33,20 @@
     {
         "model"   :  "iam/role",
         "schema"  :  {
-            "name"  :  "type:string,5 index required min:1 max:25 fillable searchable selectable"
+            "name"  :  "type:string,25 index required min:1 max:25 fillable searchable selectable"
         },
         "controllers"  :  ["iam/role"],
         "seeders"      :  [["Admin"], ["User"]],
         "migrations"   :  false,
 
-        "pages": ["iam/role"] 
+        "pages": {
+            "iam/user": {
+                "features": "create",
+                "schema": {
+                    "Nama"      :  "name column:sortable form:text|required|min:1|max:25"
+                }
+            }
+        }
     },
     {
         "model"   :  "iam/user-role",
@@ -53,7 +60,8 @@
         },
         "controllers"  :  false,
         "seeders"      :  [[1, 1], [2, 2]],
-        "migrations"   :  false
+        "migrations"   :  false,
+        "pages": false
     },
     {
         "model"   :  "iam/role-permission",
@@ -76,7 +84,8 @@
             "last_used_at"  :  "type:timestamp nullable fillable selectable",
             "expired_at"    :  "type:timestamp nullable fillable selectable"
         },
-        "migrations"  :  false
+        "migrations"  :  false,
+        "pages": false
     },
     {
         "model"        :  "iam/user-mail-token",
@@ -88,6 +97,7 @@
             "used_at"     :  "type:timestamp fillable selectable",
             "expired_at"  :  "type:timestamp fillable selectable"
         },
-        "migrations"  :  false
+        "migrations"  :  false,
+        "pages": false
     }
 ]

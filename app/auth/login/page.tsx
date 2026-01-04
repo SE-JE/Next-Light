@@ -17,7 +17,7 @@ export default function Login() {
 
         <CardComponent className="mt-4 p-6 w-[400px] rounded-2xl">
           <FormSupervisionComponent
-            forms={[
+            fields={[
               {
                 construction: {
                   name: "email",

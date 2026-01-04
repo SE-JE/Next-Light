@@ -52,7 +52,7 @@ export type TableSupervisionProps = {
     )[] 
     | ((data: Record<string, any>) => ReactNode);
   actionControl   ?:  boolean | (
-    | 'edit' | 'delete' | {
+    | 'EDIT' | 'DELETE' | {
       label           :  string,
       modal          ?:  ModalConfirmProps,
       button         ?:  ButtonProps,
@@ -180,8 +180,8 @@ export function TableSupervisionComponent({
     return (
       <>
         <div className={cn("flex items-center gap-2", options?.className)}>
-          {(Array.isArray(actions) ? actions : (actions || actions == undefined) ? ['edit', "delete"] : [])?.map((action, key) => {
-            if(action == "edit") {
+          {(Array.isArray(actions) ? actions : (actions || actions == undefined) ? ['EDIT', "DELETE"] : [])?.map((action, key) => {
+            if(action == "EDIT") {
               return (
                 <ButtonComponent
                   key={key}
@@ -199,7 +199,7 @@ export function TableSupervisionComponent({
               )
             }
 
-            if(action == "delete") {
+            if(action == "DELETE") {
               return (
                 <ButtonComponent
                   key={key}
@@ -488,14 +488,14 @@ export function TableSupervisionComponent({
         noIndex={noIndex}
         responsiveControl={responsiveControl ? {
           mobile: responsiveControl?.mobile == true ? {
-            leftActionControl: (Array.isArray(actionControl) ? actionControl : (actionControl || actionControl == undefined) ? ['edit', "delete"] : []).includes('edit') ? {
+            leftActionControl: (Array.isArray(actionControl) ? actionControl : (actionControl || actionControl == undefined) ? ['EDIT', "DELETE"] : []).includes('EDIT') ? {
               icon: faEdit,
               onAction: (item) => {
                 setToggle(`MODAL_FORM_${toggleKey}`);
                 item && setSelected?.(item);
               }
             } : undefined,
-            rightActionControl: (Array.isArray(actionControl) ? actionControl : (actionControl || actionControl == undefined) ? ['edit', "delete"] : []).includes('delete') ? {
+            rightActionControl: (Array.isArray(actionControl) ? actionControl : (actionControl || actionControl == undefined) ? ['EDIT', "DELETE"] : []).includes('DELETE') ? {
               icon: faTrash,
               onAction: (item) => {
                 setToggle(`MODAL_DELETE_${toggleKey}`);
