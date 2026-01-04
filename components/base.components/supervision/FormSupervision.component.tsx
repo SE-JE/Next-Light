@@ -97,7 +97,7 @@ export interface FormType<T extends TypeKeys = keyof ConstructionMap> {
 
 export interface formSupervisionProps {
   title          ?:  string;
-  forms           :  FormType[];
+  fields          :  FormType[];
   confirmation   ?:  boolean;
   defaultValue   ?:  object | null;
   payload        ?:  (values: any) => object;
@@ -112,7 +112,7 @@ export interface formSupervisionProps {
 
 export function FormSupervisionComponent({
   title,
-  forms,
+  fields,
   submitControl,
   confirmation,
   defaultValue,
@@ -162,7 +162,7 @@ export function FormSupervisionComponent({
 
   useEffect(() => {
     resetFresh();
-  }, [forms]);
+  }, [fields]);
 
   useEffect(() => {
     if (defaultValue) setDefaultValues(defaultValue);
@@ -295,7 +295,7 @@ export function FormSupervisionComponent({
       {title && <h4 className={cn("text-lg font-semibold mb-4", pcn<CT>(className, "title"))}>{title}</h4>}
 
       <form className={cn("grid grid-cols-12 gap-4", pcn<CT>(className, "base"))} onSubmit={submit}>
-        {fresh && forms.map((f, i) => renderInput(f, i))}
+        {fresh && fields.map((f, i) => renderInput(f, i))}
 
         <div className="col-span-12">
           {footerControl?.({ loading }) || (

@@ -8,9 +8,6 @@ export default function Table() {
           title="User"
           fetchControl={{
             path: "users",
-            params: {
-              expand: ['roles'],
-            },
           }}
           columnControl={[
             {
@@ -27,14 +24,24 @@ export default function Table() {
               width: "250px",
             },
           ]}
+          detailControl={[
+            {
+              label: "Nama",
+              item: "name",
+            },
+            {
+              label: "Email",
+              item: "email",
+            }
+          ]}
           formControl={{
-            forms: [
+            fields: [
               {
                 construction: {
                   name: "email",
                   label: "E-mail",
                   placeholder: "Ex: example@mail.com",
-                  validations: "required",
+                  validations: ["required"],
                 },
               },
               {

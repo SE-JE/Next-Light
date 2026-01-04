@@ -27,7 +27,7 @@ export interface TableSupervisionColumnProps {
 };
 
 export interface TableSupervisionFormProps {
-  forms                :  string[] | (FormType & { visibility?: "*" | "create" | "update" })[];
+  fields                :  string[] | (FormType & { visibility?: "*" | "create" | "update" })[];
   defaultValue        ?:  (item: Record<string, any> | null) => Record<string, any>;
   payload             ?:  (values: any) => object;
   modalControl        ?:  FloatingPageProps;
@@ -44,10 +44,13 @@ export type TableSupervisionProps = {
   onRowClick      ?:  (data: Record<string, any>) => void;
   columnControl   ?:  string[] | TableSupervisionColumnProps[];
   formControl     ?:  TableSupervisionFormProps;
-  detailControl   ?:  boolean | ({
-    columns        :  (string | ((data: Record<string, any>) => ReactNode))[],
-    className     ?:  string;
-  });
+  detailControl   ?:  boolean 
+    | (
+      | string 
+      | { label: string, item: string | ((data: Record<string, any>) => ReactNode) }
+      | ((data: Record<string, any>) => ReactNode)
+    )[] 
+    | ((data: Record<string, any>) => ReactNode);
   actionControl   ?:  boolean | (
     | 'edit' | 'delete' | {
       label           :  string,
@@ -278,15 +281,20 @@ export function TableSupervisionComponent({
       <div className="p-4">
         <div className={cn(
           "flex flex-col gap-y-4", 
-          typeof detailControl === "object" ? detailControl.className : undefined
         )}>
-          {!!selected && (typeof detailControl === "object" && detailControl?.columns?.length 
-          ? detailControl?.columns?.map((column, key) => {
+          {!!selected && (typeof detailControl === "object" && detailControl?.length 
+          ? detailControl?.map((column, key) => {
             if (typeof column === "string") {
               return (<TypographyColumnComponent
                 key={key}
                 title={columns?.find((c) => c.selector == column)?.label} 
                 content={selected[column]}
+              />)
+            } else if (typeof column === "object") {
+              return (<TypographyColumnComponent
+                key={key}
+                title={column?.label} 
+                content={typeof column?.item === "string" ? selected[column?.item] : column?.item(selected)}
               />)
             } else {
               return column?.(selected)
@@ -309,8 +317,8 @@ export function TableSupervisionComponent({
   // ============================
   // ## Form preparation
   // ============================
-  const forms = useMemo(() => {
-    return formControl?.forms?.length ? formControl?.forms.map((form) => {
+  const fields = useMemo(() => {
+    return formControl?.fields?.length ? formControl?.fields.map((form) => {
       return typeof form === "string" ? {
         col           :  12,
         type          :  "text",
@@ -359,7 +367,7 @@ export function TableSupervisionComponent({
             method: !(selected as { id: number })?.id ? "POST" : "PUT", 
           }
         }
-        forms={forms as FormType[]}
+        fields={fields as FormType[]}
         defaultValue={formControl?.defaultValue ? formControl?.defaultValue(selected || null) : selected}
         payload={formControl?.payload}
         onSuccess={() => {

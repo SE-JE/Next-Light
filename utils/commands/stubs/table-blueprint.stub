@@ -1,0 +1,13 @@
+{{ marker }}
+import { TableSupervisionComponent } from "@components";
+
+export default function {{ name }}Page() {
+  return (
+    <>
+      <TableSupervisionComponent
+        title="{{ title }}"
+        {{ properties }}
+      />
+    </>
+  );
+}
