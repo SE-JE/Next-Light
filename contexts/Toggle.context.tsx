@@ -1,26 +1,44 @@
 "use client";
 
-import { createContext, FC, ReactNode, useContext, useState } from "react";
+import { createContext, useContext, useState, useCallback } from "react";
 
 interface ToggleContextInterface {
-  toggle: Record<string, string | number | Record<string,any> | boolean>;
-  setToggle: (key: string, value?: string | number | object | boolean) => void;
+  toggle: Record<string, ToggleValue>;
+  setToggle: (key: string, value?: ToggleValue) => void;
 }
 
-const ToggleContext = createContext<ToggleContextInterface | undefined>(undefined);
+const ToggleContext = createContext<ToggleContextInterface | null>(null);
 
-export const ToggleContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
-  const [actives, setActives] = useState<Record<string, string | number | object | boolean>>({});
+type ToggleValue = string | number | boolean | object;
 
-  const setActive = (key: string, value?: (string | number | object | boolean)) => setActives((prev) => ({ ...prev, [key]: value != undefined ? value : !prev?.[key] }));
+const toggleState: Record<string, ToggleValue> = {};
 
-  return <ToggleContext.Provider value={{toggle: actives, setToggle: setActive}}>{children}</ToggleContext.Provider>;
+
+export const ToggleContextProvider = ({ children }: { children: React.ReactNode }) => {
+  const [, forceRender] = useState(0);
+
+  const setToggle = useCallback((key: string, value?: ToggleValue) => {
+    const next = value !== undefined ? value : !toggleState[key];
+    if (toggleState[key] === next) return;
+
+    toggleState[key] = next;
+    forceRender(v => v + 1);
+  }, []);
+
+  return (
+    <ToggleContext.Provider
+      value={{
+        toggle: toggleState,
+        setToggle
+      }}
+    >
+      {children}
+    </ToggleContext.Provider>
+  );
 };
 
-export const useToggleContext = (): ToggleContextInterface => {
-  const context = useContext(ToggleContext);
-  if (!context) {
-    throw new Error("useToggleContext must be used within a ToggleContextProvider");
-  }
-  return context;
+export const useToggleContext = () => {
+  const ctx = useContext(ToggleContext);
+  if (!ctx) throw new Error("useToggleContext must be used inside provider");
+  return ctx;
 };

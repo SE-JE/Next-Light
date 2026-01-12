@@ -1,13 +1,12 @@
 "use client"
 
 import { useReducer, useEffect, useState } from "react";
-import { api, ApiType } from "./api.util";
-import { validation, ValidationRules } from "@utils";
+import { DBSchema, idb, validation, ValidationRules, api, ApiType } from "@utils";
 
 export interface FormRegisterType { 
   name         : string; 
   status      ?: boolean; 
-  validations ?: string;
+  validations ?: ValidationRules;
 }
 
 export interface FormValueType { 
@@ -133,19 +132,21 @@ const formReducer = (state: FormStateType, action: ActionType) => {
 // ## Hook form
 // ==============================>
 export const useForm = (
-  submitControl   : ApiType,
-  payload        ?: ((values: any)  => object) | false,
+  submitControl   : (ApiType & { idb?: never }) | { idb: { store: string, schema?: DBSchema }},
+  payload        ?: ((values: any)  => Promise<object> | object) | false,
   confirmation   ?: boolean,
   onSuccess      ?: (data: any)     => void,
   onFailed       ?: (code: number)  => void,
 ) => {
+  const isApiSubmit = !!(submitControl as ApiType)?.path || !!(submitControl as ApiType)?.url
+  const isIdbSubmit = !!submitControl?.idb
   const [state, dispatch] = useReducer(formReducer, initialState);
 
 
   // ==============================>
   // ## Reset when first load
   // ==============================>
-  useEffect(() => dispatch({ type: "RESET" }), [submitControl?.path]);
+  useEffect(() => dispatch({ type: "RESET" }), [(submitControl as ApiType)?.path, (submitControl as ApiType)?.url, submitControl?.idb]);
 
 
   // ==============================>
@@ -168,6 +169,45 @@ export const useForm = (
   });
 
 
+
+  const getObjectValues = () => state.formValues.reduce<Record<string, any>>((acc, val) => {
+    acc[val.name] = val.value
+    return acc
+  }, {})
+    
+  const submitIdb = async () => {
+    const values = payload
+      ? await payload(getObjectValues())
+      : getObjectValues()
+
+    const client = submitControl?.idb?.schema ? idb.useSchema(submitControl?.idb?.schema) : idb
+
+    await client.put(submitControl?.idb?.store || "", values)
+
+    return { status: 200, data: values }
+  }
+
+  const submitApi = async () => {
+    const formData = new FormData()
+
+    const values = payload
+      ? await payload(getObjectValues())
+      : getObjectValues()
+
+    Object.entries(values).forEach(([k, v]) => {
+      formData.append(k, v ?? "")
+    })
+
+    return api({
+      url     : (submitControl as ApiType).url,
+      path    : (submitControl as ApiType).path,
+      method  : (submitControl as ApiType).method || "POST",
+      bearer  : (submitControl as ApiType).bearer,
+      headers : (submitControl as ApiType).headers,
+      payload : formData,
+    })
+  }
+
   // ==============================>
   // ## Fetch to api
   // ==============================>
@@ -177,46 +217,15 @@ export const useForm = (
     // ==============================>
     dispatch({ type: "SET_LOADING", payload: true });
 
-
-    // ==============================>
-    // ## State values to payload
-    // ==============================>
-    const formData = new FormData();
-        
-    if(!payload) {
-      // ==============================>
-      // ## Basic from state values
-      // ==============================>
-      state.formValues.forEach((val) => {
-        formData.append(val.name, val.value);
-      });
+    let execute
+    
+    if (isApiSubmit) {
+      execute = await submitApi()
+    } else if (isIdbSubmit) {
+      execute = await submitIdb()
     } else {
-      // ==============================>
-      // ## Custom from payload
-      // ==============================>
-      const objValues = state.formValues.reduce<Record<string, any>>((acc, val) => {
-        acc[val.name] = val.value;
-        return acc;
-      }, {});
-      
-      const payloadValues: Record<string, any> = payload(objValues);
-      Object.keys(payloadValues).forEach((key) => {
-        formData.append(key, payloadValues[key]);
-      });
+      throw new Error("Invalid submitControl")
     }
-
-
-    // ==============================>
-    // ## Execute api handler
-    // ==============================>
-    const execute = await api({
-      url               : submitControl.url,
-      path              : submitControl.path,
-      method            : submitControl.method || "POST",
-      bearer            : submitControl.bearer,
-      headers           : submitControl.headers,
-      payload           : formData,
-    });
 
     if (execute?.status === 200 || execute?.status === 201) {
       // ==============================>
@@ -225,7 +234,7 @@ export const useForm = (
       dispatch({ type: "SET_LOADING", payload: false });
       onSuccess?.(execute.data);
       dispatch({ type: "RESET" });
-    } else if (execute?.status === 422) {
+    } else if (isApiSubmit && execute?.status === 422) {
       // ==============================>
       // ## When error invalid
       // ==============================>
@@ -270,7 +279,7 @@ export const useForm = (
         newErrors.push({ name: form.name, error: message });
       }
     });
-
+    
     if (newErrors.length) {
       dispatch({ type: "SET_ERRORS", payload: newErrors });
       return;
@@ -285,6 +294,7 @@ export const useForm = (
       fetch();
     }
   };
+
 
 
   // ==============================>
@@ -354,7 +364,6 @@ export const useInputHandler = (
   validations?: ValidationRules,
   register?: (name: string, validations?: ValidationRules) => void,
   isFile?: boolean,
-  // multiple?: boolean,
 ) => {
   const [inputValue, setInputValue]                    =  useState<any>("");
   const [focus, setFocus]                              =  useState<boolean>(false);

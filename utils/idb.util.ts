@@ -32,8 +32,122 @@ type UpsertPolicy  =  'replace' | 'merge' | 'keep-local'
 const exportName  =  "DB -" + String(process.env.NEXT_PUBLIC_APP_NAME || "");
 
 
+export const idb = {
+  // =====================
+  // schema management
+  // =====================
+  setDefaultSchema(schema: DBSchema) {
+    defaultSchema = normalizeSchema(schema)
+  },
 
-export const  idb = {
+  useSchema(schema: DBSchema) {
+    return createScopedIdb(normalizeSchema(schema))
+  },
+
+  // =====================
+  // default schema ops
+  // =====================
+  query<T = any>(store: string) {
+    if (!defaultSchema) {
+      throw new Error("Default DBSchema is not set")
+    }
+    return createScopedIdb(defaultSchema).query<T>(store)
+  },
+
+  put<T>(store: string, row: T) {
+    if (!defaultSchema) {
+      throw new Error("Default DBSchema is not set")
+    }
+    return createScopedIdb(defaultSchema).put(store, row)
+  },
+
+  upsert(store: string, rows: any[], keyPath: string, policy: UpsertPolicy) {
+    if (!defaultSchema) {
+      throw new Error("Default DBSchema is not set")
+    }
+    return createScopedIdb(defaultSchema).upsert(store, rows, keyPath, policy)
+  },
+
+  delete(store: string, key: IDBValidKey) {
+    if (!defaultSchema) {
+      throw new Error("Default DBSchema is not set")
+    }
+    return createScopedIdb(defaultSchema).delete(store, key)
+  },
+
+  export(type?: "json" | "excel", filename?: string) {
+    if (!defaultSchema) {
+      throw new Error("Default DBSchema is not set")
+    }
+    return createScopedIdb(defaultSchema).export(type, filename)
+  },
+
+  import(data: JSONExport, policy?: UpsertPolicy) {
+    if (!defaultSchema) {
+      throw new Error("Default DBSchema is not set")
+    }
+    return createScopedIdb(defaultSchema).import(data, policy)
+  },
+}
+
+
+let defaultSchema: DBSchema | null = null
+
+const dbPool = new Map<string, Promise<IDBDatabase>>()
+
+const getDbBySchema = (schema: DBSchema): Promise<IDBDatabase> => {
+  const key = `${schema.name}@${schema.version}`
+
+  if (!dbPool.has(key)) {
+    dbPool.set(key, idbCore.open(schema))
+  }
+
+  return dbPool.get(key)!
+}
+
+
+function createScopedIdb(schema: DBSchema) {
+  return {
+    async query<T = any>(store: string) {
+      const db = await getDbBySchema(schema)
+      return idbCore.query<T>(db, store)
+    },
+
+    async put<T>(store: string, row: T) {
+      const db = await getDbBySchema(schema)
+      return idbCore.put(db, store, row)
+    },
+
+    async upsert(
+      store: string,
+      rows: any[],
+      keyPath: string,
+      policy: UpsertPolicy
+    ) {
+      const db = await getDbBySchema(schema)
+      return idbCore.upsert(db, store, rows, keyPath, policy)
+    },
+
+    async delete(store: string, key: IDBValidKey) {
+      const db = await getDbBySchema(schema)
+      return idbCore.delete(db, store, key)
+    },
+
+    async export(type?: "json" | "excel", filename?: string) {
+      const db = await getDbBySchema(schema)
+      return idbCore.export(db, schema, type, filename)
+    },
+
+    async import(data: JSONExport, policy?: UpsertPolicy) {
+      const db = await getDbBySchema(schema)
+      return idbCore.import(db, schema, data, policy)
+    },
+  }
+}
+
+
+
+const idbCore = {
   open: (schema: DBSchema): Promise<IDBDatabase> => {
     return new Promise((resolve, reject) => {
       const req = indexedDB.open(schema.name, schema.version)
@@ -71,7 +185,15 @@ export const  idb = {
   put: <T>(db: IDBDatabase, store: string, row: T) => {
     return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(store, 'readwrite')
-      tx.objectStore(store).put(row)
+
+      const now = () => new Date().toISOString()
+      const data = {
+        ...row,
+        created_at: (row as any).created_at ?? now(),
+        updated_at: now(),
+      }
+
+      tx.objectStore(store).put(data)
   
       tx.oncomplete  =  () => resolve()
       tx.onerror     =  () => reject(tx.error)
@@ -102,6 +224,21 @@ export const  idb = {
 
       tx.oncomplete  =  () => resolve()
       tx.onerror     =  () => reject(tx.error)
+    })
+  },
+
+  delete: (db: IDBDatabase, store: string, key: IDBValidKey) => {
+    return new Promise<void>((resolve, reject) => {
+      if (!db.objectStoreNames.contains(store)) {
+        reject(new Error(`ObjectStore "${store}" not found`))
+        return
+      }
+
+      const tx = db.transaction(store, "readwrite")
+      tx.objectStore(store).delete(key)
+
+      tx.oncomplete = () => resolve()
+      tx.onerror = () => reject(tx.error)
     })
   },
 
@@ -136,7 +273,7 @@ export const  idb = {
       const url         =  URL.createObjectURL(blob)
       const a           =  document.createElement('a')
       a.href            =  url
-      a.download        =  `${schema.name}-backup.xlsx`
+      a.download        =  `${filename}.xlsx`
       a.click()
       URL.revokeObjectURL(url)
 
@@ -215,6 +352,8 @@ class IDBQuery<T = any> {
   private range?: IDBKeyRange
   private filters: WhereFn<T>[] = []
   private limitCount?: number
+  private direction: IDBCursorDirection = "next"
+  private offset?: number
 
   constructor(
     private db: IDBDatabase,
@@ -241,9 +380,51 @@ class IDBQuery<T = any> {
     return this
   }
 
+  order(dir: "asc" | "desc") {
+    this.direction = dir === "desc" ? "prev" : "next"
+    return this
+  }
+
   limit(n: number) {
     this.limitCount = n
     return this
+  }
+
+  paginate(page: number, limit: number) {
+    this.offset = (page - 1) * limit
+    this.limitCount = limit
+    return this
+  }
+
+  async count(): Promise<number> {
+    const tx = this.db.transaction(this.storeName, "readonly")
+    const store = tx.objectStore(this.storeName)
+    const source = this.indexName ? store.index(this.indexName) : store
+
+    if (!this.filters.length) {
+      return new Promise((resolve, reject) => {
+        const req = source.count(this.range)
+        req.onsuccess = () => resolve(req.result)
+        req.onerror = () => reject(req.error)
+      })
+    }
+
+    return new Promise((resolve, reject) => {
+      let total = 0
+      const req = source.openCursor(this.range)
+
+      req.onsuccess = () => {
+        const cursor = req.result
+        if (!cursor) return resolve(total)
+
+        if (this.filters.every(f => f(cursor.value))) {
+          total++
+        }
+        cursor.continue()
+      }
+
+      req.onerror = () => reject(req.error)
+    })
   }
 
   async get(): Promise<T[]> {
@@ -253,23 +434,59 @@ class IDBQuery<T = any> {
 
     return new Promise((resolve, reject) => {
       const result: T[] = []
-      const req = source.openCursor(this.range)
+      const req = source.openCursor(this.range, this.direction)
+
+      let skipped = 0
 
       req.onsuccess = () => {
         const cursor = req.result
         if (!cursor) return resolve(result)
 
+        if (this.offset && skipped < this.offset) {
+          skipped++
+          cursor.continue()
+          return
+        }
+
         const value = cursor.value as T
+
         if (this.filters.every(f => f(value))) {
           result.push(value)
+
           if (this.limitCount && result.length >= this.limitCount) {
             return resolve(result)
           }
         }
+
         cursor.continue()
       }
 
       req.onerror = () => reject(req.error)
     })
+  }
+}
+
+
+function normalizeSchema(schema: DBSchema): DBSchema {
+  return {
+    ...schema,
+    stores: Object.fromEntries(
+      Object.entries(schema.stores).map(([storeName, store]) => [
+        storeName,
+        {
+          ...store,
+          fields: {
+            ...store.fields,
+            created_at: "date",
+            updated_at: "date",
+          },
+          indexes: [
+            ...store.indexes || [],
+            { fields: "created_at" },
+            { fields: "updated_at" },
+          ],
+        },
+      ])
+    ),
   }
 }

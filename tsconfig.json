@@ -52,8 +52,17 @@
       "@contexts/*": [
         "./contexts/*"
       ],
+      "@app": [
+        "./app/index.ts"
+      ],
       "@app/*": [
         "./app/*"
+      ],
+      "@schema": [
+        "./schema/index.ts"
+      ],
+      "@schema/*": [
+        "./schema/*"
       ],
       "@styles/*": [
         "./styles/*"

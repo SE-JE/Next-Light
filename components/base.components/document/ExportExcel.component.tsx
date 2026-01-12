@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { faArrowLeft, faArrowRight, faEdit, faPlus, faTimes } from "@fortawesome/free-solid-svg-icons";
 import ExcelJS from "exceljs";
 import { api, FetchControlType, useTable } from "@utils";
-import { TableComponent, ButtonComponent, IconButtonComponent, SelectComponent, ModalComponent, FilterComponent } from "@components";
+import { TableComponent, ButtonComponent, IconButtonComponent, SelectComponent, ModalComponent } from "@components";
 import { useToggleContext } from "@contexts";
 
 
@@ -140,7 +140,7 @@ export function ExportExcel({ fetchControl, columnControl, filename }: ExportExc
     columns.forEach((col, iCol) => {
       controlRow[col.selector] = (
         <div className="flex justify-between">
-          <p>{getColumnLabel(col.source)}</p>
+          <p className="font-semibold">{getColumnLabel(col.source)}</p>
 
           <div className="flex gap-1">
             {iCol > 0 && (
@@ -208,7 +208,7 @@ export function ExportExcel({ fetchControl, columnControl, filename }: ExportExc
 
       row[ADD_COLUMN_KEY] = "-"
       columns.forEach(col => {
-        row[col.selector] = col.source ? item[col.source] : "";
+        row[col.selector] = col.source ? <span className="line-clamp-1">{item[col.source] || "-"}</span> : "-";
       });
 
       return row;
@@ -261,13 +261,13 @@ export function ExportExcel({ fetchControl, columnControl, filename }: ExportExc
 
   return (
     <>
-      <div className="p-4">
+      {/* <div className="p-4">
         <FilterComponent 
           columns={data?.data[0] && Object.keys(data?.data[0])?.map((c) => ({ label: c, selector: c }))}
           onChange={() => {}}
           value={[]}
         />
-      </div>
+      </div> */}
 
       <TableComponent
         controlBar={false}

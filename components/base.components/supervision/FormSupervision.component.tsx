@@ -2,7 +2,7 @@
 
 import React, { ReactNode, useEffect, useState } from "react";
 import { faSave, faQuestionCircle, faPlus, faTimes } from "@fortawesome/free-solid-svg-icons";
-import { ApiType, cn, pcn, FormErrorType, FormRegisterType, FormValueType, useForm } from "@utils";
+import { ApiType, cn, pcn, FormErrorType, FormRegisterType, FormValueType, useForm, ValidationRules, DBSchema } from "@utils";
 import {
   InputCheckboxComponent,
   InputComponent,
@@ -48,20 +48,26 @@ type formCustomConstructionProps = ({
   errors,
   setErrors,
 }: {
-  formControl  ?:  (name: string) => any;
-  values       ?:  { name: string; value?: any }[];
-  setValues    ?:  (values: FormValueType[]) => void;
-  errors       ?:  FormErrorType[];
-  setErrors    ?:  (errors: FormErrorType[]) => void;
-  setRegister  ?:  (registers: FormRegisterType) => void;
+  formControl  :  (name: string) => {
+    register: (regName: string, regValidations?: ValidationRules | undefined) => void;
+    onChange: (e: any) => void;
+    value: any;
+    invalid: any;
+  };
+  values       :  { name: string; value?: any }[];
+  setValues    :  (values: FormValueType[]) => void;
+  errors       :  FormErrorType[];
+  setErrors    :  (errors: FormErrorType[]) => void;
+  setRegister  :  (registers: FormRegisterType) => void;
+  prefixName  ?:  string;
 }) => ReactNode;
 
 type ClusterConstruction = {
-  name       :  string;
-  label      :  string;
-  tip        :  string;
-  forms      :  FormType[];
-  wrap       :  boolean;
+  name    :  string;
+  label   :  string;
+  tip     :  string;
+  fields  :  FormType[];
+  wrap    :  boolean;
 
   /** Use custom class with: "label::", "tip::", "error::", "icon::", "suggest::", "suggest-item::". */
   className  :  string;
@@ -100,8 +106,8 @@ export interface formSupervisionProps {
   fields          :  FormType[];
   confirmation   ?:  boolean;
   defaultValue   ?:  object | null;
-  payload        ?:  (values: any) => object;
-  submitControl   :  ApiType;
+  payload        ?:  (values: any) => Promise<object> | object;
+  submitControl   :  (ApiType & { idb?: never }) | { idb: { store: string, schema?: DBSchema }};
   footerControl  ?:  ({ loading }: { loading: boolean }) => ReactNode;
   onSuccess      ?:  (data: any) => void;
   onError        ?:  (code: number) => void;
@@ -199,7 +205,7 @@ export function FormSupervisionComponent({
     if (form?.onHide?.(values)) return null;
 
     if (inputType === "cluster") {
-      const { name: mapName, forms: innerForms, label, tip, wrap, className } = form.construction as ClusterConstruction;
+      const { name: mapName, fields: innerForms, label, tip, wrap, className } = form.construction as ClusterConstruction;
 
       const groupKey = prefix ? `${prefix}.${mapName}` : mapName;
       const group = mapGroups[groupKey] || [0];
@@ -259,7 +265,7 @@ export function FormSupervisionComponent({
           <div>
             <ButtonComponent
               icon={faPlus}
-              label={`Tambah ${mapName}`}
+              label={`Tambah ${label || mapName}`}
               variant="outline"
               size="sm"
               onClick={addGroup}
@@ -273,7 +279,7 @@ export function FormSupervisionComponent({
       const customRender = form.construction as formCustomConstructionProps;
       return (
         <div key={key} className={cn(form.className, generateColClass(form.col || "12"))}>
-          {customRender?.({ formControl, values, setValues, errors, setErrors, setRegister })}
+          {customRender?.({ formControl, values, setValues, errors, setErrors, setRegister, prefixName: prefix })}
         </div>
       );
     }

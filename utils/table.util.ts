@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import LZString from "lz-string";
-import { ApiFilterType, ApiParamsType, conversion, useGetApi } from "@utils";
+import { ApiFilterType, ApiParamsType, conversion, ResourceParams, useResource, UseResourceApi, UseResourceIdb, UseResourceProps } from "@utils";
 
 
 
@@ -27,7 +27,7 @@ export type FetchControlType = {
 
 
 export const useTable = (
-  fetchControl  :  FetchControlType,
+  fetchControl  :  UseResourceProps & { params?: ResourceParams },
   id            :  string = "",
   title         :  string = "",
   urlParam     :  boolean | {
@@ -41,7 +41,7 @@ export const useTable = (
   // ======================
   // ## Table state key
   // ======================
-  const getTableKey = () => id || (title ? conversion.strSlug(title) : null) || fetchControl.path || "";
+  const getTableKey = () => id || (title ? conversion.strSlug(title) : null) || (fetchControl as UseResourceApi).path || (fetchControl as UseResourceIdb).store || "";
   const tableKey = getTableKey();
 
   // ======================
@@ -126,7 +126,7 @@ export const useTable = (
   // ==========================
   // ## Fetch api
   // ==========================
-  const { loading, data, reset } = useGetApi({
+  const { loading, data, reset } = useResource({
     ...fetchControl,
     method: "GET",
     params: {

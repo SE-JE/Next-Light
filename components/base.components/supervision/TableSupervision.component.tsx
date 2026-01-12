@@ -3,9 +3,9 @@
 import { ReactNode, useEffect, useMemo } from "react";
 import { faQuestionCircle } from "@fortawesome/free-regular-svg-icons";
 import { faEdit, faFileExcel, faFilePdf, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { ApiType, cn, conversion, FetchControlType, shortcut, ShortcutHandler, useResponsive, useTable } from "@utils";
+import { ApiType, cn, conversion, FetchControlType, shortcut, ShortcutHandler, UseResourceIdb, UseResourceProps, useResponsive, useTable } from "@utils";
 import { useToggleContext } from "@contexts";
-import { FloatingPageComponent, FloatingPageProps, ButtonComponent, IconButtonComponent, TableColumnType, TableComponent, FormSupervisionComponent, FormType, ModalConfirmComponent, TypographyColumnComponent, ButtonProps, ModalConfirmProps, TableProps, ControlBarOptionType, BottomSheetComponent, SwipeActionType, ExportExcel, ImportExcel, PrintTable } from "@components";
+import { FloatingPageComponent, FloatingPageProps, ButtonComponent, IconButtonComponent, TableColumnType, TableComponent, FormSupervisionComponent, FormType, ModalConfirmComponent, TypographyColumnComponent, ButtonProps, ModalConfirmProps, TableProps, ControlBarOptionType, BottomSheetComponent, SwipeActionType, ExportExcel, ImportExcel } from "@components";
 
 
 
@@ -28,15 +28,15 @@ export interface TableSupervisionColumnProps {
 
 export interface TableSupervisionFormProps {
   fields                :  string[] | (FormType & { visibility?: "*" | "create" | "update" })[];
-  defaultValue        ?:  (item: Record<string, any> | null) => Record<string, any>;
-  payload             ?:  (values: any) => object;
-  modalControl        ?:  FloatingPageProps;
+  defaultValue        ?:  (item: Record<string, any> | null) => Promise<Record<string, any>> | Record<string, any>;
+  payload             ?:  (values: any) => Promise<Record<string, any>> | object;
+  modalControl        ?:  Omit<FloatingPageProps, "show" | "onClose" | "children">;
   contentType         ?:  "application/json" | "multipart/form-data";
 };
 
 
 export type TableSupervisionProps = {
-  fetchControl     :  FetchControlType;
+  fetchControl     :  UseResourceProps;
   title           ?:  string;
   id              ?:  string;
   accessCode      ?:  number;
@@ -62,7 +62,7 @@ export type TableSupervisionProps = {
       setModal         :  (type: "EDIT" | "DELETE") => void,
       setDataSelected ?:  () => void,
       setShortcut     ?:  (key: string, handler: ShortcutHandler, description?: string) => void
-    ) => ReactNode[])
+    ) => ReactNode)
   )[];
   block                ?:  boolean,
   noIndex              ?: boolean;
@@ -98,7 +98,6 @@ export function TableSupervisionComponent({
   const { tableKey, tableControl, data, selected, setSelected, checks, setChecks, reset, focus, setFocus }  =  useTable(fetchControl, id, title, (urlParam || true))
   const { setToggle, toggle }                                                                               =  useToggleContext()
   const { isSm }                                                                                            =  useResponsive();
-
 
   const toggleKey = useMemo(() => conversion.strSnake(tableKey).toUpperCase(), [tableKey])
 
@@ -219,7 +218,7 @@ export function TableSupervisionComponent({
 
             if(typeof action == "object") {
               <ButtonComponent
-                key={key}
+                key={`action-object-${key}`}
                 label={action?.button?.label || action?.label}
                 variant={action?.button?.variant || "outline"}
                 paint={action?.button?.paint || "primary"}
@@ -238,20 +237,24 @@ export function TableSupervisionComponent({
             }
 
             if(typeof action == "function") {
-              action(item || {}, (type: "EDIT" | "DELETE") => {
-                if(type == "EDIT") {
-                  setToggle(`MODAL_FORM_${toggleKey}`);
-                  item && setSelected?.(item);
-                } 
-                
-                if (type == "DELETE") {
-                  setToggle(`MODAL_DELETE_${toggleKey}`);
-                  item && setSelected?.(item);
-                }
-              })
+              return (
+                <span key={`action-fn-${key}`}>
+                  {action(item || {}, (type: "EDIT" | "DELETE") => {
+                    if(type == "EDIT") {
+                      setToggle(`MODAL_FORM_${toggleKey}`);
+                      item && setSelected?.(item);
+                    } 
+                    
+                    if (type == "DELETE") {
+                      setToggle(`MODAL_DELETE_${toggleKey}`);
+                      item && setSelected?.(item);
+                    }
+                  })}
+                </span>
+              )
             }
             
-            return "";
+            return <span key={`action-default-${key}`}></span>;
           })}
         </div>
       </>
@@ -272,7 +275,6 @@ export function TableSupervisionComponent({
   }, [actionControl, data]);
 
 
-
   // ============================
   // ## Render detail page 
   // ============================
@@ -282,8 +284,7 @@ export function TableSupervisionComponent({
         <div className={cn(
           "flex flex-col gap-y-4", 
         )}>
-          {!!selected && (typeof detailControl === "object" && detailControl?.length 
-          ? detailControl?.map((column, key) => {
+          {!!selected && (typeof detailControl === "object" && detailControl?.length ? detailControl?.map((column, key) => {
             if (typeof column === "string") {
               return (<TypographyColumnComponent
                 key={key}
@@ -299,7 +300,7 @@ export function TableSupervisionComponent({
             } else {
               return column?.(selected)
             }
-          }) : columns?.map((column, key) => (
+          }) : typeof detailControl == "function" ? detailControl(selected) : columns?.map((column, key) => (
             <TypographyColumnComponent
               key={key}
               title={column.label} 
@@ -356,19 +357,19 @@ export function TableSupervisionComponent({
   // ============================
   // ## Render form page 
   // ============================
-  const formPage = useMemo(() => {
+  const formPage = useMemo(async () => {
     return (
       <FormSupervisionComponent
-        submitControl={fetchControl.path ? { 
-            path: `${fetchControl.path}/${(selected as { id: number })?.id || "" }`,
+        submitControl={(fetchControl as ApiType).path ? { 
+            path: `${(fetchControl as ApiType).path}/${(selected as { id: number })?.id || "" }`,
             method: !(selected as { id: number })?.id ? "POST" : "PUT", 
-          } : { 
-            url: `${fetchControl.url}/${(selected as { id: number })?.id || ""}`,
+          } : (fetchControl as ApiType).url ? { 
+            url: `${(fetchControl as ApiType).url}/${(selected as { id: number })?.id || ""}`,
             method: !(selected as { id: number })?.id ? "POST" : "PUT", 
-          }
+          } : { idb: (fetchControl as ({ idb: UseResourceIdb }))?.idb }
         }
         fields={fields as FormType[]}
-        defaultValue={formControl?.defaultValue ? formControl?.defaultValue(selected || null) : selected}
+        defaultValue={formControl?.defaultValue ? await formControl?.defaultValue(selected || null) : selected}
         payload={formControl?.payload}
         onSuccess={() => {
           reset();
@@ -546,7 +547,7 @@ export function TableSupervisionComponent({
         <BottomSheetComponent
           show={!!toggle[`MODAL_FORM_${toggleKey}`]}
           onClose={() => setToggle(`MODAL_FORM_${toggleKey}`, false)}
-          className="bg-white"
+          className={cn("bg-white", formControl?.modalControl?.className)}
           size="98vh"
         >
           <div className="p-4 h-[110vh]">
@@ -558,7 +559,7 @@ export function TableSupervisionComponent({
           show={!!toggle[`MODAL_FORM_${toggleKey}`]}
           onClose={() => setToggle(`MODAL_FORM_${toggleKey}`, false)}
           title={!!selected ? "Ubah Data" : "Tambah Data"}
-          className="bg-white"
+          className={cn("bg-white", formControl?.modalControl?.className)}
         >
           <div className="p-4">
             {formPage}
@@ -574,7 +575,7 @@ export function TableSupervisionComponent({
         className="bg-white md:w-[1200px] max-w-[1200px]"
       >
         <ExportExcel 
-          fetchControl={fetchControl} 
+          fetchControl={fetchControl as FetchControlType} 
           filename={"Export - " + title}
           columnControl={columns?.map((cc) => ({
             label: cc.label || "",
@@ -600,7 +601,7 @@ export function TableSupervisionComponent({
       </FloatingPageComponent>
 
 
-      <FloatingPageComponent
+      {/* <FloatingPageComponent
         show={!!toggle[`MODAL_PRINT_${toggleKey}`]}
         onClose={() => setToggle(`MODAL_PRINT_${toggleKey}`, false)}
         title="Print PDF"
@@ -614,7 +615,7 @@ export function TableSupervisionComponent({
           }))} 
           title={"Print - " + title}
         />
-      </FloatingPageComponent>
+      </FloatingPageComponent> */}
 
 
       <ModalConfirmComponent
@@ -624,9 +625,10 @@ export function TableSupervisionComponent({
         title={`Menghapus Data?`}
         submitControl={{
           onSubmit: {
-            ...(fetchControl.path 
-              ? {path: `${fetchControl.path}/${(selected as { id: number })?.id || ""}`} 
-              : {url: `${fetchControl.url}/${(selected as { id: number })?.id || ""}`}
+            ...((fetchControl as ApiType).path 
+              ? {path: `${(fetchControl as ApiType).path}/${(selected as { id: number })?.id || ""}`} 
+              : (fetchControl as ApiType).url ? {url: `${(fetchControl as ApiType).url}/${(selected as { id: number })?.id || ""}`}
+              : { idb: { ...(fetchControl as ({ idb: UseResourceIdb }))?.idb, id: (selected as { id: number })?.id || "" }}
             ),
             method: "DELETE",
           },

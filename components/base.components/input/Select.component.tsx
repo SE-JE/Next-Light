@@ -3,7 +3,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faChevronDown, faTimes,} from "@fortawesome/free-solid-svg-icons";
-import { api, ApiType, cavity, cn, pcn, useInputHandler, useInputRandomId, useLazySearch, useValidation, validation, ValidationRules,} from "@utils";
+import { api, ApiType, cavity, cn, idb, pcn, useInputHandler, useInputRandomId, useLazySearch, useValidation, validation, ValidationRules,} from "@utils";
 
 
 
@@ -34,7 +34,8 @@ export interface SelectProps {
 
   options              ?:  SelectOptionProps[];
   searchable           ?:  boolean;
-  serverOptionControl  ?:  ApiType & { cacheName?: string };
+  serverOptionControl  ?:  ApiType & { cacheName?: string | false };
+  idbOptionControl     ?:  { store: string, labelKey: string, valueKey: string };
   serverSearchable     ?:  boolean;
   includedOptions      ?:  SelectOptionProps[];
   exceptOptions        ?:  (string | number)[];
@@ -72,6 +73,7 @@ export function SelectComponent({
   options = [],
   searchable,
   serverOptionControl,
+  idbOptionControl,
   serverSearchable,
   includedOptions = [],
   exceptOptions = [],
@@ -196,31 +198,58 @@ export function SelectComponent({
 
     const serverControl = {
       ...serverOptionControl,
-      params: serverSearchable ? { search: keywordSearch } : {},
+      params: serverSearchable ? { search: keywordSearch, ...(serverOptionControl?.params || {}) } : (serverOptionControl?.params || {}),
+      headers: { "X-Option": 1 }
     };
 
-    const cacheOptions = await cavity.get(serverOptionControl?.cacheName || `option_${serverOptionControl?.path}`);
-
-    if (cacheOptions) {
-      // setDataOptions(
-      //   [...cacheOptions, ...includedOptions].filter(
-      //     (op: SelectOptionPropsType) => !exceptOptions?.includes(op.value)
-      //   )
-      // );
+    const getCacheOptions = await cavity.get(serverOptionControl?.cacheName || `option_${serverOptionControl?.path}`)
+    const cacheOptions = (getCacheOptions?.data || []) as SelectOptionProps[];
+    
+    if (cacheOptions?.length) {
+      setDataOptions(
+        [...cacheOptions, ...includedOptions].filter(
+          (op: SelectOptionProps) => !exceptOptions?.includes(op.value)
+        )
+      );
       setLoadingOption(false);
     } else {
       const mutateOptions = await api(serverControl || {});
       setDataOptions(
-        [...mutateOptions?.data, ...includedOptions].filter(
+        [...(mutateOptions?.data?.data || []), ...(includedOptions || [])].filter(
           (op: SelectOptionProps) => !exceptOptions?.includes(op.value)
         )
       );
       setShowOption(true);
-      cavity.set({
-        key: serverOptionControl?.cacheName || `option_${serverOptionControl?.path}`,
-        data: mutateOptions?.data,
-        expired: 5,
-      });
+
+      if(serverOptionControl?.cacheName != false) {
+        cavity.set({
+          key: serverOptionControl?.cacheName || `option_${serverOptionControl?.path}`,
+          data: mutateOptions?.data,
+          expired: 5,
+        });
+      }
+      setLoadingOption(false);
+    }
+  };
+
+  const fetchIdbOptions = async () => {
+    setLoadingOption(true);
+    
+    if (idbOptionControl?.store) {
+      const getIdbOptions = await (await idb.query<any>(idbOptionControl?.store)).get()
+
+      const rows = getIdbOptions.map((row: Record<string,any>) => {
+        const value = row[idbOptionControl.valueKey] || row["id"];
+        const label = row[idbOptionControl.labelKey] || row["id"];
+
+        return {
+          label,
+          value,
+          ...row,
+        }
+      })
+
+      setDataOptions(rows);
       setLoadingOption(false);
     }
   };
@@ -229,10 +258,13 @@ export function SelectComponent({
     if (!serverSearchable) {
       if (serverOptionControl?.path || serverOptionControl?.url) {
         fetchOptions();
+      } else if (idbOptionControl?.store) {
+        fetchIdbOptions();
       } else {
         !options && setDataOptions([]);
       }
     }
+    
   }, [serverOptionControl?.path, serverOptionControl?.url]);
 
   useEffect(() => {

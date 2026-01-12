@@ -1,12 +1,11 @@
-import { socket as s } from "@utils";
-import { logger } from "./commands/logger";
+import { socket as s, logger } from "@utils";
 
 const name           =  String(process.env.NEXT_PUBLIC_APP_NAME || "").toLowerCase().trim().replace(/[^\w\s-]/g, "").replace(/[\s_-]+/g, "-").replace(/^-+|-+$/g, "") + ".cavity";
 const storeName      =  "cache";
 const version        =  1;
 
 const subscriptions  =  new Set<string>();
-const socket         =  s.connect();
+const socket         =  process.env.NEXT_PUBLIC_SOCKET_URL ? s.connect() : null;
 let   registered     =  false;
 
 type CavityType = {
@@ -57,7 +56,7 @@ export const cavity = {
   // ==============================>
   // ## Get cache from indexDb
   // ==============================>
-  get: async (key: string) => {
+  get: async (key: string) : Promise<{ message: string, data: Record<string, any> }> => {
     const db     =  await idb();
     const tx     =  db.transaction(storeName, "readonly");
     const store  =  tx.objectStore(storeName);
@@ -67,18 +66,18 @@ export const cavity = {
 
       request.onsuccess = () => {
         const item = request.result;
-        if (!item) return resolve(null);
+        if (!item) return resolve({ message: "Record not found!", data: [] });
 
         if (item.expired > Date.now()) {
           resolve(item.data);
         } else {
           const deleteTx = db.transaction(storeName, "readwrite");
           deleteTx.objectStore(storeName).delete(key);
-          resolve(null);
+          resolve({ message: "Record not found!", data: [] });
         }
       };
 
-      request.onerror = () => resolve(null);
+      request.onerror = () => resolve({ message: "Error!", data: [] });
     });
   },
 

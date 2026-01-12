@@ -38,14 +38,15 @@ export type ApiFilterType = {
 // ## Type of api params
 // =========================>
 export type ApiParamsType = {
-  page           ?:  number;
-  paginate       ?:  number;
-  sort           ?:  string[];
-  search         ?:  string;
-  searchable     ?:  string[];
-  selectable     ?:  string[];
-  expand         ?:  string[];
-  filter         ?:  ApiFilterType[];
+  page              ?:  number;
+  paginate          ?:  number;
+  sort              ?:  string[];
+  search            ?:  string;
+  searchable        ?:  string[];
+  selectable        ?:  string[];
+  expand            ?:  string[];
+  selectableOption  ?:  string[];
+  filter            ?:  ApiFilterType[];
 };
 
 // =========================>
@@ -104,7 +105,7 @@ export const api = async ({
   }
 
   if (params) {
-    const normalizeToJson = ["sort", "searchable", "selectable", "expand"];
+    const normalizeToJson = ["sort", "searchable", "selectable", "selectableOption", "expand"];
 
     normalizeToJson.forEach((key) => {
       const k = key as keyof ApiParamsType;
@@ -113,7 +114,7 @@ export const api = async ({
       }
     });
   }
-
+  
   return await axios(fetchUrl, {
       method   :  method || "GET",
       headers  :  buildHeaders,
@@ -181,6 +182,8 @@ export const useGetApi = (props: ApiType & { method?: "GET", cacheName?: string;
     props.params?.search,
     props.params?.sort,
     props.params?.filter,
+    props.params?.selectable,
+    props.params?.selectableOption,
     props.includeParams,
     props.headers,
     props.bearer,

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "barrels": "bun run utils/commands/barrels.ts",
-    "dev": "concurrently --raw \"bun run barrels\" \"next dev --turbopack\"",
+    "dev": "concurrently --raw \"bun run barrels\" \"next dev\"",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",

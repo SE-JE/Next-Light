@@ -60,6 +60,7 @@ export * from "./typography/TypographyColumn.component";
 export * from "./typography/TypographyContent.component";
 export * from "./typography/TypographyTips.component";
 export * from "./wrap/Draggable.component";
+export * from "./wrap/IDBProvider";
 export * from "./wrap/Image.component";
 export * from "./wrap/OutsideClick.component";
 export * from "./wrap/ScrollContainer.component";

@@ -109,7 +109,7 @@ export function ImportExcel({ columnControl, onSubmit }: ImportExcelProps) {
       mappingRow[col.selector] = (
         <>
           <div className="flex justify-between">
-            <p>{getColumnLabel(col.source) || <p className="text-light-foreground">-- PILIH KOLOM --</p>}</p>
+            <p className="font-semibold">{getColumnLabel(col.source) || <p className="text-light-foreground">-- PILIH KOLOM --</p>}</p>
 
             <IconButtonComponent
               icon={faEdit}
