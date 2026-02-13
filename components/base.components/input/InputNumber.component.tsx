@@ -22,7 +22,8 @@ export interface InputNumberProps extends Omit<InputHTMLAttributes<HTMLInputElem
   max          ?:  number;
   
   onChange  ?:  (value: number) => any;
-  register  ?:  (name: string, validations?: ValidationRules) => void;
+  register    ?:  (name: string, validations?: ValidationRules) => void;
+  unregister  ?:  (name: string) => void;
   
   /** Use custom class with: "label::", "tip::", "error::", "icon::", "suggest::", "suggest-item::". */
   className  ?:  string;
@@ -44,6 +45,7 @@ export function InputNumberComponent({
 
   onChange,
   register,
+  unregister,
 
   className = "",
   ...props
@@ -52,7 +54,7 @@ export function InputNumberComponent({
   // =========================>
   // ## Initial
   // =========================>
-  const inputHandler  =  useInputHandler(props.name, value, validations, register, false)
+  const inputHandler  =  useInputHandler(props.name, value, validations, register, unregister, false)
   const randomId      =  useInputRandomId()
 
 
@@ -106,7 +108,7 @@ export function InputNumberComponent({
           )}
         >
           {label}
-          {validations && validation.hasRules(validations, "required") && <span className="text-danger">*</span>}
+          {validations && validation.hasRules(validations, "required") && <span className="text-danger ml-1">*</span>}
         </label>
 
         {tip && (

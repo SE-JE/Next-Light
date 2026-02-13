@@ -3,12 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "barrels": "bun run utils/commands/barrels.ts",
-    "dev": "concurrently --raw \"bun run barrels\" \"next dev\"",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "light": "bun utils/commands/light.ts"
+    "dev"      :  "concurrently --raw \"bun run barrels\" \"next dev\"",
+    "build"    :  "next build",
+    "start"    :  "next start",
+    "test"     :  "bun tsc --noEmit",
+    "lint"     :  "npx eslint app/* components/* utils/* contexts/* schema/*",
+    "light"    :  "bun utils/commands/light.ts",
+    "barrels"  :  "bun run utils/commands/barrels.ts"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.7.2",

@@ -22,7 +22,8 @@ export interface InputDateProps extends Omit<InputHTMLAttributes<HTMLInputElemen
   validations  ?: ValidationRules;
   
   onChange  ?:  (value: string) => any;
-  register  ?:  (name: string, validations?: ValidationRules) => void;
+  register    ?:  (name: string, validations?: ValidationRules) => void;
+  unregister  ?:  (name: string) => void;
 
   /** Use custom class with: "label::", "tip::", "error::", "icon::". */
   className  ?:  string;
@@ -41,6 +42,7 @@ export function InputDateComponent({
   validations,
 
   register,
+  unregister,
   onChange,
   
   className = "",
@@ -51,7 +53,7 @@ export function InputDateComponent({
   // =========================>
   // ## Initial
   // =========================>
-  const inputHandler = useInputHandler(props.name, value, validations, register, false)
+  const inputHandler = useInputHandler(props.name, value, validations, register, unregister, false)
   const randomId = useInputRandomId()
 
 
@@ -78,7 +80,7 @@ export function InputDateComponent({
           )}
         >
           {label}
-          {validations && validation.hasRules(validations, "required") && <span className="text-danger">*</span>}
+          {validations && validation.hasRules(validations, "required") && <span className="text-danger ml-1">*</span>}
         </label>
 
         {tip && (
@@ -151,7 +153,7 @@ export function InputDateComponent({
             )}
 
             {!isSm && inputHandler.focus && (
-              <div className="w-max h-72 bg-white border p-2 rounded-[6px] absolute top-full right-0 mt-1 z-50">
+              <div className="w-max h-72 bg-background border p-2 rounded-[6px] absolute top-full right-0 mt-1 z-50">
                 <InputDatePickerComponent
                   onChange={(e) => {
                     inputHandler.setValue(e);

@@ -44,7 +44,8 @@ export interface SelectProps {
   maxShowOption        ?:  number;
 
   onChange  ?:  (value: string | number | (string | number)[], data?: any) => any;
-  register  ?:  (name: string, validations?: ValidationRules) => void;
+  register    ?:  (name: string, validations?: ValidationRules) => void;
+  unregister  ?:  (name: string) => void;
   onFocus   ?:  () => void;
   onBlur    ?:  () => void;
 
@@ -82,6 +83,7 @@ export function SelectComponent({
   maxShowOption = 10,
 
   register,
+  unregister,
   onChange,
   onFocus,
   onBlur,
@@ -103,7 +105,7 @@ export function SelectComponent({
   // =========================>
   // ## Initial
   // =========================>
-  const inputHandler  =  useInputHandler(name, value, validations, register, false)
+  const inputHandler  =  useInputHandler(name, value, validations, register, unregister, false)
   const randomId      =  useInputRandomId()
 
 
@@ -294,7 +296,7 @@ export function SelectComponent({
           )}
         >
           {label}
-          {validations && validation.hasRules(validations, "required") && <span className="text-danger">*</span>}
+          {validations && validation.hasRules(validations, "required") && <span className="text-danger ml-1">*</span>}
         </label>
 
         {tip && (

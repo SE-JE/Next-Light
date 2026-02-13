@@ -29,7 +29,8 @@ export interface InputDocumentProps extends Omit<InputHTMLAttributes<HTMLInputEl
   validations   ?:  ValidationRules;
 
   onChange  ?:  (value: any) => any;
-  register  ?:  (name: string, validations  ?: ValidationRules) => void;
+  register    ?:  (name: string, validations  ?: ValidationRules) => void;
+  unregister  ?:  (name: string) => void;
 
   /** Use custom class with: "label::", "tip::", "error::", "icon::", "suggest::", "suggest-item::". */
   className  ?:  string;
@@ -50,6 +51,7 @@ export function InputDocumentComponent({
   validations,
 
   register,
+  unregister,
   onChange,
 
   ...props
@@ -59,7 +61,7 @@ export function InputDocumentComponent({
   // =========================>
   // ## Initial
   // =========================>
-  const inputHandler      =  useInputHandler(props.name, value, validations, register, props.type == "file")
+  const inputHandler      =  useInputHandler(props.name, value, validations, register, unregister, props.type == "file")
   const randomId          =  useInputRandomId()
 
   // =========================>
@@ -85,7 +87,7 @@ export function InputDocumentComponent({
           )}
         >
           {label}
-          {validations && validation.hasRules(validations, "required") && <span className="text-danger">*</span>}
+          {validations && validation.hasRules(validations, "required") && <span className="text-danger ml-1">*</span>}
         </label>
 
         {tip && (
@@ -307,7 +309,7 @@ export const InputDocumentPicker: React.FC<InputDocumentPickerProps> = ({ value,
             return (
               <div
                 key={f.id}
-                className={`relative w-full aspect-square flex justify-center bg-white items-center cursor-pointer ${
+                className={`relative w-full aspect-square flex justify-center bg-background items-center cursor-pointer ${
                   previewActive === f.id ? "brightness-100" : "brightness-70 hover:brightness-90"
                 }`}
                 onClick={() => setPreviewActive(f.id)}

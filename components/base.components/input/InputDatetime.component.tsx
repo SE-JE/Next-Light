@@ -20,7 +20,8 @@ export interface InputDateTimeProps extends Omit<InputHTMLAttributes<HTMLInputEl
   validations  ?: ValidationRules;
   
   onChange  ?:  (value: string) => any;
-  register  ?:  (name: string, validations?: ValidationRules) => void;
+  register    ?:  (name: string, validations?: ValidationRules) => void;
+  unregister  ?:  (name: string) => void;
 
   /** Use custom class with: "label::", "tip::", "error::", "icon::", "suggest::", "suggest-item::". */
   className  ?:  string;
@@ -39,6 +40,7 @@ export function InputDatetimeComponent({
   validations,
   
   register,
+  unregister,
   onChange,
   
   className = "",
@@ -54,7 +56,7 @@ export function InputDatetimeComponent({
   // =========================>
   // ## Initial
   // =========================>
-  const inputHandler  =  useInputHandler(props.name, value, validations, register, false)
+  const inputHandler  =  useInputHandler(props.name, value, validations, register, unregister, false)
   const randomId      =  useInputRandomId()
 
 
@@ -100,7 +102,7 @@ export function InputDatetimeComponent({
           )}
         >
           {label}
-          {validations && validation.hasRules(validations, "required") && <span className="text-danger">*</span>}
+          {validations && validation.hasRules(validations, "required") && <span className="text-danger ml-1">*</span>}
         </label>
 
         {tip && (
@@ -161,7 +163,7 @@ export function InputDatetimeComponent({
 
             {!isSm && inputHandler.focus && (
               <>
-                <div className="absolute z-50 top-full right-0 mt-1 w-max bg-white border rounded-[6px] p-2 shadow min-w-[350]">
+                <div className="absolute z-50 top-full right-0 mt-1 w-max bg-background border rounded-[6px] p-2 shadow min-w-[350]">
                   <TabbarComponent 
                     items={[
                       {

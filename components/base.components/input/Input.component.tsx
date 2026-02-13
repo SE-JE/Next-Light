@@ -26,7 +26,8 @@ export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
   multiple      ?:  boolean;
 
   onChange  ?:  (value: any) => any;
-  register  ?:  (name: string, validations?: ValidationRules) => void;
+  register    ?:  (name: string, validations?: ValidationRules) => void;
+  unregister  ?:  (name: string) => void;
 
   ref       ?:  Ref<HTMLInputElement>,
 
@@ -54,6 +55,7 @@ export function InputComponent({
   multiple,
 
   register,
+  unregister,
   onChange,
 
   ref,
@@ -70,7 +72,7 @@ export function InputComponent({
   // =========================>
   // ## Initial
   // =========================>
-  const inputHandler      =  useInputHandler(props.name, value, validations, register, props.type == "file")
+  const inputHandler      =  useInputHandler(props.name, value, validations, register, unregister, props.type == "file")
   const randomId          =  useInputRandomId()
 
 
@@ -168,7 +170,7 @@ export function InputComponent({
           )}
         >
           {label}
-          {validations && validation.hasRules(validations, "required") && <span className="text-danger">*</span>}
+          {validations && validation.hasRules(validations, "required") && <span className="text-danger ml-1">*</span>}
         </label>
 
         {tip && (

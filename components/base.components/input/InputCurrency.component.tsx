@@ -23,7 +23,8 @@ export interface InputCurrencyProps extends Omit<InputHTMLAttributes<HTMLInputEl
   };
 
   onChange  ?:  (value: number) => any;
-  register  ?:  (name: string, validations?: ValidationRules) => void;
+  register    ?:  (name: string, validations?: ValidationRules) => void;
+  unregister  ?:  (name: string) => void;
 
   /** Use custom class with: "label::", "tip::", "error::", "icon::". */
   className  ?:  string;
@@ -44,6 +45,7 @@ export function InputCurrencyComponent({
   format,
 
   register,
+  unregister,
   onChange,
   
   className = "",
@@ -53,7 +55,7 @@ export function InputCurrencyComponent({
   // =========================>
   // ## Initial
   // =========================>
-  const inputHandler = useInputHandler(props.name, value, validations, register, false)
+  const inputHandler = useInputHandler(props.name, value, validations, register, unregister, false)
   const randomId = useInputRandomId()
 
 
@@ -79,7 +81,7 @@ export function InputCurrencyComponent({
         )}
       >
         {label}
-        {validations && validation.hasRules(validations, "required") && <span className="text-danger">*</span>}
+        {validations && validation.hasRules(validations, "required") && <span className="text-danger ml-1">*</span>}
       </label>
 
       {tip && (

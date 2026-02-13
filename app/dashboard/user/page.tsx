@@ -1,8 +1,9 @@
 import { TableSupervisionComponent} from "@components";
+import { Suspense } from "react";
 
 export default function Table() {
   return (
-    <>
+    <Suspense fallback={<div>Loading...</div>}>
       <TableSupervisionComponent
         title="User"
         fetchControl={{
@@ -71,6 +72,6 @@ export default function Table() {
           mobile: true,
         }}
       />
-    </>
+    </Suspense>
   );
 }

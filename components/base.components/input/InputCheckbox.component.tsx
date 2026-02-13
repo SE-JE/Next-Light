@@ -30,6 +30,7 @@ export interface InputCheckboxProps {
   
   onChange             ?:  (value: string[] | number[]) => any;
   register             ?:  (name: string, validations?: ValidationRules) => void;
+  unregister           ?:  (name: string) => void;
 
   /** Use custom class with: "label::", "tip::", "error::", "icon::". */
   className            ?: string;
@@ -58,6 +59,7 @@ export function InputCheckboxComponent({
   validations,
 
   register,
+  unregister,
   onChange,
 }: InputCheckboxProps) {
 
@@ -68,7 +70,7 @@ export function InputCheckboxComponent({
   // =========================>
   // ## initial
   // =========================>
-  const inputHandler = useInputHandler(name, value, validations, register, false)
+  const inputHandler = useInputHandler(name, value, validations, register, unregister, false)
 
 
   // =========================>
@@ -112,7 +114,7 @@ export function InputCheckboxComponent({
           )}
         >
           {label}
-          {validations && validation.hasRules(validations, "required") && <span className="text-danger">*</span>}
+          {validations && validation.hasRules(validations, "required") && <span className="text-danger ml-1">*</span>}
         </label>
 
         {tip && (

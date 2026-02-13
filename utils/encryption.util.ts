@@ -6,7 +6,7 @@ export const encryption = {
   // ==============================>
   // ## Encryption data 
   // ==============================>
-  set: (data: any, key = process.env.NEXT_PUBLIC_COOKIE_KEY || "", algorithm: AlgorithmType = "AES") => {
+  set: (data: any, key = process.env.NEXT_PUBLIC_APP_KEY || "", algorithm: AlgorithmType = "AES") => {
     const text  =  typeof data  ===  "string" ? data : JSON.stringify(data);
 
     let encrypted: string;
@@ -31,7 +31,7 @@ export const encryption = {
   // ==============================>
   // ## Decryption data 
   // ==============================>
-  get: (data: string, key = process.env.NEXT_PUBLIC_COOKIE_KEY || "", algorithm: AlgorithmType = "AES") => {
+  get: (data: string, key = process.env.NEXT_PUBLIC_APP_KEY || "", algorithm: AlgorithmType = "AES") => {
     if (["SHA256", "SHA512", "MD5"].includes(algorithm)) throw new Error(`${algorithm} is a one-way hash and cannot be decrypted.`);
 
     const decData  =  CryptoJS.enc.Base64.parse(data).toString(CryptoJS.enc.Utf8);

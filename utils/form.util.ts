@@ -27,9 +27,6 @@ export interface FormStateType {
   showConfirm   : boolean;
 }
 
-// ==============================>
-// ## Form state
-// ==============================>
 const initialState: FormStateType = {
   formRegisters   : [],
   formValues      : [],
@@ -39,30 +36,24 @@ const initialState: FormStateType = {
 };
 
 type ActionPayloadType = {
-  SET_REGISTER  : FormRegisterType;
-  SET_VALUES    : FormValueType[];
-  SET_VALUE     : FormValueType;
-  SET_ERRORS    : FormErrorType[];
-  SET_LOADING   : boolean;
-  SET_CONFIRM   : boolean;
+  SET_REGISTER      : FormRegisterType;
+  UNREGISTER        : string;
+  UNREGISTER_PREFIX : string;
+  SET_VALUES        : FormValueType[];
+  SET_VALUE         : FormValueType;
+  SET_ERRORS        : FormErrorType[];
+  SET_LOADING       : boolean;
+  SET_CONFIRM       : boolean;
 };
 
 type TypeKeys = keyof ActionPayloadType;
 
-export type ActionType<
-  T extends TypeKeys =
-    | "SET_REGISTER"
-    | "SET_VALUES"
-    | "SET_VALUE"
-    | "SET_ERRORS"
-    | "SET_LOADING"
-    | "SET_CONFIRM"
-    | "RESET"
-    | any,
-> = {
+export type ActionType<T extends TypeKeys = "SET_REGISTER" | "SET_VALUES" | "SET_VALUE" | "SET_ERRORS" | "SET_LOADING" | "SET_CONFIRM" | "RESET" | any> = {
   type: T,
   payload?: ActionPayloadType[T];
 };
+
+
 
 // ==============================>
 // ## Form state handler
@@ -78,6 +69,26 @@ const formReducer = (state: FormStateType, action: ActionType) => {
         ...state.formRegisters.filter((reg) => reg.name !== action.payload.name),
         action.payload,
       ],
+    };
+
+    // ==============================>
+    // ## Unregister single field — removes register, value, and error
+    // ==============================>
+    case "UNREGISTER"       : return {
+      ...state,
+      formRegisters : state.formRegisters.filter((reg) => reg.name !== action.payload),
+      formValues    : state.formValues.filter((val) => val.name !== action.payload),
+      formErrors    : state.formErrors.filter((err) => err.name !== action.payload),
+    };
+
+    // ==============================>
+    // ## Unregister all fields matching prefix — for cluster group removal
+    // ==============================>
+    case "UNREGISTER_PREFIX" : return {
+      ...state,
+      formRegisters : state.formRegisters.filter((reg) => !reg.name.startsWith(action.payload)),
+      formValues    : state.formValues.filter((val) => !val.name.startsWith(action.payload)),
+      formErrors    : state.formErrors.filter((err) => !err.name.startsWith(action.payload)),
     };
 
     // ==============================>
@@ -131,16 +142,16 @@ const formReducer = (state: FormStateType, action: ActionType) => {
 // ==============================>
 // ## Hook form
 // ==============================>
-export const useForm = (
-  submitControl   : (ApiType & { idb?: never }) | { idb: { store: string, schema?: DBSchema }},
-  payload        ?: ((values: any)  => Promise<object> | object) | false,
-  confirmation   ?: boolean,
-  onSuccess      ?: (data: any)     => void,
-  onFailed       ?: (code: number)  => void,
-) => {
-  const isApiSubmit = !!(submitControl as ApiType)?.path || !!(submitControl as ApiType)?.url
-  const isIdbSubmit = !!submitControl?.idb
-  const [state, dispatch] = useReducer(formReducer, initialState);
+export const useForm = (submitControl: ((ApiType & { idb?: never }) | { idb: { store: string, schema?: DBSchema }}) & {
+  payload       ?:  ((values: any)  => Promise<Record<string, any>> | Record<string, any>) | false,
+  confirmation  ?:  boolean,
+  onSuccess     ?:  (data: any)     => void,
+  onFailed      ?:  (code: number)  => void,
+}) => {
+  const isApiSubmit                                   =  !!(submitControl as ApiType)?.path || !!(submitControl as ApiType)?.url
+  const isIdbSubmit                                   =  !!submitControl?.idb
+  const [state, dispatch]                             =  useReducer(formReducer, initialState);
+  const {payload, confirmation, onSuccess, onFailed}  =  submitControl
 
 
   // ==============================>
@@ -159,28 +170,29 @@ export const useForm = (
   // ## FormControl handler
   // ==============================>
   const formControl  =  (name: string)  =>  ({
-    register  : (regName: string, regValidations?: ValidationRules) => dispatch({
-      type    : "SET_REGISTER",
-      payload : { name: regName, validations: regValidations },
+    register    : (_: string, regValidations?: ValidationRules) => dispatch({
+      type      : "SET_REGISTER",
+      payload   : { name, validations: regValidations },
     }),
-    onChange  :  (e: any)                                        =>  onChange(name, e),
-    value     :  state.formValues.find((val)                     =>  val.name === name)?.value || undefined,
-    invalid   :  state.formErrors.find((err: { name: string })   =>  err.name === name)?.error || undefined,
+    unregister  : () => dispatch({ type: "UNREGISTER", payload: name }),
+    onChange    :  (e: any)                                        =>  onChange(name, e),
+    value       :  state.formValues.find((val)                     =>  val.name === name)?.value || undefined,
+    invalid     :  state.formErrors.find((err: { name: string })   =>  err.name === name)?.error || undefined,
   });
 
 
 
-  const getObjectValues = () => state.formValues.reduce<Record<string, any>>((acc, val) => {
-    acc[val.name] = val.value
-    return acc
-  }, {})
+  const getObjectValues = () => {
+    const registeredNames = new Set(state.formRegisters.map(r => r.name));
+    return state.formValues.reduce<Record<string, any>>((acc, val) => {
+      if (registeredNames.has(val.name)) acc[val.name] = val.value;
+      return acc;
+    }, {});
+  }
     
   const submitIdb = async () => {
-    const values = payload
-      ? await payload(getObjectValues())
-      : getObjectValues()
-
-    const client = submitControl?.idb?.schema ? idb.useSchema(submitControl?.idb?.schema) : idb
+    const values  =  payload ? await payload(getObjectValues()) : getObjectValues()
+    const client  =  submitControl?.idb?.schema ? idb.useSchema(submitControl?.idb?.schema) : idb
 
     await client.put(submitControl?.idb?.store || "", values)
 
@@ -188,13 +200,10 @@ export const useForm = (
   }
 
   const submitApi = async () => {
-    const formData = new FormData()
+    const formData  =  new FormData()
+    const values    =  payload ? await payload(getObjectValues()) : getObjectValues()
 
-    const values = payload
-      ? await payload(getObjectValues())
-      : getObjectValues()
-
-    Object.entries(values).forEach(([k, v]) => {
+    Object.entries(values as Record<string, any>).forEach(([k, v]) => {
       formData.append(k, v ?? "")
     })
 
@@ -212,13 +221,10 @@ export const useForm = (
   // ## Fetch to api
   // ==============================>
   const fetch        =  async () => {
-    // ==============================>
-    // ## Set to loading
-    // ==============================>
     dispatch({ type: "SET_LOADING", payload: true });
 
     let execute
-    
+
     if (isApiSubmit) {
       execute = await submitApi()
     } else if (isIdbSubmit) {
@@ -308,9 +314,9 @@ export const useForm = (
   // ==============================>
   const setDefaultValues = (values: Record<string, any> | null) => {
     const newValues = values ? Object.keys(values).map((keyName) => ({
-      name  : keyName,
-      value : values[keyName],
-    })) : [];
+    name   :  keyName,
+    value  :  values[keyName],
+    }))    :  [];
     
     dispatch({ type: "SET_VALUES", payload: newValues });
   };
@@ -319,24 +325,24 @@ export const useForm = (
   // ==============================>
   // ## Return hook handler
   // ==============================>
-  return [
-    {
-      submit,
-      formControl,
-      setDefaultValues,
-      values          : state.formValues,
-      setValues       : (values: FormValueType[])   => dispatch({ type: "SET_VALUES", payload: values || [] }),
-      errors          : state.formErrors,
-      setErrors       : (errors: FormErrorType[])   => dispatch({ type: "SET_ERRORS", payload: errors }),
-      setRegister     : (inputs: FormRegisterType)  => dispatch({ type: "SET_REGISTER", payload: inputs }),
-      loading         : state.loading,
-      confirm         : {
-        onConfirm,
-        show          : state.showConfirm,
-        onClose       : () => dispatch({ type: "SET_CONFIRM", payload: false }),
-      },
+  return {
+    submit,
+    formControl,
+    setDefaultValues,
+    values            :  state.formValues,
+    setValues         :  (values: FormValueType[])   => dispatch({ type: "SET_VALUES", payload: values || [] }),
+    errors            :  state.formErrors,
+    setErrors         :  (errors: FormErrorType[])   => dispatch({ type: "SET_ERRORS", payload: errors }),
+    setRegister       :  (inputs: FormRegisterType)  => dispatch({ type: "SET_REGISTER", payload: inputs }),
+    unregister        :  (name: string)              => dispatch({ type: "UNREGISTER", payload: name }),
+    unregisterPrefix  :  (prefix: string)            => dispatch({ type: "UNREGISTER_PREFIX", payload: prefix }),
+    loading           :  state.loading,
+    confirm           :  {
+      onConfirm,
+      show       : state.showConfirm,
+      onClose    : () => dispatch({ type: "SET_CONFIRM", payload: false }),
     },
-  ];
+  }
 };
 
 
@@ -363,6 +369,7 @@ export const useInputHandler = (
   value?: any, 
   validations?: ValidationRules,
   register?: (name: string, validations?: ValidationRules) => void,
+  unregister?: (name: string) => void,
   isFile?: boolean,
 ) => {
   const [inputValue, setInputValue]                    =  useState<any>("");
@@ -371,6 +378,7 @@ export const useInputHandler = (
 
   useEffect(() => {
     name && register?.(name || "", validations);
+    return () => { name && unregister?.(name); };
   }, [name, validations]);
 
   useEffect(() => {

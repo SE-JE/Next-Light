@@ -22,6 +22,7 @@ export interface InputImageProps {
 
   onChange?: (file?: File | null) => void;
   register?: (name: string, validations?: ValidationRules) => void;
+  unregister?: (name: string) => void;
 
   className?: string;
 }
@@ -41,6 +42,7 @@ export const InputImageComponent: React.FC<InputImageProps> = ({
 
   onChange,
   register,
+  unregister,
   className = "",
 }) => {
   const { isSm }  =  useResponsive();
@@ -53,7 +55,7 @@ export const InputImageComponent: React.FC<InputImageProps> = ({
   const [cropSrc, setCropSrc]    =  useState<string | null>(null);
   const [openCrop, setOpenCrop]  =  useState(false);
 
-  const inputHandler                         =  useInputHandler(name, value, validations, register, true);
+  const inputHandler                         =  useInputHandler(name, value, validations, register, unregister, true);
   const [invalidMessage, setInvalidMessage]  =  useValidation(inputHandler.value, validations, invalid, inputHandler.idle);
 
   useEffect(() => {
@@ -131,7 +133,7 @@ export const InputImageComponent: React.FC<InputImageProps> = ({
           )}
         >
           {label}
-          {validations && validation.hasRules(validations, "required") && <span className="text-danger">*</span>}
+          {validations && validation.hasRules(validations, "required") && <span className="text-danger ml-1">*</span>}
         </label>
       )}
 

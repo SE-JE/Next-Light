@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { cn, pcn, useInputRandomId } from "@utils";
@@ -11,7 +11,7 @@ type CT  =  "label" | "checked" | "error" | "base";
 
 export type CheckboxProps = {
   name    :  string;
-  label  ?:  string;
+  label  ?:  string | ReactNode;
   
   value     ?:  string;
   disabled  ?:  boolean;
@@ -76,15 +76,17 @@ export function CheckboxComponent({
         disabled && "pointer-events-none opacity-60"
         )}
       >
-        <div
-          className={cn(
-            `flex justify-center items-center rounded-md border w-6 h-6 transition-colors border-light-foreground text-light-foreground`,
-            checked && "border-light-primary bg-primary text-white",
-            checked && pcn<CT>(className, "checked"),
-            pcn<CT>(className, "base"),
-          )}
-        >
-          {checked && <FontAwesomeIcon icon={faCheck} className="text-sm" />}
+        <div>
+          <div
+            className={cn(
+              `flex justify-center items-center rounded-md border w-6 h-6 transition-colors border-light-foreground text-light-foreground`,
+              checked && "border-light-primary bg-primary !text-background",
+              checked && pcn<CT>(className, "checked"),
+              pcn<CT>(className, "base"),
+            )}
+          >
+            {checked && <FontAwesomeIcon icon={faCheck} className="text-sm" />}
+          </div>
         </div>
         <span
           className={cn(

@@ -23,6 +23,11 @@ type FormItem = {
     label        :  string
     placeholder  :  string
     validations  :  ValidationRules[]
+    serverOptionControl ?: {
+      path : string
+    }
+    fields ?: FormItem[]
+    wrap  ?: boolean
   }
 }
 
@@ -39,13 +44,16 @@ type ParsedSchema = {
 
 type BlueprintPage = {
   features  ?:  string
+  path      ?:  string
   schema    ?:  Record<string, string>
 }
 
 type BlueprintStruct = {
   model    :  string
+  controllers ?: string[]
   schema  ?:  SchemaMap
   pages   ?:  false | Record<string, BlueprintPage>
+  [key: string]: any
 }
 
 type LoadedBlueprintFile = {
@@ -93,10 +101,10 @@ function extractValidationArray(def: string = ""): ValidationRules[] {
 
   if (def.includes("url")) rules.push("url")
 
-  const min = def.match(/min:(\d+)/)
+  const min = def.match(/min,(\d+)/)
   if (min) rules.push(`min:${min[1]}`)
 
-  const max = def.match(/max:(\d+)/)
+  const max = def.match(/max,(\d+)/)
   if (max) rules.push(`max:${max[1]}`)
 
   return rules
@@ -109,7 +117,7 @@ function extractFormType(rules: string[]): string | undefined {
 
 function inferFormType(pageDef = "", modelDef = ""): string {
   const explicit = pageDef.split("|")
-  if (explicit && explicit[0] != "text") return explicit[0]
+  if (explicit && explicit[0] && explicit[0] != "text") return explicit[0]
 
   if (modelDef.includes("type:integer") || modelDef.includes("type:float")) {
     return "number"
@@ -140,8 +148,9 @@ function parseFeatures(features?: string): { controlBar: string[]; action: strin
   if (list.includes("export")) controlBar.push("EXPORT")
   if (list.includes("print")) controlBar.push("PRINT")
 
-  if (list.includes("update")) action.push("EDIT")
+  if (list.includes("update") || list.includes("edit")) action.push("EDIT")
   if (list.includes("delete")) action.push("DELETE")
+  if (list.includes("detail")) action.push("DETAIL")
 
   return { controlBar, action }
 }
@@ -176,57 +185,121 @@ function parseModelSchema(schema: SchemaMap = {}): ParsedSchema {
   return { columns, forms, details }
 }
 
+function resolvePath(page: BlueprintPage, controllers: string[] | boolean | undefined, model: string): string {
+  if (page.path) return page.path
+
+  if (Array.isArray(controllers)) {
+    const match = controllers
+    if (match) return "/" + match[1]
+  }
+
+  return "/" + model.split("/").pop()
+}
+
 function parsePageSchema(pageSchema: Record<string, string>, modelSchema: SchemaMap = {}): ParsedSchema {
   const columns: ColumnItem[] = []
   const forms: FormItem[] = []
   const details: DetailItem[] = []
 
-  for (const [label, def] of Object.entries(pageSchema)) {
-    const parts = def.split(" ")
-    const field = parts.shift() as string
-    const rules = parts
+  for (const [field, def] of Object.entries(pageSchema)) {
+    const rules = def.replace(/\|/g, " ").split(" ").filter(Boolean)
+    
+    const defaultLabel = conversion.strPascal(field, " ")
+    
+    const colLabelRule = rules.find(r => r.includes("column:label,"))
+    const colLabel = conversion.strPascal(colLabelRule ? colLabelRule.split(",")[1] : defaultLabel, " ")
 
-    const hasColumn = rules.some(r => r.startsWith("column"))
-    const hasForm = rules.some(r => r.startsWith("form"))
+    const formLabelRule = rules.find(r => r.includes("form:label,"))
+    const formLabel = conversion.strPascal(formLabelRule ? formLabelRule.split(",")[1] : (colLabelRule ? colLabel : defaultLabel), " ")
+
+    const detailLabel = colLabelRule ? colLabel : (formLabelRule ? formLabel : defaultLabel) 
+
+    const hasColumn = rules.some(r => r.includes("column:"))
+    const hasForm = rules.some(r => r.includes("form:")) || rules.every(r => !r.includes("column:"))
+    
     const hasDetail = rules.includes("detail")
 
     if (hasColumn) {
       columns.push({
         selector: field,
-        label,
-        sortable: rules.includes("column:sortable")
+        label: colLabel,
+        ...(rules.includes("column:sortable") || rules.includes("sortable") ? { sortable: true } : {})
       })
-      if (!hasDetail) details.push({ label, item: field })
+      if (!hasDetail) details.push({ label: detailLabel, item: field })
     }
 
     if (hasForm) {
-      const type = extractFormType(rules)
-      const fieldType = inferFormType(type, modelSchema[field] || "");
+      const typeRules = rules.filter(r => !r.startsWith("form:label,"))
+      const typeRule = extractFormType(typeRules)
+      let fieldType = inferFormType(typeRule, modelSchema[field] || "");
 
+      let selectPath = ""
+      const selectRule = rules.find(r => r.startsWith("select,") || r.startsWith("form:select,"))
+      if (selectRule) {
+        fieldType = "select"
+        selectPath = selectRule.split(",")[1]
+      }
+      
+      if (typeRule === "check") fieldType = "boolean" 
+      if (typeRule === "currency") fieldType = "currency"
+      if (typeRule === "image") fieldType = "image"
+      if (typeRule === "date") fieldType = "date"
+      if (typeRule === "time") fieldType = "time"
+      
       let col: number | undefined
-      const colRule = rules.find(r => /^\d+$/.test(r))
-
+      const colRule = rules.find(r => /col,(\d+)/.test(r))
+      
       if (colRule) {
-        const n = Number(colRule)
+        const n = Number(colRule.split(',').pop())
         if (n >= 1 && n <= 12) col = n
       }
 
       forms.push({
-        ...(fieldType != "default" ? { type: fieldType } : {}),
+        ...(fieldType != "default" && fieldType != "text" ? { type: fieldType } : {}),
         ...(col ? { col } : {}),
         construction: {
           name: field,
-          label,
-          placeholder: "Masukkan " + label.toLowerCase(),
-          validations: extractValidationArray(modelSchema[field] || "")
+          label: formLabel,
+          placeholder: "Masukkan " + formLabel.toLowerCase(),
+          validations: extractValidationArray(modelSchema[field] || ""),
+          ...(selectPath ? { serverOptionControl: { path: selectPath } } : {}),
+          ...(rules.includes("wrap") ? { wrap: true } : {})
         }
       })
     }
 
-    if (hasDetail) details.push({ label, item: field })
+    if (hasDetail) details.push({ label: detailLabel, item: field })
   }
 
-  return { columns, forms, details }
+  const formMap = new Map<string, FormItem>()
+  forms.forEach(f => formMap.set(f.construction.name, f))
+
+  const nestedForms: FormItem[] = []
+
+  forms.forEach(f => {
+    const name = f.construction.name
+    if (name.includes(".")) {
+      const parts = name.split(".")
+      const selfName = parts.pop() as string
+      const parentName = parts.join(".")
+      const parent = formMap.get(parentName)
+
+      if (parent) {
+        if (!parent.type) parent.type = "cluster"
+        if (!parent.construction.fields) parent.construction.fields = []
+        
+        f.construction.name = selfName
+        
+        parent.construction.fields.push(f)
+      } else {
+        nestedForms.push(f)
+      }
+    } else {
+      nestedForms.push(f)
+    }
+  })
+  
+  return { columns, forms: nestedForms, details }
 }
 
 
@@ -269,46 +342,55 @@ const blueprintMarker = `// ============================================
 // ## Main generator
 // ===============================
 
-export async function blueprint(options: { only?: string[] } = {}): Promise<void> {
-  const { only } = options
-
+export async function blueprint(options?: { only?: string[] }): Promise<void> {
   const stub = fs.readFileSync(path.join(process.cwd(), "/utils/commands/stubs/table-blueprint.stub"), "utf-8")
 
   const loaded = loadBlueprintFiles()
 
   for (const file of loaded) {
-    if (only && Array.isArray(only) && !only.includes(file.file)) continue
-
     for (const bp of file.blueprints) {
-      if(bp?.pages != false && Object.keys(bp?.pages || {})?.at(0)) {
-        const route = Object.keys(bp?.pages || {}).at(0) || ""
-        const name = conversion.strPascal(route.split("/").pop() as string)
-  
-        const outDir = path.join(process.cwd(), "app", route)
-        fs.mkdirSync(outDir, { recursive: true })
-  
-        const filePath = path.join(outDir, "page.tsx");
-  
-        if (fs.existsSync(filePath)) {
-          const content = fs.readFileSync(filePath, "utf-8")
-  
-          if (!content.includes("AUTO-GENERATED BY BLUEPRINT")) {
-            logger.info(`Skip overridden file: ${filePath}`)
-            continue
-          }
+
+    const pagesToGenerate: Record<string, BlueprintPage> = { ...(bp.pages || {}) }
+    
+    for (const [key, val] of Object.entries(bp)) {
+      if (typeof val === "object" && val["schema"]) {
+        pagesToGenerate[key] = val as BlueprintPage
+      }
+    }
+
+    for (const [key, page] of Object.entries(pagesToGenerate)) {
+
+      const route = key;
+      const name = conversion.strPascal(route.split("/").pop() as string)
+
+      if (options?.only && !options.only.includes(name)) continue
+
+      const outDir = path.join(process.cwd(), "app", route)
+      fs.mkdirSync(outDir, { recursive: true })
+
+      const filePath = path.join(outDir, "page.tsx");
+
+      if (fs.existsSync(filePath)) {
+        const content = fs.readFileSync(filePath, "utf-8")
+
+        if (!content.includes("AUTO-GENERATED BY BLUEPRINT")) {
+          logger.info(`Skip overridden file: ${filePath}`)
+          continue
         }
-  
-        const page = bp.pages?.[route]
-        const schema = bp.schema ?? {}
-  
-        const parsed: ParsedSchema = page?.schema ? parsePageSchema(page.schema, schema) : parseModelSchema(schema)
-  
-        const { controlBar, action } = parseFeatures(page?.features)
-  
-        let properties = `
-          fetchControl={{
-            path: "${bp.model}" 
-          }}
+      }
+
+      const schema = bp.schema ?? {}
+
+      const parsed: ParsedSchema = page?.schema ? parsePageSchema(page.schema, schema) : parseModelSchema(schema)
+
+      const { controlBar, action } = parseFeatures(page?.features)
+
+      const fetchPath = resolvePath(page, bp.controllers, bp.model)
+
+      let properties = `
+        fetchControl={{
+          path: "${fetchPath}" 
+        }}
           columnControl={${renderJS(parsed.columns, 8)}}
           formControl={{ 
             fields: ${renderJS(parsed.forms, 10)} 
@@ -333,6 +415,7 @@ export async function blueprint(options: { only?: string[] } = {}): Promise<void
           .replace(/{{ properties }}/g, properties)
   
         fs.writeFileSync(path.join(outDir, "page.tsx"), content)
+        logger.info(`Generated: ${filePath}`)
       }
     }
   }

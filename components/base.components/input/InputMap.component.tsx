@@ -29,7 +29,8 @@ export interface InputMapProps extends Omit<React.InputHTMLAttributes<HTMLInputE
   validations  ?:  ValidationRules;
 
   onChange  ?:  (value: any) => any;
-  register  ?:  (name: string, validations?: ValidationRules) => void;
+  register    ?:  (name: string, validations?: ValidationRules) => void;
+  unregister  ?:  (name: string) => void;
 
   className  ?:  string;
 }
@@ -47,6 +48,7 @@ export function InputMapComponent({
   validations,
   
   register,
+  unregister,
   onChange,
   
   className = "",
@@ -57,7 +59,7 @@ export function InputMapComponent({
   // =========================>
   // ## Invalid handler
   // =========================>
-  const inputHandler  =  useInputHandler(props.name, value, validations, register, false)
+  const inputHandler  =  useInputHandler(props.name, value, validations, register, unregister, false)
   const randomId      =  useInputRandomId()
 
 
@@ -82,7 +84,7 @@ export function InputMapComponent({
           )}
         >
           {label}
-          {validations && validation.hasRules(validations, "required") && <span className="text-danger">*</span>}
+          {validations && validation.hasRules(validations, "required") && <span className="text-danger ml-1">*</span>}
         </label>
       )}
 

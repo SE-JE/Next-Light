@@ -20,7 +20,8 @@ export interface InputTimeProps extends Omit<InputHTMLAttributes<HTMLInputElemen
   validations  ?:  ValidationRules;
 
   onChange  ?:  (value: string) => any;
-  register  ?:  (name: string, validations?: ValidationRules) => void;
+  register    ?:  (name: string, validations?: ValidationRules) => void;
+  unregister  ?:  (name: string) => void;
 
   /** Use custom class with: "label::", "tip::", "error::", "icon::". */
   className  ?:  string;
@@ -39,6 +40,7 @@ export function InputTimeComponent({
   validations,
 
   register,
+  unregister,
   onChange,
   
   className = "",
@@ -49,7 +51,7 @@ export function InputTimeComponent({
   // =========================>
   // ## Initial
   // =========================>
-  const inputHandler  =  useInputHandler(props.name, value, validations, register, false)
+  const inputHandler  =  useInputHandler(props.name, value, validations, register, unregister, false)
   const randomId      =  useInputRandomId()
   
   
@@ -73,7 +75,7 @@ export function InputTimeComponent({
           )}
         >
           {label}
-          {validations && validation.hasRules(validations, "required") && <span className="text-danger">*</span>}
+          {validations && validation.hasRules(validations, "required") && <span className="text-danger ml-1">*</span>}
         </label>
 
         {tip && (
@@ -137,7 +139,7 @@ export function InputTimeComponent({
             )}
 
             {!isSm && inputHandler.focus && (
-              <div className="absolute z-50 top-full right-0 mt-1 w-max bg-white border rounded-[6px] p-2 shadow min-w-[300]">
+              <div className="absolute z-50 top-full right-0 mt-1 w-max bg-background border rounded-[6px] p-2 shadow min-w-[300]">
                 <InputTimePickerComponent
                   onChange={(time) => {
                     inputHandler.setValue(time);
@@ -252,7 +254,7 @@ export const InputTimePickerComponent: FC<InputTimePickerProps> = ({
 
   return (
     <div className="w-full max-h-[260] flex gap-2">
-      <div className="w-1/3 overflow-y-auto bg-white rounded-[6px] input-scroll">
+      <div className="w-1/3 overflow-y-auto bg-background rounded-[6px] input-scroll">
         {timeSlots.map((time) => (
           <div
             key={time}

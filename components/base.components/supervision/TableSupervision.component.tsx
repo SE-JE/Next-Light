@@ -1,6 +1,6 @@
 "use client"
 
-import { ReactNode, useEffect, useMemo } from "react";
+import { ReactNode, Suspense, useEffect, useMemo } from "react";
 import { faQuestionCircle } from "@fortawesome/free-regular-svg-icons";
 import { faEdit, faFileExcel, faFilePdf, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { ApiType, cn, conversion, FetchControlType, shortcut, ShortcutHandler, UseResourceIdb, UseResourceProps, useResponsive, useTable } from "@utils";
@@ -54,11 +54,11 @@ export type TableSupervisionProps = {
   actionControl   ?:  boolean | (
     | 'EDIT' | 'DELETE' | {
       label           :  string,
-      modal          ?:  ModalConfirmProps,
+      modal          ?:  Omit<ModalConfirmProps, "show" | "onClose">,
       button         ?:  ButtonProps,
       shortcut       ?:  { key: string, description: string },
     } | ((
-      row              :  object,
+      row              :  Record<string, any>,
       setModal         :  (type: "EDIT" | "DELETE") => void,
       setDataSelected ?:  () => void,
       setShortcut     ?:  (key: string, handler: ShortcutHandler, description?: string) => void
@@ -388,290 +388,293 @@ export function TableSupervisionComponent({
 
   return (
     <>
-      {title && <h1 className="text-lg lg:text-xl font-bold mb-2 lg:mb-4">{title}</h1>}
+      <Suspense fallback={<div>Loading...</div>}>
+        {title && <h1 className="text-lg lg:text-xl font-bold mb-2 lg:mb-4">{title}</h1>}
+      
 
-      <TableComponent
-        id={tableKey}
-        controlBar={controlBar?.map((cb) => {
-            if (cb == "CREATE") {
-              if (isSm) return 
-              return (
-                <div className="pl-1.5 pr-3 mr-2 border-r" key="button-add">
-                  <ButtonComponent
-                    icon={faPlus}
-                    label="Tambah Data"
-                    size="sm"
-                    onClick={() => {
-                      setToggle(`MODAL_FORM_${toggleKey}`)
-                      setSelected(null)
-                    }}
-                  />
-                </div>
-              )
-            }
-
-            if (cb == "IMPORT") {
-              return (
-                <div className="px-1.5 rounded-md relative" key={"import"}>
-                  <ButtonComponent
-                    icon={faFileExcel}
-                    label="Import"
-                    variant="outline"
-                    className="!text-foreground"
-                    onClick={() => setToggle(`MODAL_IMPORT_${toggleKey}`)}
-                    size="sm"
-                  />
-                </div>
-              )
-            }
-
-            if (cb == "EXPORT") {
-              return (
-                <div className="px-1.5 rounded-md relative" key={"export-excel"}>
-                  <ButtonComponent
-                    icon={faFileExcel}
-                    label="Export"
-                    variant="outline"
-                    className="!text-foreground"
-                    onClick={() => setToggle(`MODAL_EXPORT_${toggleKey}`)}
-                    size="sm"
-                  />
-                </div>
-              )
-            }
-
-            if (cb == "PRINT") {
-              return (
-                <div className="px-1.5 rounded-md relative" key={"export-pdf"}>
-                  <ButtonComponent
-                    icon={faFilePdf}
-                    label="Cetak"
-                    variant="outline"
-                    className="!text-foreground"
-                    onClick={() => setToggle(`MODAL_PRINT_${toggleKey}`)}
-                    size="sm"
-                  />
-                </div>
-              )
-            }
-
-            return cb
-          }) || [
-          ...(!isSm ? [
-            <div className="pl-1.5 pr-3 mr-2 border-r" key="button-add">
-              <ButtonComponent
-                icon={faPlus}
-                label="Tambah Data"
-                size="sm"
-                onClick={() => {
-                  setToggle(`MODAL_FORM_${toggleKey}`)
-                  setSelected(null)
-                }}
-              />
-            </div>
-          ] : []), 
-          "SEARCH", 
-          ...(columns?.filter((c) => !!(c as { filterable?: any }).filterable)?.length ? ["FILTER"] : []),
-          ...(columns?.filter((c) => !!(c as { sortable?: any }).sortable)?.length ? ["SORT"] : []),
-          "SELECTABLE", "REFRESH",
-        ]}
-        columns={columns as TableColumnType[]}
-        data={dataTables}
-        onRowClick={onRowClick ? onRowClick : detailControl != false ? (e) => {
-          setToggle(`MODAL_SHOW_${toggleKey}`)
-          setSelected(e)
-        } : undefined}
-        actionBulking={actionBulkingControl}
-        checks={checks || []}
-        onChangeChecks={(e) => setChecks(e)}
-        block={block}
-        focus={focus}
-        noIndex={noIndex}
-        responsiveControl={responsiveControl ? {
-          mobile: responsiveControl?.mobile == true ? {
-            leftActionControl: (Array.isArray(actionControl) ? actionControl : (actionControl || actionControl == undefined) ? ['EDIT', "DELETE"] : []).includes('EDIT') ? {
-              icon: faEdit,
-              onAction: (item) => {
-                setToggle(`MODAL_FORM_${toggleKey}`);
-                item && setSelected?.(item);
+        <TableComponent
+          id={tableKey}
+          controlBar={controlBar?.map((cb) => {
+              if (cb == "CREATE") {
+                if (isSm) return 
+                return (
+                  <div className="pl-1.5 pr-3 mr-2 border-r" key="button-add">
+                    <ButtonComponent
+                      icon={faPlus}
+                      label="Tambah Data"
+                      size="sm"
+                      onClick={() => {
+                        setToggle(`MODAL_FORM_${toggleKey}`)
+                        setSelected(null)
+                      }}
+                    />
+                  </div>
+                )
               }
-            } : undefined,
-            rightActionControl: (Array.isArray(actionControl) ? actionControl : (actionControl || actionControl == undefined) ? ['EDIT', "DELETE"] : []).includes('DELETE') ? {
-              icon: faTrash,
-              onAction: (item) => {
-                setToggle(`MODAL_DELETE_${toggleKey}`);
-                item && setSelected?.(item);
+
+              if (cb == "IMPORT") {
+                return (
+                  <div className="px-1.5 rounded-md relative" key={"import"}>
+                    <ButtonComponent
+                      icon={faFileExcel}
+                      label="Import"
+                      variant="outline"
+                      className="!text-foreground"
+                      onClick={() => setToggle(`MODAL_IMPORT_${toggleKey}`)}
+                      size="sm"
+                    />
+                  </div>
+                )
               }
-            } : undefined
-          } : responsiveControl?.mobile || undefined,
-        } : undefined}
-        {...tableControl}
-      />
 
-      <IconButtonComponent
-        icon={faPlus}
-        className="fixed bottom-2 left-2 w-12 h-12 md:hidden"
-        size="lg"
-        rounded
-        onClick={() => {
-          setToggle(`MODAL_FORM_${toggleKey}`)
-          setSelected(null)
-        }}
-      />
+              if (cb == "EXPORT") {
+                return (
+                  <div className="px-1.5 rounded-md relative" key={"export-excel"}>
+                    <ButtonComponent
+                      icon={faFileExcel}
+                      label="Export"
+                      variant="outline"
+                      className="!text-foreground"
+                      onClick={() => setToggle(`MODAL_EXPORT_${toggleKey}`)}
+                      size="sm"
+                    />
+                  </div>
+                )
+              }
 
+              if (cb == "PRINT") {
+                return (
+                  <div className="px-1.5 rounded-md relative" key={"export-pdf"}>
+                    <ButtonComponent
+                      icon={faFilePdf}
+                      label="Cetak"
+                      variant="outline"
+                      className="!text-foreground"
+                      onClick={() => setToggle(`MODAL_PRINT_${toggleKey}`)}
+                      size="sm"
+                    />
+                  </div>
+                )
+              }
 
-      {isSm ? (
-        <BottomSheetComponent
-          show={!!toggle[`MODAL_SHOW_${toggleKey}`]}
-          onClose={() => setToggle(`MODAL_SHOW_${toggleKey}`, false)}
-          className="bg-white"
-          footer={renderTableAction(actionControl, undefined, {className: isSm ? "justify-end p-2 bg-background" : "justify-end", size: isSm ? "sm" : "md"})}
-          size="98vh"
-        >
-          {detailPage}
-        </BottomSheetComponent>
-      ) : (
-        <FloatingPageComponent
-          show={!!toggle[`MODAL_SHOW_${toggleKey}`]}
-          onClose={() => setToggle(`MODAL_SHOW_${toggleKey}`, false)}
-          title="Detail"
-          className="bg-white"
-          footer={renderTableAction(actionControl, undefined, {className: isSm ? "justify-end p-2 bg-background" : "justify-end", size: isSm ? "sm" : "md"})}
-        >
-          {detailPage}
-        </FloatingPageComponent>
-      )}
-
-
-      {isSm ? (
-        <BottomSheetComponent
-          show={!!toggle[`MODAL_FORM_${toggleKey}`]}
-          onClose={() => setToggle(`MODAL_FORM_${toggleKey}`, false)}
-          className={cn("bg-white", formControl?.modalControl?.className)}
-          size="98vh"
-        >
-          <div className="p-4 h-[110vh]">
-            {formPage}
-          </div>
-        </BottomSheetComponent>
-      ) : (
-        <FloatingPageComponent
-          show={!!toggle[`MODAL_FORM_${toggleKey}`]}
-          onClose={() => setToggle(`MODAL_FORM_${toggleKey}`, false)}
-          title={!!selected ? "Ubah Data" : "Tambah Data"}
-          className={cn("bg-white", formControl?.modalControl?.className)}
-        >
-          <div className="p-4">
-            {formPage}
-          </div>
-        </FloatingPageComponent>
-      )}
-
-
-      <FloatingPageComponent
-        show={!!toggle[`MODAL_EXPORT_${toggleKey}`]}
-        onClose={() => setToggle(`MODAL_EXPORT_${toggleKey}`, false)}
-        title="Export Ke Excel"
-        className="bg-white md:w-[1200px] max-w-[1200px]"
-      >
-        <ExportExcel 
-          fetchControl={fetchControl as FetchControlType} 
-          filename={"Export - " + title}
-          columnControl={columns?.map((cc) => ({
-            label: cc.label || "",
-            selector: cc.selector || "",
-          }))} 
+              return cb
+            }) || [
+            ...(!isSm ? [
+              <div className="pl-1.5 pr-3 mr-2 border-r" key="button-add">
+                <ButtonComponent
+                  icon={faPlus}
+                  label="Tambah Data"
+                  size="sm"
+                  onClick={() => {
+                    setToggle(`MODAL_FORM_${toggleKey}`)
+                    setSelected(null)
+                  }}
+                />
+              </div>
+            ] : []), 
+            "SEARCH", 
+            ...(columns?.filter((c) => !!(c as { filterable?: any }).filterable)?.length ? ["FILTER"] : []),
+            ...(columns?.filter((c) => !!(c as { sortable?: any }).sortable)?.length ? ["SORT"] : []),
+            "SELECTABLE", "REFRESH",
+          ]}
+          columns={columns as TableColumnType[]}
+          data={dataTables}
+          onRowClick={onRowClick ? onRowClick : detailControl != false ? (e) => {
+            setToggle(`MODAL_SHOW_${toggleKey}`)
+            setSelected(e)
+          } : undefined}
+          actionBulking={actionBulkingControl}
+          checks={checks || []}
+          onChangeChecks={(e) => setChecks(e)}
+          block={block}
+          focus={focus}
+          noIndex={noIndex}
+          responsiveControl={responsiveControl ? {
+            mobile: responsiveControl?.mobile == true ? {
+              leftActionControl: (Array.isArray(actionControl) ? actionControl : (actionControl || actionControl == undefined) ? ['EDIT', "DELETE"] : []).includes('EDIT') ? {
+                icon: faEdit,
+                onAction: (item) => {
+                  setToggle(`MODAL_FORM_${toggleKey}`);
+                  item && setSelected?.(item);
+                }
+              } : undefined,
+              rightActionControl: (Array.isArray(actionControl) ? actionControl : (actionControl || actionControl == undefined) ? ['EDIT', "DELETE"] : []).includes('DELETE') ? {
+                icon: faTrash,
+                onAction: (item) => {
+                  setToggle(`MODAL_DELETE_${toggleKey}`);
+                  item && setSelected?.(item);
+                }
+              } : undefined
+            } : responsiveControl?.mobile || undefined,
+          } : undefined}
+          {...tableControl}
         />
-      </FloatingPageComponent>
 
-
-      <FloatingPageComponent
-        show={!!toggle[`MODAL_IMPORT_${toggleKey}`]}
-        onClose={() => setToggle(`MODAL_IMPORT_${toggleKey}`, false)}
-        title="Import Dari Excel"
-        className="bg-white md:w-[1200px] max-w-[1200px]"
-      >
-        <ImportExcel 
-          onSubmit={() => {}}
-          columnControl={columns?.map((cc) => ({
-            label: cc.label || "",
-            selector: cc.selector || "",
-          }))} 
+        <IconButtonComponent
+          icon={faPlus}
+          className="fixed bottom-2 left-2 w-12 h-12 md:hidden"
+          size="lg"
+          rounded
+          onClick={() => {
+            setToggle(`MODAL_FORM_${toggleKey}`)
+            setSelected(null)
+          }}
         />
-      </FloatingPageComponent>
 
 
-      {/* <FloatingPageComponent
-        show={!!toggle[`MODAL_PRINT_${toggleKey}`]}
-        onClose={() => setToggle(`MODAL_PRINT_${toggleKey}`, false)}
-        title="Print PDF"
-        className="bg-white md:w-[1200px] max-w-[1200px]"
-      >
-        <PrintTable 
-          fetchControl={fetchControl} 
-          columnControl={columns?.map((cc) => ({
-            label: cc.label || "",
-            selector: cc.selector || "",
-          }))} 
-          title={"Print - " + title}
-        />
-      </FloatingPageComponent> */}
-
-
-      <ModalConfirmComponent
-        show={!!toggle[`MODAL_DELETE_${toggleKey}`]}
-        onClose={() => setToggle(`MODAL_DELETE_${toggleKey}`, false)}
-        icon={faQuestionCircle}
-        title={`Menghapus Data?`}
-        submitControl={{
-          onSubmit: {
-            ...((fetchControl as ApiType).path 
-              ? {path: `${(fetchControl as ApiType).path}/${(selected as { id: number })?.id || ""}`} 
-              : (fetchControl as ApiType).url ? {url: `${(fetchControl as ApiType).url}/${(selected as { id: number })?.id || ""}`}
-              : { idb: { ...(fetchControl as ({ idb: UseResourceIdb }))?.idb, id: (selected as { id: number })?.id || "" }}
-            ),
-            method: "DELETE",
-          },
-          onSuccess: () => {
-            reset();
-            setToggle(`MODAL_DELETE_${toggleKey}`, false);
-          },
-        }}
-      >
-        {columns?.at(0)?.selector && selected ? (
-          <p className="px-2 pb-2 text-sm text-center">Yakin menghapus <span className="font-semibold">&quot;{selected[columns?.at(0)?.selector || ""]}&quot;</span>?</p>
+        {isSm ? (
+          <BottomSheetComponent
+            show={!!toggle[`MODAL_SHOW_${toggleKey}`]}
+            onClose={() => setToggle(`MODAL_SHOW_${toggleKey}`, false)}
+            className="bg-background"
+            footer={renderTableAction(actionControl, undefined, {className: isSm ? "justify-end p-2 bg-background" : "justify-end", size: isSm ? "sm" : "md"})}
+            size="98vh"
+          >
+            {detailPage}
+          </BottomSheetComponent>
         ) : (
-          <p className="px-2 pb-2 text-sm text-center">Yakin yang dihapus sudah benar?</p>
+          <FloatingPageComponent
+            show={!!toggle[`MODAL_SHOW_${toggleKey}`]}
+            onClose={() => setToggle(`MODAL_SHOW_${toggleKey}`, false)}
+            title="Detail"
+            className="bg-background"
+            footer={renderTableAction(actionControl, undefined, {className: isSm ? "justify-end p-2 bg-background" : "justify-end", size: isSm ? "sm" : "md"})}
+          >
+            {detailPage}
+          </FloatingPageComponent>
         )}
-      </ModalConfirmComponent>
 
-      {actionControl && Array.isArray(actionControl) && actionControl.filter((ac) => typeof ac == "object")?.map((ac, acKey) => {
-        const submitControl = ac.modal?.submitControl?.onSubmit as ApiType;
-        return (
-          <ModalConfirmComponent
-            key={acKey}
-            show={!!toggle[`MODAL_${conversion.strSnake(ac.label).toUpperCase()}_${toggleKey}`]}
-            onClose={() => setToggle(`MODAL_${conversion.strSnake(ac.label).toUpperCase()}_${toggleKey}`, false)}
-            icon={ac?.modal?.icon || faQuestionCircle}
-            title={ac?.modal?.title || ac.label}
-            submitControl={{
-              onSubmit: {
-                ...(submitControl?.path 
-                  ? {path: `${submitControl?.path}/${(selected as { id: number })?.id || ""}`} 
-                  : {url: `${submitControl?.url}/${(selected as { id: number })?.id || ""}`}
-                ),
-                method: submitControl?.method || "POST",
-              },
-              onSuccess: () => {
-                reset();
-                setToggle(`MODAL_${conversion.strSnake(ac.label).toUpperCase()}_${conversion.strSnake(tableKey).toUpperCase()}`, false);
-                setSelected(null)
-                ac.modal?.submitControl?.onSuccess?.()
-              },
-            }}
-          >{ac.modal?.children}</ModalConfirmComponent>
-        )
-      })}
+
+        {isSm ? (
+          <BottomSheetComponent
+            show={!!toggle[`MODAL_FORM_${toggleKey}`]}
+            onClose={() => setToggle(`MODAL_FORM_${toggleKey}`, false)}
+            className={cn("bg-background", formControl?.modalControl?.className)}
+            size="98vh"
+          >
+            <div className="p-4 h-[110vh]">
+              {formPage}
+            </div>
+          </BottomSheetComponent>
+        ) : (
+          <FloatingPageComponent
+            show={!!toggle[`MODAL_FORM_${toggleKey}`]}
+            onClose={() => setToggle(`MODAL_FORM_${toggleKey}`, false)}
+            title={!!selected ? "Ubah Data" : "Tambah Data"}
+            className={cn("bg-background", formControl?.modalControl?.className)}
+          >
+            <div className="p-4">
+              {formPage}
+            </div>
+          </FloatingPageComponent>
+        )}
+
+
+        <FloatingPageComponent
+          show={!!toggle[`MODAL_EXPORT_${toggleKey}`]}
+          onClose={() => setToggle(`MODAL_EXPORT_${toggleKey}`, false)}
+          title="Export Ke Excel"
+          className="bg-background md:w-[1200px] max-w-[1200px]"
+        >
+          <ExportExcel 
+            fetchControl={fetchControl as FetchControlType} 
+            filename={"Export - " + title}
+            columnControl={columns?.map((cc) => ({
+              label: cc.label || "",
+              selector: cc.selector || "",
+            }))} 
+          />
+        </FloatingPageComponent>
+
+
+        <FloatingPageComponent
+          show={!!toggle[`MODAL_IMPORT_${toggleKey}`]}
+          onClose={() => setToggle(`MODAL_IMPORT_${toggleKey}`, false)}
+          title="Import Dari Excel"
+          className="bg-background md:w-[1200px] max-w-[1200px]"
+        >
+          <ImportExcel 
+            onSubmit={() => {}}
+            columnControl={columns?.map((cc) => ({
+              label: cc.label || "",
+              selector: cc.selector || "",
+            }))} 
+          />
+        </FloatingPageComponent>
+
+
+        {/* <FloatingPageComponent
+          show={!!toggle[`MODAL_PRINT_${toggleKey}`]}
+          onClose={() => setToggle(`MODAL_PRINT_${toggleKey}`, false)}
+          title="Print PDF"
+          className="bg-background md:w-[1200px] max-w-[1200px]"
+        >
+          <PrintTable 
+            fetchControl={fetchControl} 
+            columnControl={columns?.map((cc) => ({
+              label: cc.label || "",
+              selector: cc.selector || "",
+            }))} 
+            title={"Print - " + title}
+          />
+        </FloatingPageComponent> */}
+
+
+        <ModalConfirmComponent
+          show={!!toggle[`MODAL_DELETE_${toggleKey}`]}
+          onClose={() => setToggle(`MODAL_DELETE_${toggleKey}`, false)}
+          icon={faQuestionCircle}
+          title={`Menghapus Data?`}
+          submitControl={{
+            onSubmit: {
+              ...((fetchControl as ApiType).path 
+                ? {path: `${(fetchControl as ApiType).path}/${(selected as { id: number })?.id || ""}`} 
+                : (fetchControl as ApiType).url ? {url: `${(fetchControl as ApiType).url}/${(selected as { id: number })?.id || ""}`}
+                : { idb: { ...(fetchControl as ({ idb: UseResourceIdb }))?.idb, id: (selected as { id: number })?.id || "" }}
+              ),
+              method: "DELETE",
+            },
+            onSuccess: () => {
+              reset();
+              setToggle(`MODAL_DELETE_${toggleKey}`, false);
+            },
+          }}
+        >
+          {columns?.at(0)?.selector && selected ? (
+            <p className="px-2 pb-2 text-sm text-center">Yakin menghapus <span className="font-semibold">&quot;{selected[columns?.at(0)?.selector || ""]}&quot;</span>?</p>
+          ) : (
+            <p className="px-2 pb-2 text-sm text-center">Yakin yang dihapus sudah benar?</p>
+          )}
+        </ModalConfirmComponent>
+
+        {actionControl && Array.isArray(actionControl) && actionControl.filter((ac) => typeof ac == "object")?.map((ac, acKey) => {
+          const submitControl = ac.modal?.submitControl?.onSubmit as ApiType;
+          return (
+            <ModalConfirmComponent
+              key={acKey}
+              show={!!toggle[`MODAL_${conversion.strSnake(ac.label).toUpperCase()}_${toggleKey}`]}
+              onClose={() => setToggle(`MODAL_${conversion.strSnake(ac.label).toUpperCase()}_${toggleKey}`, false)}
+              icon={ac?.modal?.icon || faQuestionCircle}
+              title={ac?.modal?.title || ac.label}
+              submitControl={{
+                onSubmit: {
+                  ...(submitControl?.path 
+                    ? {path: `${submitControl?.path}/${(selected as { id: number })?.id || ""}`} 
+                    : {url: `${submitControl?.url}/${(selected as { id: number })?.id || ""}`}
+                  ),
+                  method: submitControl?.method || "POST",
+                },
+                onSuccess: () => {
+                  reset();
+                  setToggle(`MODAL_${conversion.strSnake(ac.label).toUpperCase()}_${conversion.strSnake(tableKey).toUpperCase()}`, false);
+                  setSelected(null)
+                  ac.modal?.submitControl?.onSuccess?.()
+                },
+              }}
+            >{ac.modal?.children}</ModalConfirmComponent>
+          )
+        })}
+      </Suspense>
     </>
   );
 }

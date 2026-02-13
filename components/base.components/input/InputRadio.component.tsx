@@ -28,7 +28,8 @@ export type InputRadioProps = {
   validations          ?:  ValidationRules;
 
   onChange  ?:  (value: string | number) => any;
-  register  ?:  (name: string, validations?: ValidationRules) => void;
+  register    ?:  (name: string, validations?: ValidationRules) => void;
+  unregister  ?:  (name: string) => void;
 
   /** Use custom class with: "label::", "tip::", "error::", "icon::", "suggest::", "suggest-item::". */
   className            ?: string;
@@ -55,6 +56,7 @@ export function InputRadioComponent({
 
   onChange,
   register,
+  unregister,
 
   className = "",
   classNameCheckbox = "",
@@ -66,7 +68,7 @@ export function InputRadioComponent({
   // =========================>
   // ## Initial
   // =========================>
-  const inputHandler  =  useInputHandler(name, value, validations, register, false)
+  const inputHandler  =  useInputHandler(name, value, validations, register, unregister, false)
 
 
   // =========================>
@@ -112,7 +114,7 @@ export function InputRadioComponent({
           )}
         >
           {label}
-          {validations && validation.hasRules(validations, "required") && <span className="text-danger">*</span>}
+          {validations && validation.hasRules(validations, "required") && <span className="text-danger ml-1">*</span>}
         </label>
 
         {tip && (
